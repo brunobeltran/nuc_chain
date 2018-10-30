@@ -178,14 +178,18 @@ In an attempt to explain these measurements, recent simulation results have sugg
     nucleosome positioning might have unexpected effects on the structure of the
     fiber. [Tamar Schlick heterogeneity papers] However, these detailed models are computationally intractable to scale beyond a few kilobases.
 
-Due to this lack of consensus on the effects nucleosomes play on the
+Due to this lack of theoretical guidance on the effects nucleosomes play on the
     chromatin fiber \textit{in vivo}, it has become the \textit{de facto}
     standard to simply treat the chromatin fiber as if it were bare DNA for
     the purposes of coarse-grained simulations of the nucleus [Mirny, us,
-    others]. Other  analytical models of DNA have focused on local deformations
-    of DNA due to kinking or melting. Although these contributions highlight the
-    importance of DNA's thermomechanical properties, they ignore the geometrical features that arise from heterogenous binding
-    of histones to DNA.
+    others].
+%i'm not saying we should take this out, but i don't know what the point is
+% you're tryign to make ehre, so maybe we should chat about it?
+% Other  analytical models of DNA have focused on local deformations
+    % of DNA due to kinking or melting.
+% Although these contributions highlight the
+    % importance of DNA's thermomechanical properties, they ignore the geometrical features that arise from heterogenous binding
+    % of histones to DNA.
 
 In this paper, we present an exact analytical treatment of a wormlike chain
     with aperiodic defects, and use it to investigate the effects of nucleosomes
@@ -197,12 +201,29 @@ Furthermore, we show that aperiodic defects due to binding of nucleosomes---or, 
     practice, any protein that binds DNA---can change the
     propensity of two genomic loci encountering each other by up to six
     orders of magnitude.
-%Finally, we provide guidance for constructing coarse-grained models of chromatin
+%TODO, you had commented out only half of this sentence, did you just want to
+    %delete it?
+Finally, we provide guidance for constructing coarse-grained models of chromatin
     that account for the important effects of nucleosome heterogeneity
     \textit{in vivo}.
 
+Because none of our results depend on the particular properties of DNA or
+    nucleosomes, we expect that our analytical approach will be broadly
+    applicable a broad class of heterogenous polymers.
 
-% \section{\label{sec:intro}Model}
+For example, block or random copolymers tend to be kinked at the junction
+    between blocks, and we predict that this would cause a previously unexpected
+    decrease in their Kuhn length.
+% here's the closest thing I can say to Levy flights
+Our work may also find application in models of driven gaussian processes,
+    whenever driving events take place aperiodically.
+%% I'd be stoked to mention conductive polymers, but not super clear on
+%applications to random copolymers and conductive polymers, as well as models of complex
+%% ah this is definitely not true, levy flights are just brownian motion with
+%% heavy tailed step size distribution
+%such as Levy flights
+
+% \section{\label{sec:model}Model}
 
 We follow the approach described in [Lena].
 
@@ -261,10 +282,6 @@ We follow the approach described in [Lena].
 % explore how realistic variability in nucleosome spacing affects the ability of chromatin to form
 % loops, which is vital to transcriptional regulation.
 
-More generally, our approach allows for calculating the statistical behavior of
-any semiflexible polymer with heterogenous kinks. As a result, our work has broad
-applications to random copolymers and conductive polymers, as well as models of complex
-diffusion, in which events take place aperiodically, such as Levy flights.
 
 
 % % State of the art models for describing the statistical mechanics of the
@@ -329,7 +346,7 @@ diffusion, in which events take place aperiodically, such as Levy flights.
     ($\Omega_\text{exit}$) orientations of the DNA from the nucleosome. Let
     ($\Omega_\text{nuc}(\theta, \phi)  =
     \Omega_\text{entry}^{-1}\Omega_\text{exit}$). The crystal structure of the
-    nucleosome dictates the spherical angle $\theta$. 
+    nucleosome dictates the spherical angle $\theta$.
     (b) The DNA double helix has an intrinsic twist density
     $\tau=\SI{10.5}{basepair}$. At zero
     temperature, if we anchor the location of one nucleosome, the binding
@@ -400,7 +417,7 @@ diffusion, in which events take place aperiodically, such as Levy flights.
     heterogenous chain tends towards a Gaussian chain with a shorter
     effective Kuhn length, individual configurations retain memory of rigid kinks
     at intermediate length scales, as indicated by residual peaks in the looping
-    probability.} 
+    probability.}
 \end{figure}
 
 \section{PRL Guidelines}
