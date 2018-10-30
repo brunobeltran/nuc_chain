@@ -1,0 +1,213 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx,array,framed,xcolor}
+
+\begin{document}
+\newcommand{\supi}[1]{#1^{\,(i)}}
+\newcommand{\supim}[1]{#1^{\,(i-1)}}
+\newcommand{\pij}[1]{#1_j^{\,(i)}}
+\newcommand{\pijm}[1]{#1_j^{\,(i-1)}}
+\newcommand{\pvec}[0]{\vec{p}}
+\newcommand{\uvec}[0]{\vec{u}}
+\newcommand{\link}[0]{{L_0}^{(i)}}
+\newcommand{\spherharm}{\sum_{\lambda, \mu}Y_{\lambda}^{\mu}(\vec{u})Y_{\lambda}^{\mu}(\vec{u_0})}
+\newcommand{\elb}[0]{e^{(-\lambda(\lambda+1)+\epsilon_b\beta)}}
+\newcommand{\elbex}[1]{e^{#1(-\lambda(\lambda+1)+\epsilon_b\beta)}}
+%macro for Wigner D; usage: \wigD{l}{m}{j}
+\newcommand{\wigD}[3]{{\mathcal{D}}^{#2#3}_{#1}}
+\newcommand{\wigDexpand}[1]{\sum_{l=0}^{\infty}\sum_{m,j=-l}^{l}#1\wigD{l}{m}{j}(\Omega)\wigD{l}{m}{j*}(\Omega_0)}
+\newcommand{\wigDexpandshort}[1]{\sum_{lmj}\sum_{l_0m_0j_0}#1\wigD{l}{m}{j}(\Omega)\wigD{l_0}{m_0}{j_0*}(\Omega_0)}
+%macro for single spherical harmonic; usage: \sharm{l}{m}
+\newcommand{\sharm}[2]{Y_{#1}^{#2}}
+%macro for chain-orientation greens function
+\newcommand{\greens}[0]{G_0(\Omega | \Omega_0; L)}
+\newcommand{\greensR}[0]{G(\vec{R}, \Omega | \Omega_0; L)}
+\newcommand{\greensk}[0]{G(\vec{k}, \Omega | \Omega_0; L)}
+%eigenvalues and coefficients
+\newcommand{\lamlj}[0]{\frac{1}{2l_p}l(l+1) + \frac{1}{2}(\frac{1}{l_t} - \frac{1}{l_p})j^2 + i\tau j}
+\newcommand{\gcoeff}[1]{g_{#1,l_0}^{j}}
+
+
+\begin{flushleft}
+% \begin{section}{Nucleosome Breathing Toy Model}
+% \begin{equation*}
+% H(i, r, x_0, y_0, z_0, \psi_0, T, c, \phi, \theta, b=146) =
+% \begin{bmatrix} 1-\sin^2\theta(1-\cos\theta)\cos^2\phi & -\sin\theta^2(1-\cos\theta)\sin\phi\cos\phi & \sin^2\theta\cos\phi \\ \Phi_{21} & \Phi_{22} & \Phi_{23} \end{bmatrix}
+% \end{equation*}
+
+% \begin{equation*}
+% \supi{\pvec} = R_N\supim{\pvec}Z_{\phi_{l}}
+% \end{equation*}
+
+% \begin{equation*}
+% G(\uvec | \uvec_0) = \sum_{N=\link}^{\link+146} \spherharm e^{-\lambda(\lambda+1)N} P(N)
+% \end{equation*}
+
+% Note: This equation is wrong because it does not multiply the thermodynamic factor $(n_b + 1)$ on the numerator, so all formulas hereafter are likely wrong...
+% \begin{equation*}
+% P(N) = \frac{e^{-(147-N+\link)\epsilon_b\beta}}{\sum_{n_b=1}^{147} e^{-n_b\epsilon_b\beta}(n_b + 1)}
+% \end{equation*}
+
+% \begin{equation*}
+% G(\uvec | \uvec_0) = \frac{e^{-\epsilon_b\beta(147+\link)}\spherharm  \elbex{\link}(1 - \elbex{147})}{1 - \elb}
+% \end{equation*}
+
+% $\link$ = length of $i^{th}$ linker \\
+
+% $n_b$ = number of basepairs bound to nucleosome\\
+
+% $\epsilon_b$ = binding energy \\
+% \end{section}
+% \pagebreak
+\begin{section}{Wigner D notation}
+For our purposes, the Wigner D functions represent rotations AND normalized probability distribution functions. As a result, we need the following scaling factor:
+
+\begin{equation*}
+{\mathcal{D}}^{mj}_{l} = \sqrt{\frac{2l+1}{8\pi^2}}D^{mj}_{l}
+\end{equation*}
+
+Here, ${\mathcal{D}}^{mj}_{l}$ refers to Andy's renormalized Wigner D's, and $D^{mj}_{l}$ refers to the standard wigner D functions found in the sympy docs and on Wikipedia.\\
+\vspace{\baselineskip}
+This results in the following orthonormality condition:
+    \begin{equation*}
+    \int_0^{2\pi}\int_0^{2\pi}\int_0^{\pi}{\mathcal{D}}^{mj*}_{l}(\alpha,\beta,\gamma)
+    {\mathcal{D}}^{m_0j_0}_{l_0}(\alpha,\beta,\gamma) d\alpha \sin\beta d\beta d\gamma =
+    \delta_{m,m_0}\delta_{j,j_0}\delta_{l,l_0}
+    \end{equation*}\\
+\vspace{\baselineskip}
+Note that this also implies we can interpret our redefined Wigner D functions as a normalized probability distribution:
+	\begin{equation*}
+    \int_0^{2\pi}\int_0^{2\pi}\int_0^{\pi}{\mathcal{D}}^{00}_{0}(\alpha,\beta,\gamma) d\alpha \sin\beta d\beta d\gamma = \sqrt{8\pi^2}
+    \end{equation*}
+This scaling factor also ensures that Andy's wigner D functions satisfy the following ladder operation condition:
+
+    \begin{equation*}
+    \cos{\theta}{\mathcal{D}}^{mj}_{l} = \alpha^{mj}_{l}{\mathcal{D}}^{mj}_{l-1} +
+    \beta^{mj}_{l}{\mathcal{D}}^{mj}_{l} + \alpha^{mj}_{l+1}{\mathcal{D}}^{mj}_{l+1}
+    \end{equation*}
+
+where $\alpha^{mj}_{l}=\sqrt{\frac{(l-m)(l+m)(l-j)(l+j)}{l^2(4l^2-1)}}$ and $\beta^{mj}_{l}=\frac{mj}{l(l+1)}$ are derived from the Clebsch-Gordon coefficients.\\
+\vspace{\baselineskip}
+
+To combine two successive Wigner D rotations together ($\Omega_1$ followed by
+$\Omega_2$),
+
+    \begin{equation*}
+    \sqrt{\frac{2l+1}{8\pi^2}}{\mathcal{D}}^{mj}_{l}(\Omega_2\Omega_1) = \sum_{\mu}{\mathcal{D}}^{m\mu}_{l}(\Omega_1){\mathcal{D}}^{\mu j}_{l}(\Omega_2)
+    \end{equation*}
+
+The connection between Wigner D's and Spherical Harmonics are as follows ($j=0$):
+
+    \begin{equation*}
+    \sqrt{2\pi}\wigD{l}{m}{0}(\alpha, \beta, \gamma) = \sharm{l}{m*}(\beta, \alpha)
+    \end{equation*}
+
+Now we turn back to the interpretation of a Wigner D as a probability distribution function. Let's say we have some discrete distribution $\sum_{i}p_i{\mathcal{D}}^{mj}_{l}(\Omega_i)$, which amounts to a weighted average of Wigner D's. Then the pdf as a function of $\Omega$ can be represented as
+
+    \begin{equation*}
+    p(\Omega) = \sum_{l,m,j}{\mathcal{D}}^{mj}_{l}(\Omega)(\sum_{i}p_i{\mathcal{D}}^{mj}_{l}(\Omega_i)^*
+    \end{equation*}
+
+\end{section}
+\pagebreak
+
+\begin{section}{Derivation of Green's Function for Kinked WLC}
+We model each linker in a chain of nucleosomes as a polymer strand whose conformation is given by the space curve $\vec{r(s)}$. The orientation of the polymer at each point along $\vec{r(s)}$ is represented by the orthonormal triad $\vec{t_i(s)}$ for $i = (1, 2, 3)$, where $\vec{t_3}$ is aligned with the tangent vector along the strand ($\vec{t_3}=\partial_s\vec{r(s)}$) and $\vec{t_1}$ and $\vec{t_2}$ are the material normals which live in the cotangent plane. We will denote this triad as $\Omega(s)$, which is equivalently a rotation matrix specified by the Euler angles $\Omega(\alpha, \beta, \gamma)$. Define the strain vector $\vec{\omega_i}$ such that $\partial_s\vec{t_i} = \vec{\omega_i}\times\vec{t_i}$.
+
+\vspace{\baselineskip}
+The molecular architecture of DNA results in a strand that opposes bending and twisting deformations. The simplest model that captures these effects is the worm-like-chain (WLC) model. The elastic deformation energy of a WLC with twist is quadratic in strain away from a straight chain with constant twist:
+
+\begin{equation}\label{eq1}
+  \beta \mathcal{E} = \frac{l_p}{2}\int_{0}^{L}ds~(\omega_1^2 + \omega_2^2)+\frac{l_t}{2}\int_{0}^{L}ds~(\omega_3- \tau)^2,
+\end{equation}
+
+where $l_p$ is the bend persistence length ($\sim$50 nm for DNA), $l_t$ is the twist persistence length ($\sim$100 nm for DNA), and $\tau$ is the natural twist density ($2\pi/10.17$ bp per turn of DNA). The polymer is also subject to the inextensibility constraint $|\partial_s\vec{r(s)}|=1$ for all $s$.\\
+\vspace{\baselineskip}
+The statistical behavior of the polymer strand is obtained by summing over all possible conformations and assigning each a Boltzmann weighting. Formally, the chain-orientation green's function is the conditional probability that a polymer of chain length $L$ will have fixed end orientation $\Omega(s=L)$ and initial orientation $\Omega(s=0)$. In the absence of end-position constraint, the Green's function is given by
+
+\begin{equation}\label{eq2}
+\greens = \int_{\Omega(s=0)}^{\Omega(s=L)}\mathcal{D}\Omega(s)\exp{ [-\beta \mathcal{E}]} = \int_{\Omega(s=0)}^{\Omega(s=L)}\mathcal{D}\Omega(s)\exp{ [i\int_0^Lds~\mathcal{L}(\Omega(s)]}.
+\end{equation}
+
+where the Lagrangian density $\mathcal{L} = il_p(\omega_1^2 + \omega_2^2)/2+il_t(\omega_3- \tau)^2/2$. This path integral formulation implies a governing diffusion or ``Schrödinger" equation of the form ${\frac{\partial G_0}{\partial L} =\mathcal{H}_0 G_0}$,
+%where ${\mathcal{H}_0=\frac{1}{2l_p}\Delta_{\Omega}^2 + \frac{1}{2}(\frac{1}{l_t} - \frac{1}{l_p})\frac{\partial^2}{\partial\gamma^2} + i\tau j}$.
+which can be solved explicitly using an eigenfunction expansion in terms of the Wigner functions $\wigD{l}{m}{j}(\Omega)$:
+
+\begin{equation}\label{eq3}
+\greens = \wigDexpand{}~\exp{(-\lambda_l^jL)},
+\end{equation}
+
+where ${\lambda_l^j = \lamlj}$. We now turn to the full end-to-end distribution function $\greensR$, which gives the probability that a chain of length L that begins at the origin with fixed initial orientation $\Omega_0$ will end at position $\vec{R}$ with fixed end orientation $\Omega$. This amounts to restricting the solution in equation \ref{eq2} to chains that end at position $\vec{R}$:
+
+\begin{equation}\label{eq4}
+\greensR = \int_{\Omega(s=0)}^{\Omega(s=L)}\mathcal{D}\Omega(s)\exp{ [-\beta \mathcal{E}]}~\delta(\vec{R}-\int_0^L~\vec{t_3}ds),
+\end{equation}
+
+where $\delta$ is the Kronecker delta function. Upon Fourier transforming the position vector $\vec{R}$ to the wave vector $\vec{k}$ in equation \ref{eq4}, our problem becomes that of a WLC with Hamiltonian
+${\beta\mathcal{H} = \beta(\mathcal{H}_0 + \mathcal{H}_{ext}) = \beta(\mathcal{H}_0 + i\vec{k}\cdot\vec{t_3})}$. Since the original Hamiltonian is invariant to an arbitrary rotation in the lab frame, we choose $\vec{k}$ to point in the $\hat{z}$ direction, such that $\mathcal{H}_{ext}=k\hat{z}\cdot\vec{t_3}=k\cos\theta$. To obtain the full Green's function, we expand in the original basis of the Wigner D functions
+
+\begin{equation}\label{eq5}
+\greensk = \wigDexpandshort{g_{l_0m_0j_0}^{lmj}},
+\end{equation}
+
+To obtain the coefficients $g_{l_0m_0j_0}^{lmj}$, we utilize the property
+
+ \begin{equation}\label{eq6}
+    \cos{\theta}{\mathcal{D}}^{mj}_{l} = \alpha^{mj}_{l}{\mathcal{D}}^{mj}_{l-1} +
+    \beta^{mj}_{l}{\mathcal{D}}^{mj}_{l} + \alpha^{mj}_{l+1}{\mathcal{D}}^{mj}_{l+1},
+    \end{equation}
+
+where $\alpha^{mj}_{l}=\sqrt{\frac{(l-m)(l+m)(l-j)(l+j)}{l^2(4l^2-1)}}$ and $\beta^{mj}_{l}=\frac{mj}{l(l+1)}$ are derived from the Clebsch-Gordon coefficients. Notice that $\cos\theta$ acts as a ladder operator which raises or lowers the $l$ index of the Wigner D function; $m$ and $j$ are unperturbed, meaning $m=m_0$ and $j=j_0$. To simplify calculations, we consider the case where $m=0$. Since $\beta^{0j}_{l}=0$, solving the ``Schrödinger'' equation amounts to solving the following tridiagonal ordinary differential equation:
+
+ \begin{equation}\label{eq7}
+\frac{\partial \gcoeff{l}}{\partial L} = -\lambda_l^j\gcoeff{l} + ik\alpha_{l}^{j}\gcoeff{l-1} + ik\alpha_{l+1}^{j}\gcoeff{l+1}
+ \end{equation}.
+
+
+Solving equation \ref{eq7} results in the Green's function in Fourier space for a WLC with twist, which models a single DNA linker in our nucleosome chain. To obtain the full propagator, we must include the entry-to-exit rotation of the DNA strand due to the nucleosome, $\Omega_{nuc}$, at the end of a linker of fixed length L.
+%insert schematic here showing kink rotation
+The angles $\alpha, \beta, \gamma$ defining $\Omega_{kink}$ are extracted from the crystal structure of a nucleosome, and change as a function of DNA unwrapping. Since $\Omega = \Omega_{nuc}^{-1}\cdot\Omega_f$, we can rewrite equation \ref{eq5} using the Wigner D for two successive rotations:
+
+\begin{equation}\label{eq8}
+\greensk = {\sum_{l_fj_f}\sum_{l_0j_0}B_{l_0,j_0}^{l_f,j_f}\wigD{l_f}{0}{j_f}(\Omega_f)\wigD{l_0}{0}{j_0*}(\Omega_0)},
+\end{equation}
+
+where $B_{l_0,j_0}^{l_f,j_f} = \sqrt{\frac{8\pi^2}{2l_f+1}}\wigD{l_f}{j_f}{j_0}(-\gamma,-\beta,-\alpha)g_{l_f,l_0}^{j_0}$. Thus, each monomer in the nucleosome chain is uniquely defined by the length of the linker, L, and the rotation due to the nucleosome $\Omega_{nuc}$.\\
+\vspace{\baselineskip}
+To compose multiple monomers in a chain, we utilize the composition property of Green's functions. In Fourier space, the spatial convolution of two Green's function is just a product:
+
+\begin{equation}\label{conv}
+G(\vec{k}, \Omega_2 | \Omega_0; L_2+L_1) = G(\vec{k}, \Omega_2 | \Omega_1; L_2)G(\vec{k}, \Omega_1 | \Omega_0; L_1)
+\end{equation}
+
+%something here about how to grow a chain of successive monomers
+
+\begin{subsection}{Kuhn Length Calculation}
+The kuhn length is the single parameter that relates the length of a polymer to its average end-to-end distance. For a WLC, the kuhn length is $b=2l_p$. For our kinked polymer, we utilize the standard definition $b=\langle{R^2}\rangle/R_{max}$, where $R_{max}$ is the maximum length the polymer can be if all the linkers were perfectly straight (cumulative length of linker DNA). The $m^{th}$ moment of the z component of $R$ is given by
+\begin{equation}\label{eq9}
+\lim_{k\to0} \frac{\partial^m B_{00}^{00}}{\partial|k|^m}=(i)^m\langle{R_z^m}\rangle.
+\end{equation}
+
+The only k-dependence in $B_{00}^{00}$ is in the linker propagator $g_{00}^{0}$, so to calculate $\langle{R^2}\rangle$, we take derivatives with respect to k of equation \ref{eq7}. This can be done efficiently using Laplace transforms.
+\end{subsection}
+
+\begin{subsection}{Real Space Green's Function}
+To compute the real space green's function, we utilize the inverse Fourier transform in three dimensions:
+
+\begin{equation}\label{eq10}
+\begin{aligned}
+\greensR &= \frac{1}{(2\pi)^3}\int_0^\infty d\vec{k}~\greensk \exp{(-i\vec{k}\cdot\vec{R})}\\
+G(\vec{R};L) &= \frac{1}{(2\pi)^3}\int_0^\infty d\vec{k}~G(\vec{k};L) \exp{(-i\vec{k}\cdot\vec{R})}\\
+&= \frac{1}{2\pi^2}\int_0^\infty dk~k^2 j_0(kR) B_{00}^{00}(k;L)\\
+P_{loop} &= G(\vec{R}=0; L)
+\end{aligned}
+\end{equation}
+
+\end{subsection}
+
+\end{section}
+
+\end{flushleft}
+\end{document}
+
