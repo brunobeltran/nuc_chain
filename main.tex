@@ -30,7 +30,7 @@ showpacs,preprintnumbers,
 \usepackage{hyperref}% add hypertext capabilities
 \usepackage[mathlines]{lineno}% Enable numbering of text and display math
 \usepackage{mathtools}
-% \linenumbers\relax % Commence numbering lines
+% \linenumbers\relax % Commence numbering lines %WARNING: not work with subfig!
 
 %\usepackage[showframe,%Uncomment any one of the following lines to test
 %%scale=0.7, marginratio={1:1, 2:3}, ignoreall,% default settings
@@ -473,6 +473,21 @@ Thus, while the exact statistics of \textit{in vivo} linker lengths remain to be
     a reference point to show the effect of linker heterogeneity on the
     statistical mechanics of the chromatin fiber.
 
+In analogy to the case of homogenous chains, we find that the zero temperature
+    structure provides good intuition for the behavior of the chromatin chain
+    when thermal fluctuations are added.
+At zero temperature, a chain with random linker lengths is going to have a
+    structure determined purely by the interactions between the nucleosome geometry
+    and the DNA's intrinsic twist.
+In our model, the angle $\theta$ in Figure~\ref{fig:entry-exit} is fixed by the
+    nucleosome geometry, but the angle $\phi$ in Figure~\ref{fig:linker-effect}
+    is determined by linker length.
+As the heterogeneity in linker length increases, this means that the
+    zero temperature heterogenous chain will interpolate between a rigid helix
+    (in the case of zero linker length variability) and a modified freely
+    rotating chain (in the case when linker variability is high enough to make
+    the distribution of $\phi$ approximately uniform over $[0, 2\pi]$).
+
 \begin{figure}[t]
     \centering
     \subfloat[]{\label{fig:exp-kuhns}
@@ -497,23 +512,62 @@ Thus, while the exact statistics of \textit{in vivo} linker lengths remain to be
     flexibility.}%\label{fig:het-kuhn}
 \end{figure}
 
+As expected, for short linker lengths, $<\SI{20}{\basepair}$, the
+    zero-temperature, ``geometric'' model predicts the Kuhn length of the chain
+    extremely well (Figure~\ref{fig:exp-kuhns}).
+As the average linker length
+    increases, the geometric picture becomes increasingly processive since each
+    linker is still a rigid rod.
+On the other hand, the fluctuating chain's Kuhn length stays markedly below the
+    \SI{100}{\nano\metre} Kuhn length of the underlying DNA backbone.
+While the Kuhn length approaches \SI{100}{\nano\metre} as the linker length
+    increases to infinity, this approach is power-law slow (difference shrinks
+    as inverse of the linker lengths, see Supplemental Figure XX).
+In fact, for realistic linker lengths, the effect is at least a factor of 2.
 
-% THOUGHTS ON LOOPING
-% Looping probabilities
-% * Order of magnitude differences in variance at short length scales
-% * Peak is at biological length scales (1 kB) —— moving nucleosomes around has a
-% much bigger effect than elasticity of DNA
-% * Everyone uses Rouse polymer at long length scales, but we’re showing that
-% things aren’t Gaussian for a while…..
-%     * Memory of kinks stays longer than in worm like chain
-%     * Biophysics community has been trying to explain peaks in looping
-%     probability at short chain lengths (J factor stuff) — can we explain this
-%     with kinking and heterogeneity?
+While exponentially-distributed linker lengths seem like the most natural
+    baseline to take, it is equally natural to ask how much variability in the
+    nucleosome spacing is needed to create this effect.
+While the answer varies depending on the mean linker length to some degree (see
+    Supplemental Figure XX for more examples), we show in
+    Figure~\ref{fig:box-kuhns} that as little as one base pair of variability
+%TODO this statement is almost certainly too strong
+    can lead to the chromatin fiber's structure being governed by the
+    nucleosome's geometrical properties.
+
+\subsection{\label{sec:looping}Effects of Nucleosome Spacing on Chromatin
+Looping}
+
+Chromatin looping is central to biological processes from transcriptional
+    control (e.g.\ via promoter-enhancer search) to DNA damage repair (e.g.\ via
+    homologous recombination).
+In Figure~\ref{fig:looping}, we evaluate our Green's function at $\vec{R} = 0$
+    for an ensemble of chains with linker lengths drawn from an exponential
+    distribution with mean \SI{54}{\basepair} (using a uniform distribution
+    yields similar results, see Supplemental Figure XX).
+This quantity quantifies the propensity for two loci on the same chromosome to
+    come into contact with each other as a function of their genomic separation.
+As expected, the large length scale behavior matches the Gaussian chain scaling
+    of $L^{-3/2}$, with the Kuhn length predicted by our earlier analysis.
+In comparison to bare DNA, we find that the looping propensity increases
+    drastically along the entire chain, as expected due to intra-superhelical
+    contacts induced by the nucleosomes' geometry, as well as due to the
+    increased elasticity predicted by the model.
+More striking than the increase in the looping propensity is the nearly four
+    orders of magnitude over which specific rearrangement of nucleosomes can
+    modulate the ability of two loci to loop together.
+Even at long length scales, where the chain is approximately Gaussian, it is
+    possible to increase or decrease the rate of looping by over an order of
+    magnitude.
+This has profound implications for the ability of chromatin remodelers to act in
+    way that can bring together or keep apart related chromosomal loci based on
+    the epigenetic environment.
+
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.95\linewidth]{./figures/fig-5a-exp-looping.png}
     %\includegraphics[width=0.35\linewidth]{./figures/fig-5b-looping-features.png}
-    \caption{(a) Each purple line designates an individual chain configuration
+    \caption{Each purple line designates an individual chain configuration
     with uniformly random linker lengths between 31 and \SI{51}{\basepair}, with
     the black line representing the average over individual chains. Thus, modulating nucleosome positions can allow the cell to change
     the probability of inter-nucleosomal contacts by up to 6 orders of
@@ -522,8 +576,81 @@ Thus, while the exact statistics of \textit{in vivo} linker lengths remain to be
     heterogenous chain tends towards a Gaussian chain with a shorter
     effective Kuhn length, individual configurations retain memory of rigid kinks
     at intermediate length scales, as indicated by residual peaks in the looping
-    probability.}
+    probability.}\label{fig:looping}
 \end{figure}
+
+Like the Kuhn length, our looping function is largely determined by the
+    geometrical properties of the underlying zero-temperature chain.
+In Figure~\ref{fig:looping}, two examples of homogenous chains with extremely
+    compact or extremely linear geometries are provided to show this.
+This suggests that \textit{in vivo}, looping propensity might be largely
+    determined by geometrical considerations, at least much more than it is
+    determined by the thermal fluctuations in the chromatin fiber.
+
+We notice that the size scale at which this is most true, around
+    \SI{1}{\kilo\basepair}, is concommitant with the sizes of loops that must
+    %TODO honestly i'm out of brain juice to word this carefully
+    often form to construct the transcription initiation complex.
+This suggests that the aforementioned phasing of nucleosomes near promoters
+    might play a causal role in transcription initiation or repression, and not
+    just be a side effect of steric exclusion.
+
+Finally, we note that even though the polymer rapidly approaches the Gaussian
+    scaling of $L^\alpha$ where $\alpha \approx -3/2$, the chain is slightly
+    non-Gaussian (i.e.\ $\alpha \gtrapprox -3/2$) for size scales even
+    approaching that of a full chromosome.
+This means that even large-scale, coarse-grained models of chromatin are likely
+    to fall short if they rely on Rouse (or WLC) looping probabilities.
+This is especially relevant to modeling epigenetic spreading, which requires
+    understanding the propensity nucleosomes at various distances have to loop with
+    each other.
+
+\section{Discussion}
+
+We present a simplified model of the chromatin fiber that retains only the most
+    basic geometrical and physical properties of a chain of nucleosomes
+    connected by bare linker DNA.\@
+By taking a fully analytical approach, we are able to outline the effects of
+    linker length and its heterogeneity on the structure of the chromatin fiber.
+Our model excludes various important facets of chromatin's structure.
+Most strikingly, we ignore the steric interactions between nucleosomes that is
+    well known~\cite{widom1992} to constrain the space of possible linker
+    lengths.
+In addition, our model ignores the finite size of the nucleosome, treating it as
+    a point-like kink in the DNA backbone.
+
+While these choices constrain the ability of our model to make predictions that
+    can be tested \textit{in vivo}, our bottom-up approach allows us to
+    formalize both new and existing intuition for how linker length affects the
+    structure of the chromatin fiber in a unified framework.
+% We hope that our framework will facilitate future analytical work that takes
+%     these details, and many more, into account.
+We expect that our central conclusions---that nucleosomes can modulate
+    chromatin's elasticity and facilitate or prevent looping between distal loci
+    through their positioning---will only gain nuance as these details are added
+    to future analytical works.
+
+While the quantitative values may yet change, we suspect that our estimate of
+    chromatin's Kuhn length and looping probabilities will already provide
+    guidance to future work relying on coarse-grained models of chromatin.
+In particular we show that the common practice~\cite{macpherson2018,nuebler2018}
+    of using a Kuhn length of \SI{100}{\nano\metre}, simply because that is the
+    Kuhn length of bare DNA, will likely lead to at least a four-fold
+    overestimation of the polymer's stiffness.
+In large-scale models of chromatin organization, this could mean the difference
+    between heterochromatin and euchromatin segregation recapitulating
+    \textit{in vivo} observations, and the chromosomes instead being uniformly
+    distributed throughout the nucleus.
+
+Finally, while our model has been designed specifically to address chromatin
+    structure, we suspect that the intuition gained here will also apply more
+    broadly to block copolymers in solution.
+Typical block copolymers have a dihedral ``kink'' at the junctions between
+    blocks, and our framework could easily be applied to any particular
+    copolymer of interest to relate the elasticity and circularization
+    propensity of the polymer to the the block size, analagously to linker
+    length.
+
 
 \section{PRL Guidelines}
 
