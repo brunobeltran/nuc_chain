@@ -363,6 +363,22 @@ Finally, to calculate the probability of two loci looping, we simply evaluate
 We note that this corresponds to a modified $J$ factor with no orientational
     component.
 
+\begin{figure*}[th]
+    \centering
+    \includegraphics[width=0.15\textwidth]{./figures/fig-2b-mc-example.png}
+    \includegraphics[width=0.325\textwidth]{./figures/fig-2a-kuhn-all.png}
+    \includegraphics[width=0.5\textwidth]{./figures/fig-2c-kuhn-zoom.png}
+    \caption{(a) The Kuhn lengths of homogenous chains are
+    \SI{10.5}{\basepair} periodic
+    in linker length, with each linker length representing a distinct,
+    discretized helical
+    WLC\@. In the limit of long linkers, the kuhn length eventually approaches that of bare DNA,
+    \SI{100}{\nano\metre}. (b) Zero-temperature structure vs. Monte Carlo simulation
+    snapshot of nucleosome chain with \SI{38}{\basepair} linkers. (c) Compact, superhelical structures afford more
+    flexibility than non-compact fibres, which have higher Kuhn lengths. Thus,
+    the overall structure of chromatin is extremely sensitive to changes in the
+    nucleosome repeat length.}\label{fig:homo-kuhn}
+\end{figure*}
 
 \section{\label{sec:model}Results}
 \subsection{\label{sec:homo-kuhn}Homogenous Nucleosome Spacing}
@@ -381,31 +397,6 @@ Because the angle between linkers depends on the linker length (again, see
     Figure~\ref{fig:nuc-geo}b), the shape of the nucleosomal helices formed by
     the homogenous chains depend on the linker length, as shown in
     Figure~\ref{fig:homo-kuhn}c.
-\begin{figure}[t]
-    \centering
-    \begin{minipage}{0.65\linewidth}
-        \includegraphics[width=1\linewidth]{./figures/fig-2a-kuhn-all.png}
-    \end{minipage}
-    \begin{minipage}{0.30\linewidth}
-        \vfill
-        \includegraphics[width=1\linewidth]{./figures/fig-2b-mc-example.png}
-        \vfill
-    \end{minipage}
-    \\
-    \includegraphics[width=0.95\linewidth]{./figures/fig-2c-kuhn-zoom.png}
-    \caption{(a) The Kuhn lengths of homogenous chains are
-    \SI{10.5}{\basepair} periodic
-    in linker length, with each linker length representing a distinct,
-    discretized helical
-    WLC\@. In the limit of long linkers, the kuhn length eventually approaches that of bare DNA,
-    \SI{100}{\nano\metre}. (b) Zero-temperature structure vs. Monte Carlo simulation
-    snapshot of nucleosome chain with \SI{38}{\basepair} linkers. (c) Compact, superhelical structures afford more
-    flexibility than non-compact fibres, which have higher Kuhn lengths. Thus,
-    the overall structure of chromatin is extremely sensitive to changes in the
-    nucleosome repeat length.}\label{fig:homo-kuhn}
-\end{figure}
-
-
 
 We can use Eq.~\ref{eq:moments} to compute the mean squared displacement, $\RR$,
     of the homogenous chain as function of its linker length.
