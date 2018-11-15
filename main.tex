@@ -20,15 +20,17 @@ showpacs,preprintnumbers,
 %prstper,
 %floatfix,
 ]{revtex4-1}
+\usepackage{natbib}
+\usepackage{graphicx}% Include figure files
+\usepackage[caption=false]{subfig}
 
 \usepackage{siunitx}
-\usepackage{graphicx}% Include figure files
 \usepackage{dcolumn}% Align table columns on decimal point
 \usepackage{bm}% bold math
 \usepackage{hyperref}% add hypertext capabilities
 \usepackage[mathlines]{lineno}% Enable numbering of text and display math
 \usepackage{mathtools}
-\linenumbers\relax % Commence numbering lines
+% \linenumbers\relax % Commence numbering lines
 
 %\usepackage[showframe,%Uncomment any one of the following lines to test
 %%scale=0.7, marginratio={1:1, 2:3}, ignoreall,% default settings
@@ -284,16 +286,21 @@ An alternate derivation can be found in the supplement.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.35\linewidth]{./figures/fig-1a-nucleosome-geometry.png}
-    \includegraphics[width=0.52\linewidth]{./figures/fig-1b-helicity-effect.png}
-    \caption{(a) When bound to a histone octamer, DNA traces out an
+    \subfloat[]{\label{fig:entry-exit}
+        \includegraphics[width=0.35\linewidth]{./figures/fig-1a-nucleosome-geometry.png}
+    }%
+    \subfloat[]{\label{fig:linker-effect}
+        \includegraphics[width=0.52\linewidth]{./figures/fig-1b-helicity-effect.png}
+    }%
+    %TODO use TikZ or just overpic to put in "theta" and "phi"
+    \caption{\protect\subref{fig:entry-exit} When bound to a histone octamer, DNA traces out an
     approximately helical path. We treat the DNA bound to the histones as rigid,
     which corresponds to fixing the entry ($\Omega_\text{entry}$) and exit
     ($\Omega_\text{exit}$) orientations of the DNA from the nucleosome. Let
     ($\Omega_\text{nuc}(\theta, \phi)  =
     \Omega_\text{entry}^{-1}\Omega_\text{exit}$). The crystal structure of the
     nucleosome dictates the spherical angle $\theta$.
-    (b) The DNA double helix has an intrinsic twist density
+    \protect\subref{fig:linker-effect} The DNA double helix has an intrinsic twist density
     $\tau=\SI{10.5}{basepair}$. At zero
     temperature, if we anchor the location of one nucleosome, the binding
     orientation of the next histone octamer must change so that it aligns with
@@ -345,7 +352,7 @@ A key property of our model is that the relative orientation of adjacent
     nucleosomes is not just determined by $\Omega_\text{kink}$ and the thermal
     fluctuations of the linker strand.
 %FINAL make sure the subfigure label matches final figure
-As demonstrated in Figure~\ref{fig:nuc-geo}b, the length of the linker strand
+As demonstrated in Figure~\ref{fig:linker-effect}, the length of the linker strand
     itself will change the relative orientation of two adjacent nucleosomes,
     even at zero temperature.
 Our propagator $G$ takes this property into account implicitly thanks to the
@@ -364,20 +371,27 @@ We note that this corresponds to a modified $J$ factor with no orientational
     component.
 
 \begin{figure*}[th]
-    \centering
-    \includegraphics[width=0.15\textwidth]{./figures/fig-2b-mc-example.png}
-    \includegraphics[width=0.325\textwidth]{./figures/fig-2a-kuhn-all.png}
-    \includegraphics[width=0.5\textwidth]{./figures/fig-2c-kuhn-zoom.png}
-    \caption{(a) The Kuhn lengths of homogenous chains are
-    \SI{10.5}{\basepair} periodic
-    in linker length, with each linker length representing a distinct,
-    discretized helical
-    WLC\@. In the limit of long linkers, the kuhn length eventually approaches that of bare DNA,
-    \SI{100}{\nano\metre}. (b) Zero-temperature structure vs. Monte Carlo simulation
-    snapshot of nucleosome chain with \SI{38}{\basepair} linkers. (c) Compact, superhelical structures afford more
-    flexibility than non-compact fibres, which have higher Kuhn lengths. Thus,
-    the overall structure of chromatin is extremely sensitive to changes in the
-    nucleosome repeat length.}\label{fig:homo-kuhn}
+    \begin{centering}
+    \subfloat[][]{\label{fig:mc-example}
+        \includegraphics[width=0.15\textwidth]{./figures/fig-2b-mc-example.png}
+    }%
+    \subfloat[][]{\label{fig:homo-kuhn-all}
+        \includegraphics[width=0.325\textwidth]{./figures/fig-2a-kuhn-all.png}
+    }%
+    \subfloat[][]{\label{fig:homo-kuhn-zoom}
+        \includegraphics[width=0.5\textwidth]{./figures/fig-2c-kuhn-zoom.png}
+    }%
+    \end{centering}
+    \caption{\protect\subref{fig:mc-example} Zero-temperature structure vs. Monte Carlo simulation
+    snapshot of nucleosome chain with \SI{38}{\basepair} linkers.
+    \protect\subref{fig:homo-kuhn-all} The Kuhn lengths of homogenous chains are
+    \SI{10.5}{\basepair} periodic in linker length, with each linker length
+    representing a distinct, discretized helical WLC\@. In the limit of long
+    linkers, the kuhn length eventually approaches that of bare DNA,
+    \SI{100}{\nano\metre}. \protect\subref{fig:homo-kuhn-zoom} Compact, superhelical
+    structures afford more flexibility than non-compact fibres, which have
+    higher Kuhn lengths. Thus, the overall structure of chromatin is extremely
+    sensitive to changes in the nucleosome repeat length.}\label{fig:homo-kuhn}
 \end{figure*}
 
 \section{\label{sec:model}Results}
@@ -392,16 +406,16 @@ Per Chasles's theorem, at zero temperature the nucleosomes in a homogenous chain
         which is in turn distinct from the intrinsic double helix of the
         underlying DNA itself.})
     whose compactness is determined by the angle between adjacent linkers, as
-    shown in Figure~\ref{fig:homo-kuhn}a.
+    shown in Figure~\ref{fig:mc-example}.
 Because the angle between linkers depends on the linker length (again, see
-    Figure~\ref{fig:nuc-geo}b), the shape of the nucleosomal helices formed by
+    Figure~\ref{fig:linker-effect}), the shape of the nucleosomal helices formed by
     the homogenous chains depend on the linker length, as shown in
-    Figure~\ref{fig:homo-kuhn}c.
+    Figure~\ref{fig:homo-kuhn-zoom}.
 
 We can use Eq.~\ref{eq:moments} to compute the mean squared displacement, $\RR$,
     of the homogenous chain as function of its linker length.
 This allows us to extract the elasticity of homogenous chromatin via its Kuhn
-    length, as shown in Figure~\ref{fig:homo-kuhn}b.
+    length, as shown in Figure~\ref{fig:homo-kuhn-all}.
 We note that due to Chasles's theorem, this calculation corresponds exactly to
     the kuhn length of the approriate discrete helical wormlike chain, as first
     done in~\cite{yamakawa1976}.
@@ -419,7 +433,7 @@ Thus, our full theory is required even for calculations involving this
 
 We find that, to first approximation, the Kuhn length is determined by the
     amount of DNA contained per unit of rise along the nucleosomal superhelix,
-    as shown in Figure~\ref{fig:homo-kuhn}c.
+    as shown in Figure~\ref{fig:homo-kuhn-zoom}.
 The bend and twist persistence lengths $l_p$ and $l_t$ of the linkers determine
     the average amount of bend and twist fluctuations in the linkers for each
     unit of distance along the DNA backbone.
@@ -459,37 +473,28 @@ Thus, while the exact statistics of \textit{in vivo} linker lengths remain to be
     a reference point to show the effect of linker heterogeneity on the
     statistical mechanics of the chromatin fiber.
 
-
-
-
-
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\linewidth]{./figures/fig-3-box-variance.png}
-    \caption{Kuhn lengths for zero-temperature configurations versus
-    fluctuating linkers as a function of the amount of variance in the uniformly
-    distributed linker lengths.  Adding \SI{6}{\basepair} of variability causes the zero-temperature
-    configuration to resemble a random walk, explaining the reduced kuhn
-    length predicted by the fullly fluctuating model. (b) For a mean linker
-    length of \SI{47}{\basepair}, adding just \SI{1}{\basepair} of variance
-    drastically reduces the kuhn length of the zero-temperature fiber.}
-\end{figure}
-
-
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.95\linewidth,height=0.6\linewidth]{./figures/fig-4-exp-variance.png}
-    \caption{Because sequence specificity of histone binding has a miniscule effect
-    \textit{in vivo}, binding energies are approximately uniform across the
-    genome. This leads to uniformly distributed nucleosome positions, with exponentially distributed linker lengths. We compare
-    the kuhn lengths of realistic chromatin fibers against those of the
-    corresponding zero-temperature configurations (red
-    triangles) and bare
-    DNA (dashed line). Geometrical kinks and fluctuations combine to drastically
-    increase the elasticity of chromatin. Mean linker lengths in \textit{S.
-    cerivisiae}[Chereji], mice embryonic stem cells [Voong], and human T cells
-    [Valouev] are marked.}
+    \subfloat[]{\label{fig:exp-kuhns}
+        \includegraphics[width=0.45\linewidth]{./figures/fig-4-exp-variance.png}
+    }%
+    \subfloat[]{\label{fig:box-kuhns}
+        \includegraphics[width=0.45\linewidth]{./figures/fig3b-box-47bp-only.png}
+    }%
+    \caption{\protect\subref{fig:exp-kuhns} We compare the kuhn lengths of realistic chromatin fibers
+    against those of the corresponding zero-temperature configurations (red
+    triangles) and bare DNA (dashed line). Geometrical kinks and fluctuations
+    combine to drastically increase the elasticity of chromatin. Mean linker
+    lengths in \textit{S.  cerivisiae}[Chereji], mice embryonic stem cells
+    [Voong], and human T cells  [Valouev] are marked.
+    \protect\subref{fig:box-kuhns} Kuhn lengths for
+    zero-temperature configurations versus fluctuating linkers as a function of
+    the amount of variance in uniformly distributed linker lengths with a mean
+    of \SI{47}{\basepair}. Adding merely \SI{1}{\basepair} of variability causes the
+    zero-temperature configuration to resemble a random walk with ``Kuhn
+    length'' (i.e.\ diffusivity) drastically lower than bare DNA's
+    \SI{100}{\basepair}, explaining the heterogenous chain's increased
+    flexibility.}%\label{fig:het-kuhn}
 \end{figure}
 
 
