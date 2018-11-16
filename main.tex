@@ -77,38 +77,42 @@ showpacs,preprintnumbers,
 
 \begin{abstract}
 
-%Start with a sentence leading into heterogeneity of proteins binding to DNA.
-    In vivo, proteins that bind non-specifically to DNA introduce heterogenous
-    kinks in the chromatin polymer.
-    We propose a coarse-grained model for the effects of nucleosome packaging on the
-    physical organization of chromosomal DNA, and present the analytical
-    solution in the form of a Green's function.
-Our analytical model combines a wormlike-chain treatment of the linker DNA
-    connecting adjacent nucleosomes with the geometrical constraints imposed by
-    DNA wrapping histone octamers.
-The model predicts that adding realistic heterogeneity in the nucleosome spacing
-    increases the elasticity of the chromatin chain relative to
-    nucleosome-free DNA.% make this sentence evoke that the comparison is between individual chain
-% instantiations
-Furthermore, we find that rearranging nucleosome positions can cause the cell to
-    change the looping probability of chromatin by up to 6 order of magnitude.
-% if you're going to remove the first "increasing", you need to have some other
-% way (you cna use more words) to evoke the idea that more variability makes the
-% thing more like a random walk clearly
-We demonstrate that these effects arise because increasing variability in
-    nucleosome spacing forces the zero-temperature configuration of the fiber to
-    increasingly resemble a random walk.
-% "this geometric effect" now doesn't refer back to the word geometric as before
-With just 1bp of variability in the nucleosome's binding positions,
-    this geometrical effect overpowers thermal fluctuations in the WLC linkers.
-Our framework fills a critical gap between models that explicitly incorporate
-% i added back the word existing because, our model is also coarse grained.
-% somethign should be done to make sure that this isnt' confusing, at least
-    nucleosomes, but are computationally impractical to scale, and existing
-    coarse-grained models of chromatin, which ignore the important contributions
-    of nucleosome geometry.
-In addition, our analytical approach is broadly applicable to any semiflexible
-    polymer with aperiodic defects.
+In vivo, the milieu of proteins that bind to DNA introduce heterogenously-spaced
+    kinks in the otherwise rigid DNA double helix.
+% theta given 0 unwrap : 62.7
+Most notably, histone-bound DNA in a nucleosome is bent to form an
+    effective interior angle of merely \ang{62.7}, a conformation that is
+    thermally inaccessible to bare DNA\@.
+We present an analytical model for the effects of this deformation on the
+    physical organization of chromosomal DNA\@.
+% Our model predicts that periodic rigid kinks, such as nucleosomes with a fixed
+%     nucleosome repeat length, can lead to chromatin chains whose elasticities
+%     differ by over an order of magnitude for small changes in the repeat length.
+% In contrast, we show that adding any heterogeneity to the nucleosome spacing
+%     eliminates this sensitivity, allowing us to robustly predict the Kuhn length
+%     of chromatin in various important cell types.
+We find that heterogenously-spaced kinks in a polymer will create a random walk
+    even at zero temperature, and demonstrate that this geometric effect
+    overpowers the effect of thermal fluctuations for chains of nucleosomes
+    connected by linker DNA\@.
+We predict that geometric constraints induced by nucleosome spacing lead to
+    chromatin \textit{in vivo} having a Kuhn length four times smaller than that
+    of bare DNA\@.
+% In addiction, we show by merely rearranging the positions of intervening
+%     nucleosomes, it is possible change the probability that two distal genomic
+%     loci loop together by up to 6 order of magnitude.
+In addition, our model predicts that the looping probability of two genomic
+    loci can change by as much as 6 orders of magnitude depending on the
+    particular spacing of the intervening nucleosomes.
+% This suggests that chromatin remodellers could play a much larger role in
+%     anchoring together distal loci than previously anticipated.
+% Our work fills a critical gap between models that explicitly incorporate
+%     nucleosomes, but are computationally impractical to scale, and existing
+%     coarse-grained models of chromatin, which ignore the important contributions
+%     of nucleosome geometry.
+Our results are broadly applicable to any semiflexible polymer with aperiodic
+    defects, and the their implications to the flexibility and cyclizability of
+    block copolymers are discussed.
 \end{abstract}
 
 \pacs{05.20.--y, 05.40.Fb, 36.20.Ey, 87.10.Ca, 87.14.gk, 87.15--v, 87.16.Sr}% PACS, the Physics and Astronomy
@@ -151,55 +155,52 @@ In addition, our analytical approach is broadly applicable to any semiflexible
 In the cell, DNA and its associated proteins---collectively, chromatin---are
     carefully organized both spatially and temporally.
 This organization is known to play a role in a myriad of biological processes,
-    from gene expression to DNA damage repair, and has motivated a large body of work on the statistical mechanics of
-    the chromatin fiber.
+    from controlling gene expression to facilitating DNA damage repair, and has
+    motivated a large body of work on the statistical mechanics of the chromatin
+    fiber.
 
 The fundamental repeating unit of Eukaryotic chromatin organization is the
-    nucleosome, formed by 147 basepairs of DNA wrapped around a histone octamer.
+    nucleosome, which is formed by 147 basepairs of DNA wrapped around a histone octamer.
 Adjacent nucleosomes are connected by linker DNA, whose average length varies from
-    $<$\SI{10}{\basepair} in some fission yeast [??] to over \SI{50}{\basepair} in
-    many human cells [??].
+    $<$\SI{10}{\basepair} in some fission yeast\cite{TODO} to over \SI{50}{\basepair} in
+    many human cells\cite{TODO}.
 
-While bare DNA is well described by a wormlike chain (WLC) with Kuhn length
-    {$b = \SI{100}{\nano\metre}$}, few analytical models have attempted to
-    incorporate nucleosomes into this picture.
-% Increasingly realistic computational models of the chromatin fiber as a chain
-%     of nucleosomes have been constructed in the past decade [Tamar-Schlick review].
-% Unfortunately, these have always been limited to short chains with prespecified nucleosome
-%     locations due to computational cost.
-Past analytical efforts have only dealt with the special
-    case of constant linker length, modeling chromatin as a WLC backbone and
-    nucleosomes as periodic kinks [Koslover].
+The statistics of bare DNA are known to quantitatively match a wormlike
+    chain (WLC) model with a persistence length {$l_p \approx
+    \SI{50}{\nano\metre}$}
+While the WLC is an excellent model for linker DNA, few analytical models have
+    attempted to investigate the conformational effects of the rigid nucleosome
+    particles connecting the linker DNA\@.
+Previously, our lab dealt with the special case of constant linker length,
+    modeling chromatin as a WLC backbone and nucleosomes as periodic
+    kinks~\cite{koslover2013}.
 The constant linker length assumption was motivated by evidence
-    that linker lengths are preferentially quantized [Widom92,Chereji18,others].
-Moreover, models of helical chromatin fibers with fixed linker lengths
-    [Grigoryev] reproduced the regularity of the well known ``\SI{30}{\nano\metre}
+    that linker lengths are preferentially
+    quantized~\cite{widom92,chereji18,add-more}.
+Moreover, models of helical chromatin fibers with fixed linker
+    lengths~\cite{grigoryev-but-which-one}
+    reproduced the regularity of the well known ``\SI{30}{\nano\metre}
     fiber'' structure of \textit{in vitro} chromatin.
 
 However, it is becoming increasingly clear that, \textit{in vivo}, nucleosome
-    spacing is extremely heterogenous [nat chem meth paper on mnase, chereji, at
-    least one eukaryotic alignment/phasing paper], even if some locations are
-    statistically preferred.
-Moreover, modern electron microscopy measurements suggest that \textit{in vivo} chromatin
-    is largely disordered, contrary to the ``\SI{30}{\nano\metre} fiber''
-    picture.
+    spacing is extremely
+    heterogenous~\cite{nat-chem-meth-paper-on-mnase,chereji,at-least-one-eukaryotic-alignment/phasing-paper},
+    even if some locations are statistically preferred.
+Moreover, modern electron microscopy measurements suggest that \textit{in vivo}
+    chromatin is largely disordered~\cite{ou2017}, contrary to the
+    ``\SI{30}{\nano\metre} fiber'' picture.
 In an attempt to explain these measurements, recent simulation results have
     suggested that heterogeneity in nucleosome positioning might have unexpected
-    effects on the structure of the fiber. [Tamar Schlick heterogeneity papers]
-However, these detailed models are computationally expensive, and so they cannot
+    effects on the structure of the
+    fiber~\cite{collepardo-guevardo2011,other-tamar-papers}.
+However, these detailed models are computationally costly, and so they cannot
     provide broad guidance on how the fiber changes as a function of the nucleosome
     spacing distribution.
-Due to this lack of theoretical guidance, it has become the \textit{de facto}
-    standard to simply treat the chromatin fiber as if it were bare DNA for
-    the purposes of coarse-grained simulations of the nucleus [Mirny, us,
-    others].
-%i'm not saying we should take this out, but i don't know what the point is
-% you're tryign to make ehre, so maybe we should chat about it?
-% Other  analytical models of DNA have focused on local deformations
-    % of DNA due to kinking or melting.
-% Although these contributions highlight the
-    % importance of DNA's thermomechanical properties, they ignore the geometrical features that arise from heterogenous binding
-    % of histones to DNA.
+Due to the lack of theoretical guidance, it has become \textit{de facto}
+    standard to treat chromatin as a WLC or Rouse polymer with a Kuhn length
+    that either matches that of bare
+    DNA~\cite{macpherson2018,nuebler2018,11marksfitpaper} or is chosen to fit
+    the quantity being measured~\cite{askquinnforexamples}.
 
 In this paper, we present an exact analytical treatment of a wormlike chain
     with arbitrarily spaced defects, and use it to investigate the effects of
