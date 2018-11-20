@@ -97,7 +97,7 @@ We present an analytical model for the effects of this deformation on the
 % In contrast, we show that adding any heterogeneity to the nucleosome spacing
 %     eliminates this sensitivity, allowing us to robustly predict the Kuhn length
 %     of chromatin in various important cell types.
-We find that heterogenously-spaced kinks in a polymer will create a random walk
+We find that heterogenously-spaced kinks in a polymer will delineate a random walk
     even at zero temperature, and demonstrate that this geometric effect
     overpowers the effect of thermal fluctuations for chains of nucleosomes
     connected by linker DNA\@.
@@ -109,7 +109,7 @@ We predict that geometric constraints induced by nucleosome spacing lead to
 %     loci loop together by up to 6 order of magnitude.
 In addition, our model predicts that the looping probability of two genomic
     loci can change by as much as 6 orders of magnitude depending on the
-    particular spacing of the intervening nucleosomes.
+    particular spacing of the intervening kinks (nucleosomes).
 % This suggests that chromatin remodellers could play a much larger role in
 %     anchoring together distal loci than previously anticipated.
 % Our work fills a critical gap between models that explicitly incorporate
@@ -161,60 +161,60 @@ Our results are broadly applicable to any semiflexible polymer with aperiodic
 In the cell, DNA and its associated proteins---collectively, chromatin---are
     carefully organized both spatially and temporally.
 This organization is known to play a role in a myriad of biological processes,
-    from controlling gene expression to facilitating DNA damage repair, and has
-    motivated a large body of work on the statistical mechanics of the chromatin
-    fiber.
+    from controlling gene expression~\cite{hubner2013} to facilitating DNA
+    damage repair~\cite{hauer2017,stadler2017}, and has motivated a large body
+    of work on the statistical mechanics of the chromatin fiber.
 
 The fundamental repeating unit of Eukaryotic chromatin organization is the
     nucleosome, which is formed by 147 basepairs of DNA wrapped around a
-    histone octamer.
+    histone octamer~\cite{cutter2015a}.
 Sequential nucleosomes are connected by linker DNA, whose average length varies
-    from $<$\SI{10}{\basepair} in some fission yeast\cite{TODO} to over
-    \SI{50}{\basepair} in many human cells\cite{TODO}.
+    from $<$\SI{10}{\basepair} in fission yeast\cite{givens2012} to over
+    \SI{50}{\basepair} in some human cells\cite{schones2008}.
 
 The statistics of bare DNA are known to quantitatively match a wormlike
     chain (WLC) model with a persistence length {$l_p \approx
-    \SI{50}{\nano\metre}$}
-While the WLC is an excellent model for linker DNA, few analytical models have
-    attempted to investigate the conformational effects of the rigid nucleosome
-    particles connecting the linker DNA\@.
+    \SI{50}{\nano\metre}$}.
+While this makes the WLC an excellent model for linker DNA, few analytical
+    models have attempted to include the rigid nucleosome particles connecting
+    the linker DNA\@.
 Previously, our lab dealt with the special case of constant linker length,
     modeling chromatin as a WLC backbone and nucleosomes as periodic
     kinks~\cite{koslover2013}.
 The constant linker length assumption was motivated by evidence
-    that linker lengths are preferentially
-    quantized~\cite{widom92,chereji18,add-more}.
+    that linker lengths are preferentially quantized~\cite{widom1992,wang2008a}.
 Moreover, models of helical chromatin fibers with fixed linker
-    lengths~\cite{grigoryev-but-which-one}
-    reproduced the regularity of the well known ``\SI{30}{\nano\metre}
-    fiber'' structure of \textit{in vitro} chromatin.
+    lengths~\cite{wedemann2002} were known to reproduce properties of the well
+    established ``\SI{30}{\nano\metre} fiber'' structure of \textit{in vitro}
+    chromatin.
 
 However, it is becoming increasingly clear that, \textit{in vivo}, nucleosome
-    spacing is extremely
-    heterogenous~\cite{nat-chem-meth-paper-on-mnase,chereji,at-least-one-eukaryotic-alignment/phasing-paper},
-    even if some locations are statistically preferred.
+    spacing is highly
+    heterogenous~\cite{lai2018,chereji2018,beshnova2014},
+    even if some genomic loci are statistically preferred.
 Moreover, modern electron microscopy measurements suggest that \textit{in vivo}
     chromatin is largely disordered~\cite{ou2017}, contrary to the
     ``\SI{30}{\nano\metre} fiber'' picture.
-In an attempt to explain these measurements, recent simulation results have
-    suggested that heterogeneity in nucleosome positioning might have unexpected
-    effects on the structure of the
-    fiber~\cite{collepardo-guevardo2011,other-tamar-papers}.
-However, these detailed models are computationally costly, and so they cannot
-    provide broad guidance on how the fiber changes as a function of the nucleosome
-    spacing distribution.
-Due to the lack of theoretical guidance, it has become \textit{de facto}
-    standard to treat chromatin as a WLC or Rouse polymer with a Kuhn length
-    that either matches that of bare
-    DNA~\cite{macpherson2018,nuebler2018,11marksfitpaper} or is chosen to fit
-    the quantity being measured~\cite{askquinnforexamples}.
 
-In this paper, we present an exact analytical treatment of a wormlike chain
-    with arbitrarily spaced defects, and use it to investigate the effects of
-    nucleosomes on chromatin structure.
-We show that the elasticity of chromatin can be increased orders of magnitude by
-    nucleosome binding, and that amount of this increase depends only on the average
-    linker length for a given organism.
+Computational modeling of individual chromatin chains with random
+    linker lengths has suggested that nucleosome heterogeneity likely plays an
+    important role in chromatin
+    architecture~\cite{woodcock1993,collepardo-guevara2014}.
+However, these methods either do not include the effects of linker
+    DNA fluctuations~\cite{woodcock1993} or are computationally expensive to run
+    even for a single fiber~\cite{collepardo-guevara2014}.
+Without theory to describe the general features of these heterogenous fibers,
+    it has become \textit{de facto} standard to treat chromatin as an effective
+    WLC with a persistence length that either matches that of bare
+    DNA~\cite{benedetti2017,macphersonInPress,nuebler2018} or is chosen to fit
+    the quantity being measured~\cite{sanborn2015,pierro2017}.
+
+In this paper, we present the exact analytical theory for a wormlike chain
+    with arbitrarily spaced rigid kinks, and use it to investigate the effects
+    of nucleosomes on chromatin structure.
+We show nucleosome binding can increase chromatin elasticity by orders of
+    magnitude, in a way that depends only on the average linker length for a
+    given cell type.
 Furthermore, we show that aperiodic defects due to binding of nucleosomes---or, in
     practice, any protein that binds DNA---can change the
     propensity of two genomic loci encountering each other by up to six
@@ -222,27 +222,9 @@ Furthermore, we show that aperiodic defects due to binding of nucleosomes---or, 
 Our results suggest that nucleosome positioning can affect not only
     accessibility and compaction, but also the mobility of a locus, and even
     the creation of functional chromatin loops.
-
-%TODO, you had commented out only half of this sentence, did you just want to
-    %delete it?
-% Finally, we provide guidance for constructing coarse-grained models of chromatin
-%     that account for the important effects of nucleosome heterogeneity
-%     \textit{in vivo}.
-
-More broadly, because none of our results depend on the particular properties of DNA or
-    nucleosomes, we expect that our analytical approach will be broadly
-    applicable a broad class of heterogenous polymers.
-For example, block or random copolymers tend to be kinked at the junction
-    between blocks, and we predict that this would cause a previously unexpected
-    decrease in their Kuhn length.
-% here's the closest thing I can say to Levy flights
-Our work may also find application in models of driven gaussian processes,
-    whenever driving events take place aperiodically.
-%% I'd be stoked to mention conductive polymers, but not super clear on
-%applications to random copolymers and conductive polymers, as well as models of complex
-%% ah this is definitely not true, levy flights are just brownian motion with
-%% heavy tailed step size distribution
-%such as Levy flights
+Furthermore, our results provide theoretical guidance for correctly
+    coarse-graining bottom-up, quantitative simulations of large-scale chromatin
+    interactions and organization~\cite{macphersonInPress}.
 
 \section{\label{sec:model}Model}
 %TODO add overview of model here
@@ -659,7 +641,7 @@ We expect that our central conclusions---that nucleosomes can modulate
 While the quantitative values may yet change, we suspect that our estimate of
     chromatin's Kuhn length and looping probabilities will already provide
     guidance to future work relying on coarse-grained models of chromatin.
-In particular we show that the common practice~\cite{macpherson2018,nuebler2018}
+In particular we show that the common practice~\cite{macphersonInPress,nuebler2018}
     of using a Kuhn length of \SI{100}{\nano\metre}, simply because that is the
     Kuhn length of bare DNA, will likely lead to at least a four-fold
     overestimation of the polymer's stiffness.
