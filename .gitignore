@@ -1,8 +1,9 @@
-main.aux
-main.bbl
-main.blg
-main.log
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
 mainNotes.bib
 main.pdf
-
+test.*
 .*.sw*
