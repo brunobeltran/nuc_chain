@@ -30,6 +30,7 @@ showpacs,preprintnumbers,
 \usepackage{hyperref}% add hypertext capabilities
 \usepackage[mathlines]{lineno}% Enable numbering of text and display math
 \usepackage{mathtools}
+\usepackage[percent]{overpic}
 % \linenumbers\relax % Commence numbering lines %WARNING: not work with subfig!
 
 %\usepackage[showframe,%Uncomment any one of the following lines to test
@@ -41,14 +42,13 @@ showpacs,preprintnumbers,
 %]{geometry}
 \DeclareSIUnit\basepair{bp}
 
+\newcommand{\gwlc}[2][\Omega_0; L_0]{G_\text{\tiny WLC}(#2|#1)}
+\newcommand{\ghat}[2][\Omega_0; L_0]{\hat{G}_\text{\tiny WLC}(#2|#1)}
 \newcommand{\greens}[2][\Omega_0; L]{G(#2|#1)}
 \newcommand{\pathd}[1]{\mathcal{D}\left[#1\right]}
 \newcommand{\energy}{\mathcal{E}}
 \newcommand{\wigD}{\mathcal{D}}
 \newcommand{\RR}{\left\langle{}R^2\right\rangle{}}
-
-%TODO change order of methods? how about explaining uniformly distributed
-%linkers first
 
 \begin{document}
 %\preprint{APS/123-QED}
@@ -107,7 +107,7 @@ We predict that geometric constraints induced by nucleosome spacing lead to
 % In addiction, we show by merely rearranging the positions of intervening
 %     nucleosomes, it is possible change the probability that two distal genomic
 %     loci loop together by up to 6 order of magnitude.
-In addition, our model predicts that the looping probability of two genomic
+In addition, our model predicts that the looping probability of two
     loci can change by as much as 6 orders of magnitude depending on the
     particular spacing of the intervening kinks (nucleosomes).
 % This suggests that chromatin remodellers could play a much larger role in
@@ -121,18 +121,13 @@ Our results are broadly applicable to any semiflexible polymer with aperiodic
     block copolymers are discussed.
 \end{abstract}
 
-\pacs{05.20.--y, 05.40.Fb, 36.20.Ey, 87.10.Ca, 87.14.gk, 87.15--v, 87.16.Sr}% PACS, the Physics and Astronomy
-                             % Classification Scheme.
-%\keywords{Suggested keywords}%Use showkeys class option if keyword
-                              %display desired
+% PACS, the Physics and Astronomy Classification Scheme.
+\pacs{05.20.--y, 05.40.Fb, 36.20.Ey, 87.10.Ca, 87.14.gk, 87.15--v, 87.16.Sr}
+%Use showkeys class option if keyword display desired
+%\keywords{chromatin \| nucleosome \| kinked WLC}
 \maketitle
 
-% examples of TOC and section headers left here for reference
-%\tableofcontents
-% \section{\label{sec:level1}First-level heading}
-% \subsection{\label{sec:level2}Second-level heading: Formatting}
-
-%HIGH LEVEL OUTLINE
+%ANDY'S ORIGINAL HIGH LEVEL OUTLINE
 %1. structure of genome matters (define nucleosome, brief intro on chromatin)
 %2. heterogeneity plays a role in structure:
 %in vivo DNA has high propensity for random binding that leads to random
@@ -203,11 +198,12 @@ Computational modeling of individual chromatin chains with random
 However, these methods either do not include the effects of linker
     DNA fluctuations~\cite{woodcock1993} or are computationally expensive to run
     even for a single fiber~\cite{collepardo-guevara2014}.
-Without theory to describe the general features of these heterogenous fibers,
-    it has become \textit{de facto} standard to treat chromatin as an effective
-    WLC with a persistence length that either matches that of bare
-    DNA~\cite{benedetti2017,macphersonInPress,nuebler2018} or is chosen to fit
-    the quantity being measured~\cite{sanborn2015,pierro2017}.
+Without theory to describe the general features of these more realistic,
+    heterogenous fibers, it has become \textit{de facto} standard to treat
+    chromatin as an effective WLC with a persistence length that either matches
+    that of bare DNA for
+    simplicity~\cite{benedetti2017,macphersonInPress,nuebler2018} or is chosen
+    to fit the quantity being measured~\cite{sanborn2015,pierro2017}.
 
 In this paper, we present the exact analytical theory for a wormlike chain
     with arbitrarily spaced rigid kinks, and use it to investigate the effects
@@ -217,7 +213,7 @@ We show nucleosome binding can increase chromatin elasticity by orders of
     given cell type.
 Furthermore, we show that aperiodic defects due to binding of nucleosomes---or, in
     practice, any protein that binds DNA---can change the
-    propensity of two genomic loci encountering each other by up to six
+    propensity for two genomic loci to encounter each other by up to six
     orders of magnitude.
 Our results suggest that nucleosome positioning can affect not only
     accessibility and compaction, but also the mobility of a locus, and even
@@ -227,18 +223,32 @@ Furthermore, our results provide theoretical guidance for correctly
     interactions and organization~\cite{macphersonInPress}.
 
 \section{\label{sec:model}Model}
-%TODO add overview of model here
+% maybe "make rigorous" is too forceful
+First, we make rigorous our ``beads on a string'' model of chromatin.
+We model linker DNA as a WLC and nucleosomes as the points where these
+    WLC's connect.
+At each nucleosome, we impose the constraint that the incoming and outgoing
+    linker DNA strands have a fixed orientation relative to each other.
+This relative orientation $\Omega_\text{kink}  =
+    {(\Omega^{(i)}_\text{entry})}^{-1}
+    \Omega^{(i)}_\text{exit}$ between the $i$th and $(i+1)$th linkers is
+    determined by the nucleosome structure, as shown in
+    Figure~\ref{fig:nuc-geo}.
 
-We represent our polymer as a space curve $R(s)$, $s\in[0,L]$, along with a
-    triad of vectors describing the chain's orientation at each location
-    $\vec{t_i}$, where $\vec{t_3} \coloneqq R'(s)$.
+We represent this sequence of WLC's as a space curve $\vec{R}(s)$, $s\in[0,L]$, along
+    with a triad of vectors describing the chain's orientation at each location
+    $\vec{t_i}$, where $\vec{t_3} \coloneqq \partial_s \vec{R}(s)$.
+% Here, $s$ tracks only along the linker DNA, since each nucleosome is merely
+    % considered a point on the curve.
 We track the bend and twist of our polymer via the Euler vector $\omega_i$
     defined by $\Omega(s) = \partial_s \vec{t_i}(s) = \omega_i(s) \times \vec{t_i}(s)$.
-The Green's function of the wormlike chain with twist starting at orientation
-    $\Omega_0$, with length L, can then be written
+
+We begin by computing the Green's function of the first linker.
+For a twistable WLC with no kinks, starting at orientation $\Omega_0$, with
+    length $L_1$, this can be written
 \begin{equation}\label{eq:path}
-    \greens{\vec{R}, \Omega} = \int_{s=0}^{s=L} \pathd{\Omega(s)}
-              \delta\left(\vec{R} - \int_{s}^L \vec{t_3} ds\right)
+    \gwlc[\Omega_0;L_1]{\vec{R}, \Omega} =\! \int_{0}^{L_1} \!\! \pathd{\Omega(s)}
+              \delta(\vec{R} - \!\int_{0}^{L_1} \!\!\vec{t_3} ds)
               e^{-\beta \mathcal{E}},
     % overflows
     % \greens{\vec{R}, \Omega} = \int_{\Omega(s=0)}^{\Omega(s=L)} \pathd{\Omega(s)}
@@ -247,70 +257,77 @@ The Green's function of the wormlike chain with twist starting at orientation
 \end{equation}
     where the energy
 \begin{equation}\label{eq:energy}
-    \beta\energy = \frac{l_p}{2}\int_{s=0}^L ds
-    (\omega_1^2 + \omega_2 ^2) + \frac{l_t}{2}\int_{s=0}^L ds
+    \beta\energy = \frac{l_p}{2}\int_{0}^{L_1} ds
+    (\omega_1^2 + \omega_2 ^2) + \frac{l_t}{2}\int_{0}^{L_1} ds
     {\left(\omega_3 - \tau\right)}^2
 \end{equation}
+%TODO get citations for DNA structure things
     is quadratic in bend and in twist, {$\tau \approx \SI{10.5}{\basepair}$}
     per turn is the equilibrium twist density of the DNA double helix, and {$l_p
     \approx \SI{50}{\nano\metre}$}, {$l_t \approx \SI{100}{\nano\metre}$} are
     the bend and twist persistence lengths of DNA, respectively.
 
-This equation can be solved in Fourier space ($\vec{R} \rightarrow \vec{k}$) by
-    expanding in Wigner D functions, the eigenfunctions of the heat equation on
-    $SO(3)$~\cite{spakowitz2006}
-% jump straight to B's, so we don't need the equation with g's here.
-% \begin{equation}\label{eq:expansion}
-%     \greens{\vec{k}, \Omega} = \sum_{l m j}\sum_{l_0 m_0 j_0} g_{l_0 m_0 j_0}^{lmj}
-%         \wigD_l^{mj}(\Omega)\wigD_{l_0}^{m_0 j_0 *}(\Omega_0).
-% \end{equation}
+This equation can be solved analytically in Fourier space~\cite{spakowitz2006}
+    ($\vec{R} \rightarrow \vec{k}$) by expanding in Wigner D functions, the
+    eigenfunctions of the heat equation on $SO(3)$.
 \begin{equation}\label{eq:expansion}
-    \greens{\vec{k}, \Omega} = \sum_{l m j}\sum_{l_0 m_0 j_0} g_{l_0 m_0 j_0}^{lmj}
+    \ghat{\vec{k}, \Omega} = \sum_{l m j}\sum_{l_0 m_0 j_0} g_{l_0 m_0 j_0}^{lmj}
         \wigD_l^{mj}(\Omega)\wigD_{l_0}^{m_0 j_0 *}(\Omega_0).
 \end{equation}
-%TODO incorporate after adding initial explanation of overall model structure to
-%beginning of section
-% +The final orientation, $\Omega$, can be rotated to account for the
-% +    kink introduced the nucleosomes at the end of the linker by replacing
-% +    $g$ with $B_{l_{0}m_{0}j_{0}}^{lmj}=\sqrt{\frac{8\pi}{2l+1}}\mathcal{D}_{l}^{jj_{0}}\left(\Omega_{kink}\right)g_{l_{0}m_{0}j_{0}}^{lmj}\left(L\right)$.
-% +The coefficients $B_{l_0 m_0 j_0}^{lmj}(\Omega_\text{kink}, L)$ were first computed
-% +    in~\cite{zhou2003}, an alternative derivation can be found in the supplement.
-The coefficients $B_{l_0 m_0 j_0}^{lmj}(\Omega_\text{kink}, L)$ that define the
-    propagator of a wormlike chain capped by a single, rigid kink were first
-    computed
+
+In order to account for the kink introduced by the nucleosome, we simply rotate
+    our final orientation ${\Omega = \Omega_\text{entry}^{(1)}}$ to
+    $\Omega_\text{exit}^{(1)}$ by replacing
+    $g_{l_0 m_0 j_0}^{lmj}$ in Eq.~\ref{eq:expansion} with $B_{l_{0}m_{0}j_{0}}^{lmj} =
+    \sqrt{\frac{8\pi}{2l+1}} \mathcal{D}_{l}^{jj_{0}}
+    \left(\Omega_{kink}\right)g_{l_{0}m_{0}j_{0}}^{lmj}\left(L\right)$.
+The coefficients $B_{l_0 m_0 j_0}^{lmj}(\Omega_\text{kink}, L)$ were first computed
     % stole this citation from Lena's "systematic coarse graining" paper
-    in~\cite{zhou2003}.
-An alternate derivation can be found in the supplement.
+    in~\cite{zhou2003}, and an alternative derivation can be found in the supplement.
 
 \begin{figure}[t]
     \centering
     \subfloat[]{\label{fig:entry-exit}
-        \includegraphics[width=0.35\linewidth]{./figures/fig-1a-nucleosome-geometry.png}
-    }%TODO add dotted parallel line to other end of DNA
+        \begin{overpic}[width=100pt]{./figures/fig-1a-nucleosome-geometry.png}
+            \put(16,-3){\large$\displaystyle\theta$}
+            \put(22,59){\large$\displaystyle\Omega_\text{in}$}
+            \put(68,18.5){\large$\displaystyle\Omega_\text{out}$}
+        \end{overpic}%
+    }\hfill{}
     \subfloat[]{\label{fig:linker-effect}
-        \includegraphics[width=0.52\linewidth]{./figures/fig-1b-helicity-effect.png}
+        \begin{overpic}[width=130pt]{./figures/fig-1b-helicity-effect.png}
+            \put(18,12){\parbox{1.5cm}{\centering DNA Helicity}}
+            \put(-2,47){\large$\displaystyle\phi$}
+            \put(-5,62){$\displaystyle\SI{33}{\basepair}$}
+            \put(10,75){$\displaystyle-\SI{2}{\basepair}$}
+            \put(40,79){$\displaystyle\SI{35}{\basepair}$}
+            \put(63,68){$\displaystyle+\SI{2}{\basepair}$}
+            \put(75,47){$\displaystyle\SI{37}{\basepair}$}
+        \end{overpic}
     }%
-    %TODO use TikZ or just overpic to put in "theta" and "phi"
-    \caption{\protect\subref{fig:entry-exit} When bound to a histone octamer, DNA traces out an
-    approximately helical path. We treat the DNA bound to the histones as rigid,
-    which corresponds to fixing the entry ($\Omega_\text{entry}$) and exit
-    ($\Omega_\text{exit}$) orientations of the DNA from the nucleosome. Let
-    ($\Omega_\text{nuc}(\theta, \phi)  =
-    \Omega_\text{entry}^{-1}\Omega_\text{exit}$). The crystal structure of the
-    nucleosome dictates the spherical angle $\theta$.
-    \protect\subref{fig:linker-effect} The DNA double helix has an intrinsic twist density
-    $\tau=\SI{10.5}{basepair}$. At zero
-    temperature, if we anchor the location of one nucleosome, the binding
-    orientation of the next histone octamer must change so that it aligns with
-    the major groove of the double helix. This means that as the linker length
-    $l$ connecting two nucleosomes gets longer or shorter, the relative
-    orientations of adjacent octamers changes by an angle $\phi = 2\phi l/\tau$.
-    TODO:\@ include source of strcutre file (see bruno's file names).}\label{fig:nuc-geo}
+    \caption{\protect\subref{fig:entry-exit} The structure of a
+        human nucleosome~\cite{wakamori2015} with straight linkers extrapolated
+        based on the entry ($\Omega_\text{entry}$) and exit ($\Omega_\text{exit}$)
+        orientations of the bound DNA\@.
+    The amount of DNA wrapping the nucleosome dictates the spherical angle
+        $\theta$.
+    \protect\subref{fig:linker-effect} Two adjacent nucleosomes at zero
+        temperature.
+    The DNA double helix has an intrinsic twist density
+        $\tau=\SI{10.5}{\basepair}$.
+    At zero temperature, if we anchor the location of one nucleosome, the
+        binding orientation of the next histone octamer must change so that it
+        aligns with the major groove of the double helix.
+    This means that as the linker length $l$ connecting two nucleosomes gets
+        longer or shorter, the relative orientations of adjacent octamers
+        changes by an angle $\phi = 2l/\tau$.
+    }\label{fig:nuc-geo}
 \end{figure}
 
-We extract the ``kink'' rotation $\Omega_\text{kink}$ describing the change in
-    orientation of the DNA double helix due to binding the histone octamer from
-    the nucleosome's structure (Figure~\ref{fig:entry-exit}).
+DNA is known to partially unwrap from the nucleosome core dynamically \textit{in
+    vivo}, whether spontaneously (called nucleosome breathing~\cite{TODO}), due to
+    force on the DNA~\cite{TODO}, or through active
+    remodelling~\cite{dion2007,kulaeva2007,senavirathne2017}.
 X-ray crystallography~\cite{white2001,richmond2003,cutter2015a} and
     %with H1: bednar, zhou; H4 acetlyation: wakamori; whole fiber: wakamori,
     %song2014b, eltsov2018, bilokapic.
@@ -319,42 +336,42 @@ X-ray crystallography~\cite{white2001,richmond2003,cutter2015a} and
     well approximated by a deformed B-DNA structure, wrapping the histone
     octamer 1.7 times in a superhelix with radius \SI{4.19}{\nano\metre} and a
     pitch of \SI{2.59}{\nano\metre}~\cite{richmond2003}.
-
-DNA is known to partially unwrap from the nucleosome core dynamically \textit{in
-    vivo}, whether spontaneously (called nucleosome breathing~\cite{TODO}), due to
-    force on the DNA~\cite{TODO}, or through active
-    remodelling~\cite{dion2007,kulaeva2007,senavirathne2017}.
-%While this process is important for allowing DNA-binding proteins to find
+This means that $\Omega_\text{in}$ and $\Omega_\text{out}$ are well defined as a
+    function of how many nucleotides are bound to to the histone core (see
+    Supplemental Materials for details).
+%even though/While this process is important for allowing DNA-binding proteins to find
 %DNA~\cite{polach1995,anderson2000,li2004}, transcript~\cite{kulaeva2007} and replication
 %to take place...
+%even though it has been directly measured through cryoem in solution that
+    % nucleosomes are on average less wrapped than this~\cite{
 In what follows, we fix the wrapping level to that found in the crystal
     structure.
-% even though it has been directly measured through cryoem in solution that
-    % nucleosomes are on average less wrapped than this~\cite{
-Variability in nucleosome unwrapping can be easily incorporated into our model
-    by drawing $\Omega_\text{nuc}$ from the appropriate distribution
-Doing so does not substantially change the results (see Supplemental Figure
-    XX).
+Using different values for the wrapping level does not substantially change our
+    results (see Supplemental Figure XX).
 
-In summary, the position and orientation of the $i$th nucleosome exit site
-    is given by the convolution
-\begin{align*}\label{eq:conv}
-\greens{\vec{R},\Omega} &= \prod_{i=1}^{N-1}
-    \left[\int d\vec{R}_{i}\int d\Omega_{i}
-        G\left(\vec{R}_{i},\Omega_{i}|\Omega_{i-1},L_{i}\right)
-    \right]
-G\left(\vec{R},\Omega|\Omega_{0};L\right)
-    &= \prod_{i=1}^{N-1}\\
-    &\cdot G\left(\vec{R}_{N},\Omega|\Omega_{N-1},L_{N}\right),
-\end{align*}
-where $L = \sum L_i$.
-In Fourier space, this simply corresponds to multiplying the matrices $B^{(i)}$
-    from Equation~\ref{eq:expansion}.
+In summary, the position and orientation of the $n$th nucleosome exit site
+    is given by iterated convolution
+\begin{equation}\label{eq:conv}
+    \greens{\vec{R},\Omega} = \greens[L_n]{\cdot} * \cdots{} * \greens[L_1]{\cdot},
+\end{equation}
+    where $L = \sum L_i$.
+In Fourier space, this simply corresponds to multiplying the matrices $B(L_i)$
+    from Eq.~\ref{eq:expansion}.
+
+Moments of the chain can simply be computed by noticing that
+% \begin{equation}\label{eq:moments}
+    $\lim_{k\to0} \frac{\partial^n B_{00}^{00}}{\partial k} = i^n \left\langle
+    R^n\right\rangle$
+% \end{equation}
+% See the Supplement for details.
+To calculate the probability of two loci looping, we numerically invert
+    the Fourier transform to evaluate $\greens[L]{\vec{R}}$ at $\vec{R} = 0$.
+We note that this corresponds to a modified $J$-factor with no orientational
+    component.
 
 A key property of our model is that the relative orientation of adjacent
     nucleosomes is not just determined by $\Omega_\text{kink}$ and the thermal
     fluctuations of the linker strand.
-%FINAL make sure the subfigure label matches final figure
 As demonstrated in Figure~\ref{fig:linker-effect}, changing the length of the
     linker strand will change the relative orientation of two adjacent
     nucleosomes, even at zero temperature.
@@ -363,17 +380,12 @@ This effect is thanks to the intrinsic twist density of the DNA
 Our propagator $G$ takes this property into account implicitly thanks to the
     inclusion of $\tau$ in Eq.~\ref{eq:energy}.
 
-Moments of the chain can simply be computed by noticing that
-\begin{equation}\label{eq:moments}
-    \lim_{k\to0} \frac{\partial^n B_{00}^{00}}{\partial k} = i^n \left\langle
-    R^n\right\rangle
-\end{equation}
-See the Supplement for details.
+In what follows, we study chains with constant linker lengths $L_i = C$, then
+chains with small amounts of heterogeneity ${L_i \stackrel{i.i.d.}\sim
+U[C - \sigma, C + \sigma]}$, and finally chains with realistic linker
+heterogeneity $L_i \stackrel{i.i.d.}\sim \operatorname{Exp}(C)$.
 
-Finally, to calculate the probability of two loci looping, we numerical invert
-    the Fourier transform to evaluate $\greens{\vec{R}}$ at $\vec{R} = 0$.
-We note that this corresponds to a modified $J$ factor with no orientational
-    component.
+
 
 \begin{figure*}[th]
     \begin{centering}
@@ -403,9 +415,8 @@ We note that this corresponds to a modified $J$ factor with no orientational
 \subsection{\label{sec:homo-kuhn}Homogenous Nucleosome Spacing}
 
 %TODO make shorter
-We begin by studying the illustrative, simple case of a homogenous chromatin
-    chain, where there is a constant linker length separating adjacent
-    nucleosomes.
+We first consider the illustrative case of a homogenous chromatin chain, where
+    there is a constant linker length separating adjacent nucleosomes.
 Per Chasles's theorem, at zero temperature the nucleosomes in a homogenous chain
     form a superhelix (hereafter, the ``nucleosomal superhelix''\footnote{%
         This is distinct from the DNA superhelix that wraps each the nucleosome,
