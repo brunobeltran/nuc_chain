@@ -105,7 +105,7 @@ We present an analytical model that elucidates the effects of this rigid deforma
 %rephrased to implicitly incorporate the homogenous chain results
 We find that heterogenously-spaced kinks in a wormlike chain change the
     zero-temperature configuration from a crystalline fiber to a random walk. This geometric effect overpowers thermal fluctuations in the linker DNA\@.
-    We predict that the Kuhn length of \texit{in vivo} chromatin is up to four times
+    We predict that the Kuhn length of \textit{in vivo} chromatin is up to four times
     smaller than that of bare DNA due to the geometric constraints induced by
     nucleosome spacing. We also find that the exact change in elasticity depends on
     the average linker length in a given organism.
@@ -180,10 +180,12 @@ While this makes the WLC an excellent model for linker DNA, few analytical
     the linker DNA\@.
 Previously, our lab dealt with the special case of constant linker length,
     modeling chromatin as a WLC backbone and nucleosomes as periodic
-    kinks~\cite{koslover2013}. 
+    kinks~\cite{koslover2013}.
     %are we just not going to gesture towards other analytical models of DNA that
     %coarse-grain out the nucleosomes -- i.e. helical WLC, kinked WLC,
-    %etc.?
+    %etc.? % we should gesture towards the ones that really were about
+    %nucleosomes, but not towards the ones that "could be used to coarse grain
+    %out nucleosomes" but never explicitly were.
 The constant linker length assumption was motivated by evidence
     that linker lengths are preferentially quantized~\cite{widom1992,wang2008a}.
 Moreover, models of helical chromatin fibers with fixed linker
@@ -191,7 +193,8 @@ Moreover, models of helical chromatin fibers with fixed linker
     chromatin.
 %since the citations are nucleosome positioning papers, should we explicitly say
     %that the latest measurements of nucleosome positions suggest that
-    %nucleosomes are heterogenously spaced along DNA?
+    %nucleosomes are heterogenously spaced along DNA? % wait, I'm confused,
+    %that's what I thought I was saying here actually
 However, it is becoming increasingly clear that, \textit{in vivo}, nucleosomes
 are heterogenously spaced along the DNA backbone~\cite{lai2018,chereji2018,beshnova2014},
     even if some genomic loci are statistically preferred.
@@ -202,21 +205,33 @@ Moreover, modern electron microscopy measurements suggest that \textit{in vivo}
     lacking.
 %The lack of consensus on how nucleosome spacing affects chromatin structure
     %necessitates analytical models.
-    %it's not just random right? hasn't shlick done the Oct4 gene with
+%it's not just random right? hasn't shlick done the Oct4 gene with
     %nucleosome positioning data?
+% I assume you mean Bascom 2017? yeah but I mean they still use random linker
+    % lengths...just like we do
 Thus far, detailed computational models of chromatin with random
     linker lengths have suggested that heterogeneity in nucleosome spacing likely plays an
     important role in chromatin
-    architecture~\cite{woodcock1993,collepardo-guevara2014, bascom2017}.  %we should  probably cite tamar schlick's more recent paper here
+    architecture~\cite{woodcock1993,collepardo-guevara2014,bascom2017a}.  %we
+    %should  probably cite tamar schlick's more recent paper here, wait, isn't it
+    %already cited right there? is there a more recent one?
     %maybe it's just me, but why cite the older paper if more recent models do
-    %include fluctuations?
+    %include fluctuations? % if I have two citations, I always put the
+    %"foundational" one and the "most recent" one. plus it's two different
+    %groups, you kinda want one citation per group to independently do a thing.
+    %alos, why not have all three citations? personally I feel like...just cite
+    %everyone, why not? especially since there's so few peopel to cite
 %However, these methods either do not include the effects of linker
-%    DNA fluctuations~\cite{woodcock1993} 
+%    DNA fluctuations~\cite{woodcock1993}
     %not claiming this rewrite is any better, but I feel like we need a stronger
-    %way of explaining the limitations of schlick's approach, other than 
-    However, computational constraints limit these simulations to individual
-    chromatin chains with perscribed nucleosome locations
-    ~\cite{collepardo-guevara2014}. As a result, there is
+    %way of explaining the limitations of schlick's approach, other than
+    % to be honest, the easiest solution to this is to include her work in the
+    % discussion, not the introduction, since, as andy said, we haven't actually
+    % used any of her work for inspiration, although that's what's implied here
+However, computational constraints limit these simulations to individual
+    chromatin chains with prescribed nucleosome
+    locations~\cite{collepardo-guevara2014}.
+As a result, there is
     a need for analytical models that can systematically
     investigate the effects of realistic linker length heterogeneity on the
     large-scale conformation of chromatin.
@@ -236,15 +251,16 @@ Without theory to describe the physical principles that organize these more real
 
     %is it worth introducing the competition between genometry and fluctuations
     %in the intro? not sure how much to recaptiulate from abstract, but this is
-    %the main "physics-y" result to highlight.
+    %the main "physics-y" result to highlight. % i feel like it doesn't make any
+    %sense to introduce it before the model, since we need to be more percise in
+    %the main text. should bring it up in results/discussion though
 In this paper, we present the exact analytical theory for a wormlike chain
     with arbitrarily spaced rigid kinks, and use it to investigate the effects
     of nucleosomes on chromatin structure.
-    %should we still be nit-picky about histone binding vs. nucleosome binding?
-We show nucleosome binding can increase chromatin elasticity by orders of
-    magnitude, and that the amount of this increase depends only on the average linker length for a
-    given cell type.
-Furthermore, we show that aperiodic defects due to binding of nucleosomes---or, in
+We show histone binding can increase chromatin elasticity by orders of
+    magnitude, and that the amount of this increase depends only on the average
+    linker length for a given cell type.
+Furthermore, we show that aperiodic defects due to nucleosomes---or, in
     practice, any protein that binds DNA---can change the
     propensity for two genomic loci to come into contact by up to six
     orders of magnitude.
@@ -256,17 +272,22 @@ Our results suggest that nucleosome positioning can affect not only
     %essential to convey the point. feel free to replace organization with
     %interactions if you prefer.
 Furthermore, our results provide theoretical guidance for quantitatively
-    coarse-graining simulations of large-scale chromatin organization from the bottom up~\cite{macphersonInPress}.
+    coarse-graining simulations of large-scale chromatin organization from the
+    bottom up~\cite{macphersonInPress}.
 
 \section{\label{sec:model}Model}
 % maybe "make rigorous" is too forceful. Maybe we just cut the first sentence,
 % since we never refer to beads on a string in intro?
+% I think it's important to keep the "beads on a string" phrase somewhere, since
+% it's how people in the field refer to this idea, and it's important for people
+% who will be skipping our methods to at least take away that one point. maybe
+% put it in intro instead?
 %First, we make rigorous our ``beads on a string'' model of chromatin.
 We model linker DNA as a WLC and nucleosomes as the points where these
     WLC's connect.
 At each nucleosome, we impose the constraint that the incoming and outgoing
-    linker DNA strands have a fixed relative orientation. This relative orientation $\Omega_\text{kink}  =
-    {(\Omega^{(i)}_\text{entry})}^{-1}
+    linker DNA strands have a fixed relative orientation. This relative
+    orientation $\Omega_\text{kink}  = {(\Omega^{(i)}_\text{entry})}^{-1}
     \Omega^{(i)}_\text{exit}$ between the $i$th and $(i+1)$th linkers is
     determined by the nucleosome structure, as shown in
     Figure~\ref{fig:nuc-geo}.
@@ -274,6 +295,7 @@ At each nucleosome, we impose the constraint that the incoming and outgoing
 We represent this sequence of WLC's as a space curve $\vec{R}(s)$, $s\in[0,L]$, along
     with a triad of vectors describing the chain's orientation at each location
     $\vec{t_i}$, where $\vec{t_3} \coloneqq \partial_s \vec{R}(s)$.
+% thoughts on deleting this?
 % Here, $s$ tracks only along the linker DNA, since each nucleosome is merely
     % considered a point on the curve.
 We track the bend and twist of our polymer via the Euler vector $\omega_i$
@@ -283,7 +305,7 @@ We begin by computing the Green's function of the first linker, which represents
 the probability that the polymer of length $L_1$, which begins at
 the origin with fixed initial orientation $\Omega_0$, will end at position
 $\vec{R}$ with fixed end orientation $\Omega$.
-For a twistable WLC with no kinks, the Green's function is given by 
+For a twistable WLC with no kinks, the Green's function is given by
 \begin{equation}\label{eq:path}
     \gwlc[\Omega_0;L_1]{\vec{R}, \Omega} =\! \int_{0}^{L_1} \!\! \pathd{\Omega(s)}
               \delta(\vec{R} - \!\int_{0}^{L_1} \!\!\vec{t_3} ds)
@@ -306,18 +328,19 @@ For a twistable WLC with no kinks, the Green's function is given by
     the bend and twist persistence lengths of DNA, respectively.
 
 This equation can be solved analytically in Fourier space
-    ($\vec{R} \rightarrow \vec{k}$) by expanding in Wigner D functions, the
-    eigenfunctions of the heat equation on $SO(3)$ ~\cite{spakowitz2006}.
+    ($\vec{R} \rightarrow \vec{k}$) by expanding in Wigner D
+    functions~\cite{spakowitz2006}, the eigenfunctions of the heat equation on
+    $SO(3)$.
 \begin{equation}\label{eq:expansion}
-    \ghat{\vec{k}, \Omega} = \sum_{l m j}\sum_{l_0 m_0 j_0} g_{l_0 m_0 j_0}^{lmj}
+    \ghat{\vec{k}, \Omega} = \sum_{l m j}\sum_{l_0 m_0 j_0} \!\! g_{l_0 m_0 j_0}^{lmj}
         \wigD_l^{mj}(\Omega)\wigD_{l_0}^{m_0 j_0 *}(\Omega_0).
 \end{equation}
 %side note: removed all instances of "simply". it's a personal pet peeve of
-%mine.
+%mine. % haha thank you, leftovers from reading too many math books.
 In order to account for the kink introduced by the nucleosome, we rotate
     the final orientation of the linker DNA ${\Omega = \Omega_\text{entry}}$ to
     $\Omega_\text{exit}$ by replacing %why the paranthetical 1? seems
-    %unnecessary
+    %unnecessary % to match first paragraph of intro
     %my derivation has this as Omega_kink inverse?
     $g_{l_0 m_0 j_0}^{lmj}$ in Eq.~\ref{eq:expansion} with $B_{l_{0}m_{0}j_{0}}^{lmj} =
     \sqrt{\frac{8\pi}{2l+1}} \mathcal{D}_{l}^{jj_{0}}
@@ -380,6 +403,7 @@ X-ray crystallography~\cite{white2001,richmond2003,cutter2015a} and
 This means that $\Omega_\text{in}$ and $\Omega_\text{out}$ are well defined as a
     function of how many nucleotides are bound to to the histone core (see
     Supplemental Materials for details). %what details were you envisioning?
+    % literally an explicit formula for our omega as a function of unwrapping
 %even though/While this process is important for allowing DNA-binding proteins to find
 %DNA~\cite{polach1995,anderson2000,li2004}, transcript~\cite{kulaeva2007} and replication
 %to take place...
@@ -393,12 +417,19 @@ Using different values for the wrapping level does not substantially change our
     %statistically preferred amounts of unwrapping with linker length fixed?
     %I also feel like this could be a whole other paper, with both unwrapping
     %and linker length heterogeneity + comparisons to ideal chain. we should
-    %talk to Andy about how deep to go with this.
-
+    %talk to Andy about how deep to go with this. % yeah sure, my thoughts are
+    %that we should have kuhn length plots maybe for one or two more unwrapping
+    %levels and just show that the general trends are the same
+    %or even for a bunch of different fixed unwrapping levels tbh, there's no
+    %reason not to do it, in fact, I'm going to start that scan right now :)
+    %i'll run the 7 plausible symmetric unwrapping cases only for now
+    %%to be honest, we could probably move the discussion of the whole
+    %nucleosome unwrapping thing to the discussion, i think it would fit better
+    %there
 To compose monomers of the nucleosome chain with perscribed linker lengths, we
-perform an iterated convolution of the green's function in equation
-\ref{eq:expansion}. The position and orientation of the $n$th nucleosome exit site
-    is given by
+    perform an iterated convolution of the green's function in
+    equation~\ref{eq:expansion}.
+The position and orientation of the $n$th nucleosome exit site is given by
 \begin{equation}\label{eq:conv}
     \greens{\vec{R},\Omega} = \greens[L_n]{\cdot} * \cdots{} * \greens[L_1]{\cdot},
 \end{equation}
@@ -429,11 +460,12 @@ As demonstrated in Figure~\ref{fig:linker-effect}, changing the length of the
 Our propagator $G$ takes this property into account implicitly thanks to the
     inclusion of $\tau$ in Eq.~\ref{eq:energy}.
 %it feels weird to quote the uniform and exponential distributions without any
-    %motivation for doing so.
-In what follows, we study chains with constant linker lengths $L_i = C$, then
-chains with small amounts of heterogeneity ${L_i \stackrel{i.i.d.}\sim
-U[C - \sigma, C + \sigma]}$, and finally chains with realistic linker
-heterogeneity $L_i \stackrel{i.i.d.}\sim \operatorname{Exp}(C)$.
+    %motivation for doing so. % agreed, it was a test to see if it would sound
+    %as weird as I thought it did, lol.
+% In what follows, we study chains with constant linker lengths $L_i = C$, then
+%     chains with small amounts of heterogeneity ${L_i \stackrel{i.i.d.}\sim
+%     U[C - \sigma, C + \sigma]}$, and finally chains with realistic linker
+%     heterogeneity $L_i \stackrel{i.i.d.}\sim \operatorname{Exp}(C)$.
 
 
 
