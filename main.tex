@@ -212,9 +212,7 @@ Moreover, modern electron microscopy measurements suggest that \textit{in vivo}
 Thus far, detailed computational models of chromatin with random
     linker lengths have suggested that heterogeneity in nucleosome spacing likely plays an
     important role in chromatin
-    architecture~\cite{woodcock1993,collepardo-guevara2014,bascom2017a}.  %we
-    %should  probably cite tamar schlick's more recent paper here, wait, isn't it
-    %already cited right there? is there a more recent one?
+    architecture~\cite{woodcock1993,collepardo-guevara2014,bascom2017a}.
     %maybe it's just me, but why cite the older paper if more recent models do
     %include fluctuations? % if I have two citations, I always put the
     %"foundational" one and the "most recent" one. plus it's two different
@@ -295,7 +293,7 @@ At each nucleosome, we impose the constraint that the incoming and outgoing
 We represent this sequence of WLC's as a space curve $\vec{R}(s)$, $s\in[0,L]$, along
     with a triad of vectors describing the chain's orientation at each location
     $\vec{t_i}$, where $\vec{t_3} \coloneqq \partial_s \vec{R}(s)$.
-% thoughts on deleting this?
+% thoughts on deleting this? yeah I'm good with deleting this
 % Here, $s$ tracks only along the linker DNA, since each nucleosome is merely
     % considered a point on the curve.
 We track the bend and twist of our polymer via the Euler vector $\omega_i$
@@ -425,7 +423,7 @@ Using different values for the wrapping level does not substantially change our
     %i'll run the 7 plausible symmetric unwrapping cases only for now
     %%to be honest, we could probably move the discussion of the whole
     %nucleosome unwrapping thing to the discussion, i think it would fit better
-    %there
+    %there. % yeah I agree
 To compose monomers of the nucleosome chain with perscribed linker lengths, we
     perform an iterated convolution of the green's function in
     equation~\ref{eq:expansion}.
@@ -475,10 +473,11 @@ Our propagator $G$ takes this property into account implicitly thanks to the
         \includegraphics[width=0.15\textwidth]{./figures/fig-2b-mc-example.png}
     }%
     \subfloat[][]{\label{fig:homo-kuhn-all}
-        \includegraphics[width=0.325\textwidth]{./figures/fig-2a-kuhn-all.png}
+        \includegraphics[width=6.02cm]{./figures/fig2b_kuhn_length_homogenous_1to1000links_0unwraps.pdf}
+
     }%
     \subfloat[][]{\label{fig:homo-kuhn-zoom}
-        \includegraphics[width=0.5\textwidth]{./figures/fig-2c-kuhn-zoom.png}
+        \includegraphics[width=8.6cm]{./figures/fig2c_kuhn_length_in_nm_31to51links_0unwraps.pdf}
     }%
     \end{centering}
     \caption{\protect\subref{fig:mc-example} Zero-temperature structure vs. Monte Carlo simulation
@@ -591,25 +590,44 @@ As the heterogeneity in linker length increases, this means that the
 
 \begin{figure}[t]
     \centering
-    \subfloat[]{\label{fig:exp-kuhns}
-        \includegraphics[width=0.45\linewidth]{./figures/fig-4-exp-variance.png}
-    }%
-    \subfloat[]{\label{fig:box-kuhns}
-        \includegraphics[width=0.45\linewidth]{./figures/fig3b-box-47bp-only.png}
-    }%
-    \caption{\protect\subref{fig:exp-kuhns} We compare the kuhn lengths of realistic chromatin fibers
+    \label{fig:exp-kuhns}
+    %\subfloat[]{\label{fig:exp-kuhns}
+        \includegraphics[width=0.95\linewidth]{./figures/fig3_kuhn_exponential.pdf}
+    %}%
+    %\subfloat[]{\label{fig:box-kuhns}
+    %    \includegraphics[width=0.45\linewidth]{./figures/fig3b-box-47bp-only.png}
+    %}%
+    \caption{We compare the kuhn lengths of realistic chromatin fibers
     against those of the corresponding zero-temperature configurations (red
     triangles) and bare DNA (dashed line). Geometrical kinks and fluctuations
     combine to drastically increase the elasticity of chromatin. Mean linker
-    lengths in \textit{S.  cerivisiae}[Chereji], mice embryonic stem cells
-    [Voong], and human T cells  [Valouev] are marked.
-    \protect\subref{fig:box-kuhns} Kuhn lengths for
-    zero-temperature configurations versus fluctuating linkers as a function of
-    the amount of variance in uniformly distributed linker lengths with a mean
-    of \SI{47}{\basepair}. Adding merely \SI{1}{\basepair} of variability causes the
-    zero-temperature configuration to resemble a random walk with ``Kuhn
-    length'' (i.e.\ diffusivity) drastically lower than bare DNA's
-    \SI{100}{\basepair}, explaining the heterogenous chain's increased
+    lengths in \textit{S.  cerivisiae}[Chereji] (A), mice embryonic stem cells
+    [Voong] (B), and human T cells  [Valouev] (C)  are marked.}
+    % \protect\subref{fig:box-kuhns} Kuhn lengths for
+    % zero-temperature configurations versus fluctuating linkers as a function of
+    % the amount of variance in uniformly distributed linker lengths with a mean
+    % of \SI{47}{\basepair}. Adding merely \SI{1}{\basepair} of variability causes the
+    % zero-temperature configuration to resemble a random walk with ``Kuhn
+    % length'' (i.e.\ diffusivity) drastically lower than bare DNA's
+    % \SI{100}{\basepair}, explaining the heterogenous chain's increased
+    %flexibility.}%\label{fig:het-kuhn}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \label{fig:box-kuhns}
+    %\subfloat[]{\label{fig:exp-kuhns}
+        \includegraphics[width=0.95\linewidth]{./figures/fig4_kuhn_length_vs_window_size_mu47bp.pdf}
+    %}%
+    %\subfloat[]{\label{fig:box-kuhns}
+    %    \includegraphics[width=0.45\linewidth]{./figures/fig3b-box-47bp-only.png}
+    %}%
+    \caption{Kuhn lengths for heterogenous chains as a function of
+     the amount of variance in the uniformly distributed linker lengths with a mean
+     of \SI{47}{\basepair}. Adding merely \SI{1}{\basepair} of variability causes the
+     zero-temperature configuration (red triangles) to resemble a random walk with ``Kuhn
+     length'' (i.e.\ diffusivity) drastically lower than that of bare DNA
+     (\SI{100}{\basepair}), explaining the heterogenous chain's increased
     flexibility.}%\label{fig:het-kuhn}
 \end{figure}
 
@@ -666,7 +684,7 @@ This has profound implications for the ability of chromatin remodelers to act in
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\linewidth]{./figures/fig-5a-exp-looping.png}
+    \includegraphics[width=0.95\linewidth]{./figures/fig5_looping_hetero31to52bp.pdf}
     %\includegraphics[width=0.35\linewidth]{./figures/fig-5b-looping-features.png}
     \caption{Each purple line designates an individual chain configuration
     with uniformly random linker lengths between 31 and \SI{51}{\basepair}, with
