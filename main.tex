@@ -49,6 +49,7 @@ showpacs,preprintnumbers,
 \newcommand{\energy}{\mathcal{E}}
 \newcommand{\wigD}{\mathcal{D}}
 \newcommand{\RR}{\left\langle{}R^2\right\rangle{}}
+\newcommand{\meanli}{\left\langle{}L_i\right\rangle}
 
 \begin{document}
 %\preprint{APS/123-QED}
@@ -83,44 +84,23 @@ showpacs,preprintnumbers,
 
 \begin{abstract}
 
-In vivo, the many proteins that bind DNA introduce heterogenously-spaced
-    kinks in the conformation of the DNA double helix.
-%I'm not sure if "otherwise rigid" is the right phrase, since DNA can bend and
-    %twist even without proteins?
+In vivo, the milieu of proteins that bind DNA introduce heterogenously-spaced
+    kinks in the conformation of the semiflexible DNA double helix.
 % theta given 0 unwrap : 62.7
-Most notably, the winding of DNA around a histone octamer to form a nucleosome
-    creates an effective \ang{62.7} kink in the DNA's conformation, a sharp bend that
+Most notably, in a nucleosome, DNA winds around the histone octamer to form an
+    effective interior angle of only \ang{62.7}, a conformation that
     is thermally inaccessible to bare DNA\@.
-%perhaps we should mention up front that our model is a wormlike chain with
-    %aperiodic defects? that way it makes more sense to talk about the
-    %competition between geometrical effects and thermal fluctuations.
-We present an analytical model that elucidates the effects of this rigid deformation on the
+We present an analytical model for the effects of these rigid kinks on the
     physical organization of chromosomal DNA\@.
-% Our model predicts that periodic rigid kinks, such as nucleosomes with a fixed
-%     nucleosome repeat length, can lead to chromatin chains whose elasticities
-%     differ by over an order of magnitude for small changes in the repeat length.
-% In contrast, we show that adding any heterogeneity to the nucleosome spacing
-%     eliminates this sensitivity, allowing us to robustly predict the Kuhn length
-%     of chromatin in various important cell types.
-%rephrased to implicitly incorporate the homogenous chain results
-We find that heterogenously-spaced kinks in a wormlike chain change the
-    zero-temperature configuration from a crystalline fiber to a random walk. This geometric effect overpowers thermal fluctuations in the linker DNA\@.
-    We predict that the Kuhn length of \textit{in vivo} chromatin is up to four times
-    smaller than that of bare DNA due to the geometric constraints induced by
-    nucleosome spacing. We also find that the exact change in elasticity depends on
-    the average linker length in a given organism.
-% In addiction, we show by merely rearranging the positions of intervening
-%     nucleosomes, it is possible change the probability that two distal genomic
-%     loci loop together by up to 6 order of magnitude.
-In addition, our model predicts that the looping probability of two genomic
-    loci can change by as much as 6 orders of magnitude depending on the
-    particular spacing of the intervening kinks (nucleosomes).
-% This suggests that chromatin remodellers could play a much larger role in
-%     anchoring together distal loci than previously anticipated.
-% Our work fills a critical gap between models that explicitly incorporate
-%     nucleosomes, but are computationally impractical to scale, and existing
-%     coarse-grained models of chromatin, which ignore the important contributions
-%     of nucleosome geometry.
+Our model predicts that periodic kinks, such as nucleosomes with a fixed
+    nucleosome repeat length, can lead to chromatin chains whose elasticities
+    differ by over an order of magnitude for small changes in the repeat length.
+In contrast, we show that any heterogeneity to the nucleosome spacing
+    eliminates this sensitivity, allowing us to robustly predict the Kuhn length
+    of chromatin in various cell types.
+In addiction, we show by merely rearranging the positions of intervening
+    nucleosomes, it is possible to change the probability that two genomic
+    loci loop together by up to 6 orders of magnitude.
 Our results are broadly applicable to any semiflexible polymer with aperiodic
     defects, and the their implications for the flexibility and cyclizability of
     block copolymers are discussed.
@@ -156,6 +136,24 @@ Our results are broadly applicable to any semiflexible polymer with aperiodic
 %latest in vivo nucleosome positioning data to show that realistic variability
 %in nucleosome spacing significantly affects the ability of chromatin to form
 %loops, which is vital to transcriptional regulation
+%DONE include discussion of how homogenous chain model is same as helical
+% chain previously used for dsDNA~\cite{liu2011a},
+%DONE how full model is related
+% to kinked chain~\cite{wiggins2005}, ....
+%DONE also note force response of our full polymer has previously been discussed
+% in~\cite{popov2005}.
+%TODO propose that we should use this new model to look at supercoiling effects
+% of nucleosome positions as proposed in~\cite{grigoryev1981} (some paradoxes
+% about this~\cite{prunell1998} were later solved in~\cite{nikitina2017}
+%TODO propose more comprehensive understading of ability of chromatin
+% remodellers to affect structure using our model, instead of
+% e.g.~\cite{muller2014} where they only ``move'' one nucleosome
+%TODO make sure we mention that although increasingly high-fidelity measurements
+%of nucelsoome position continue to suggest that linker lengths are
+%preferentially quantized, this does not exclude them not being perfectly
+%quantized. (probalby in introducetion to section on "uniformly dist" linker
+%lengths
+
 
 % \section{\label{sec:intro}Introduction}
 In the cell, DNA and its associated proteins---collectively, chromatin---are
@@ -166,122 +164,95 @@ This organization is known to play a role in a myriad of biological processes,
     of work on the statistical mechanics of the chromatin fiber.
 
 The fundamental repeating unit of Eukaryotic chromatin organization is the
-    nucleosome, which is formed by 147 basepairs of DNA wrapped around a
-    histone octamer~\cite{cutter2015a}.
-Adjacent nucleosomes are connected by linker DNA, whose average length varies
-    from $<$\SI{10}{\basepair} in fission yeast\cite{givens2012} to over
-    \SI{50}{\basepair} in some human cells\cite{schones2008}.
+    nucleosome, which is formed by 147 basepairs of DNA wrapped around a histone
+    octamer~\cite{cutter2015a}.
+Linker DNA connecting adjacent nucleosomes is typically much shorter than the
+    \SI{150}{\basepair} persistence length of bare DNA---ranging
+    from $<$\SI{10}{\basepair} on average in fission yeast~\cite{givens2012} to
+    \SI{50}{\basepair} in human cells~\cite{schones2008}.
+Therefore, the chromatin fiber is well approximated by a series of stiff rods
+    connected at angles determined by the structure of the nucleosome, as shown
+    in Figure~\ref{fig:nuc-geo}.
 
-The statistics of bare DNA are known to quantitatively match a wormlike
-    chain (WLC) model with a persistence length {$l_p \approx
-    \SI{50}{\nano\metre}$}.
-While this makes the WLC an excellent model for linker DNA, few analytical
-    models have attempted to include the local geometry of nucleosomes connecting
-    the linker DNA\@.
-Previously, our lab dealt with the special case of constant linker length,
-    modeling chromatin as a WLC backbone and nucleosomes as periodic
-    kinks~\cite{koslover2013}.
-    %are we just not going to gesture towards other analytical models of DNA that
-    %coarse-grain out the nucleosomes -- i.e. helical WLC, kinked WLC,
-    %etc.? % we should gesture towards the ones that really were about
-    %nucleosomes, but not towards the ones that "could be used to coarse grain
-    %out nucleosomes" but never explicitly were.
-The constant linker length assumption was motivated by evidence
-    that linker lengths are preferentially quantized~\cite{widom1992,wang2008a}.
-Moreover, models of helical chromatin fibers with fixed linker
-    lengths~\cite{wedemann2002} reproduced properties of the well-established ``\SI{30}{\nano\metre} fiber'' structure of \textit{in vitro}
-    chromatin.
-%since the citations are nucleosome positioning papers, should we explicitly say
-    %that the latest measurements of nucleosome positions suggest that
-    %nucleosomes are heterogenously spaced along DNA? % wait, I'm confused,
-    %that's what I thought I was saying here actually
-However, it is becoming increasingly clear that, \textit{in vivo}, nucleosomes
-are heterogenously spaced along the DNA backbone~\cite{lai2018,chereji2018,beshnova2014},
-    even if some genomic loci are statistically preferred.
-Moreover, modern electron microscopy measurements suggest that \textit{in vivo}
-    chromatin is largely disordered~\cite{ou2017}, contrary to the
-    ``\SI{30}{\nano\metre} fiber'' picture. However, a comprehensive
-    understanding of how nucleosome spacing affects this disordered structure is still
-    lacking.
-%The lack of consensus on how nucleosome spacing affects chromatin structure
-    %necessitates analytical models.
-%it's not just random right? hasn't shlick done the Oct4 gene with
-    %nucleosome positioning data?
-% I assume you mean Bascom 2017? yeah but I mean they still use random linker
-    % lengths...just like we do
-Thus far, detailed computational models of chromatin with random
-    linker lengths have suggested that heterogeneity in nucleosome spacing likely plays an
-    important role in chromatin
-    architecture~\cite{woodcock1993,collepardo-guevara2014,bascom2017a}.
-    %maybe it's just me, but why cite the older paper if more recent models do
-    %include fluctuations? % if I have two citations, I always put the
-    %"foundational" one and the "most recent" one. plus it's two different
-    %groups, you kinda want one citation per group to independently do a thing.
-    %alos, why not have all three citations? personally I feel like...just cite
-    %everyone, why not? especially since there's so few peopel to cite
-%However, these methods either do not include the effects of linker
-%    DNA fluctuations~\cite{woodcock1993}
-    %not claiming this rewrite is any better, but I feel like we need a stronger
-    %way of explaining the limitations of schlick's approach, other than
-    % to be honest, the easiest solution to this is to include her work in the
-    % discussion, not the introduction, since, as andy said, we haven't actually
-    % used any of her work for inspiration, although that's what's implied here
-However, computational constraints limit these simulations to individual
-    chromatin chains with prescribed nucleosome
-    locations~\cite{collepardo-guevara2014}.
-As a result, there is
-    a need for analytical models that can systematically
-    investigate the effects of realistic linker length heterogeneity on the
-    large-scale conformation of chromatin.
-    %this next sentence is good, but I'm concerned that the "what's missing"
-    %part of the above literature review is sort of masked until this point. I
-    %wonder if we can hint that the role that nucleosomes play in the structure
-    %of chromatin is still poorly understood earlier on? I feel like that main
-    %point gets lost in all the detailed descriptions of past models. I tried
-    %tweaking things but if it's not coming across, leaving this comment to let
-    %you know what I'm going for.
-Without theory to describe the physical principles that organize these more realistic,
-    heterogenous fibers, it has become \textit{de facto} standard to treat
-    chromatin as an effective WLC with a persistence length that either matches
-    that of bare DNA for
-    simplicity~\cite{benedetti2017,macphersonInPress,nuebler2018} or is chosen
+While computational models of this chromatin fiber abound~\cite{bascom2017a,
+    collepardo-guevara2014, bascom2018, grigoryev2016, kepper2008, koslover2010,
+    langowski2007, muller2014, schiessel2001, scipioni2010, wedemann2002,
+    woodcock1993%
+    %these are "meh" norouzi2015, stolz2010,
+    }, few analytical models have attempted to explicitly incorporate the
+    geometrical effects of nucleosomes.
+As a result, very little is known about the properties of the chromatin fiber in
+    general, only about particular chains with specific linker lengths.
+Most models simply treat chromatin as an effective wormlike chain (WLC), where
+    the persistence length $l_p$ is either chosen to match that of bare DNA for
+    simplicity~\cite{benedetti2017, macphersonInPress, nuebler2018} or is chosen
     to fit the quantity being measured~\cite{sanborn2015,pierro2017}.
 
-    %is it worth introducing the competition between genometry and fluctuations
-    %in the intro? not sure how much to recaptiulate from abstract, but this is
-    %the main "physics-y" result to highlight. % i feel like it doesn't make any
-    %sense to introduce it before the model, since we need to be more percise in
-    %the main text. should bring it up in results/discussion though
-In this paper, we present the exact analytical theory for a wormlike chain
-    with arbitrarily spaced rigid kinks, and use it to investigate the effects
-    of nucleosomes on chromatin structure.
-We show histone binding can increase chromatin elasticity by orders of
-    magnitude, and that the amount of this increase depends only on the average
-    linker length for a given cell type.
-Furthermore, we show that aperiodic defects due to nucleosomes---or, in
-    practice, any protein that binds DNA---can change the
-    propensity for two genomic loci to come into contact by up to six
-    orders of magnitude.
-Our results suggest that nucleosome positioning can affect not only
-    the compaction of genetic material, but also the creation of
-    functional chromatin loops. %mobility of locus might be a stretch
-    %"correctly" is a vague word to describe models. deleted "interactions"
-    %because I generally dislike phrases that have A and B when both are not
-    %essential to convey the point. feel free to replace organization with
-    %interactions if you prefer.
-Furthermore, our results provide theoretical guidance for quantitatively
-    coarse-graining simulations of large-scale chromatin organization from the
-    bottom up~\cite{macphersonInPress}.
+In order to remedy this, our lab previously used the assumption of constant
+    linker lengths to coarse grain a chain of nucleosomes from first
+    principles~\cite{koslover2013a}.
+Chromatin was modeled via a wormlike chain backbone representing dsDNA with
+    periodically spaced rigid kinks representing nucleosomes.
+However, nucleosomes in the cell are almost never perfectly spaced.
+The occupancy profiles of even the most well-positioned nucleosomes---such as
+    those near transcription start sites---are well described by a model where
+    nucleosomes instead bind uniformly along the DNA~\cite{kornberg1988,%
+    %extra
+    chevereau2009, chereji2011, beshnova2014, chou2007, kornberg1981,
+    mavrich2008, mobius2010, mobius2013, teif2010, tesoro2016%
+    %indirect locke2010,
+    %foundational math mcghee1974, vanderlick1986
+    %belongs in extra but i'm morally opposed to giving credit: schopflin2013
+    }, and
+    are merely excluded from certain areas~\cite{ozonov2013}.
+These models are referred to as the ``lattice gas'' picture of nucleosome
+    binding, after the Tonks gas they generalize.
+
+
+%BRUNO: consider including the following if there's space
+%The main disagreement between these lattice-gas models and experimental data
+    % was due to the experimental data being more ``smooth'' than the
+    % model~\cite{beshnova2014}.
+%This inspired many additions to the model, most
+    % notably, introduction of non-nucleosome non-specific DNA binding
+    % proteins and partial nucleosome unwrapping~\cite{beshnova2014}.
+% However, recent single-cell MNAse-seq data~\cite{lai2018} do not show this
+    % discrepancy\footnote{Compare the red and green curves in Figure 2a and 2c
+    % of \citep{lai2018} to see how pooling multiple cells can cause the effects
+    % that \citep{beshnova2014} attempt to prevent by adding unwrapping to their
+    % model.}, suggesting that the most naive lattice gas
+    % model with uniform binding and no unwrapping can likely explain nucleosome
+    % positioning in human cells.
+
+%DEEPTI:is it worth introducing the competition between genometry and fluctuations
+%in the intro? not sure how much to recaptiulate from abstract, but this is
+%the main "physics-y" result to highlight.
+%BRUNO: i feel like it doesn't make any sense to introduce it before the model,
+%since we need to be more percise in the main text. should bring it up in
+%results/discussion though
+In this paper, we extend our analytical theory to incorporate arbitrarily spaced
+    kinks, and use it to investigate the effects of realistic nucleosome spacing
+    on chromatin structure.
+We first discuss the properties of a chromatin fiber with delta-distributed
+    linker lengths (periodic nucleosome spacing).
+We then show even with very little variance in nucleosome positions, the
+    structure rapidly develops univeral properties.
+More specifically, the statistics of the chain are shown to not depend on the
+    particular distribution of linker lengths chosen, only on the average linker
+    length.
+This result allows us to calculate the looping probabilities and Kuhn length of
+    chromatin as a function of the average linker length without specifying a
+    detailed model of nucleosome binding.
 
 \section{\label{sec:model}Model}
-% maybe "make rigorous" is too forceful. Maybe we just cut the first sentence,
-% since we never refer to beads on a string in intro?
-% I think it's important to keep the "beads on a string" phrase somewhere, since
+%BRUNO: maybe "make rigorous" is too forceful. Maybe we just cut the first sentence,
+%DEEPTI:since we never refer to beads on a string in intro?
+%BRUNO: no, I think it's important to keep the "beads on a string" phrase somewhere, since
 % it's how people in the field refer to this idea, and it's important for people
 % who will be skipping our methods to at least take away that one point. maybe
 % put it in intro instead?
 %First, we make rigorous our ``beads on a string'' model of chromatin.
-We model linker DNA as a WLC and nucleosomes as the points where these
+We treat linker DNA as separate WLC's and nucleosomes as the points where these
     WLC's connect.
 At each nucleosome, we impose the constraint that the incoming and outgoing
     linker DNA strands have a fixed relative orientation. This relative
@@ -297,7 +268,8 @@ We represent this sequence of WLC's as a space curve $\vec{R}(s)$, $s\in[0,L]$, 
 % Here, $s$ tracks only along the linker DNA, since each nucleosome is merely
     % considered a point on the curve.
 We track the bend and twist of our polymer via the Euler vector $\omega_i$
-    defined by $\Omega(s) = \partial_s \vec{t_i}(s) = \omega_i(s) \times \vec{t_i}(s)$.
+    defined by ${\Omega(s) = \partial_s \vec{t_i}(s) = \omega_i(s) \times
+    \vec{t_i}(s)}$.
 
 We begin by computing the Green's function of the first linker, which represents
 the probability that the polymer of length $L_1$, which begins at
@@ -386,10 +358,6 @@ The coefficients $B_{l_0 m_0 j_0}^{lmj}(\Omega_\text{kink}, L)$ were first compu
     }\label{fig:nuc-geo}
 \end{figure}
 
-DNA is known to partially unwrap from the nucleosome core dynamically \textit{in
-    vivo}, whether spontaneously (called nucleosome breathing~\cite{TODO}), due to
-    force on the DNA~\cite{TODO}, or through active
-    remodelling~\cite{dion2007,kulaeva2007,senavirathne2017}.
 X-ray crystallography~\cite{white2001,richmond2003,cutter2015a} and
     %with H1: bednar, zhou; H4 acetlyation: wakamori; whole fiber: wakamori,
     %song2014b, eltsov2018, bilokapic.
@@ -440,8 +408,10 @@ Moments of the chain can be computed by noticing that
     $\lim_{k\to0} \frac{\partial^n B_{00}^{00}}{\partial k} = i^n \left\langle
     R^n\right\rangle$.
 % \end{equation}
-% See the Supplement for details.
-    %still think we should include equation for the inversion
+In particular, we extract the elasticity of the chain chromatin via its Kuhn
+    length, $b = \lim_{N\to\infty} \RR/\sum_{i=0}^N L_i$.
+%DEEPTI:still think we should include equation for the inversion
+%BRUNO: which one?
 To calculate the probability of two loci looping, we numerically invert
     the Fourier transform to evaluate $\greens[L]{\vec{R}}$ at $\vec{R} = 0$.
 We note that this corresponds to a modified $J$-factor with no orientational
@@ -465,8 +435,6 @@ Our propagator $G$ takes this property into account implicitly thanks to the
 %     U[C - \sigma, C + \sigma]}$, and finally chains with realistic linker
 %     heterogeneity $L_i \stackrel{i.i.d.}\sim \operatorname{Exp}(C)$.
 
-
-
 \begin{figure*}[th]
     \begin{centering}
     \subfloat[][]{\label{fig:mc-example}
@@ -480,47 +448,64 @@ Our propagator $G$ takes this property into account implicitly thanks to the
         \includegraphics[width=8.6cm]{./figures/fig2c_kuhn_length_in_nm_31to51links_0unwraps.pdf}
     }%
     \end{centering}
-    \caption{\protect\subref{fig:mc-example} Zero-temperature structure vs. Monte Carlo simulation
-    snapshot of nucleosome chain with \SI{38}{\basepair} linkers.
-    \protect\subref{fig:homo-kuhn-all} The Kuhn lengths of homogenous chains are
-    \SI{10.5}{\basepair} periodic in linker length, with each linker length
-    representing a distinct, discretized helical WLC\@. In the limit of long
-    linkers, the Kuhn length eventually approaches that of bare DNA,
-    \SI{100}{\nano\metre}. \protect\subref{fig:homo-kuhn-zoom} Compact, superhelical
-    structures afford more flexibility than non-compact fibres, which have
-    higher Kuhn lengths. Thus, the overall structure of chromatin is extremely
-    sensitive to changes in the nucleosome repeat length.}\label{fig:homo-kuhn}
+    \caption{\protect\subref{fig:mc-example} Zero-temperature structure vs.
+    Monte Carlo simulation snapshot of nucleosome chain with \SI{38}{\basepair}
+    linkers.  \protect\subref{fig:homo-kuhn-all} The Kuhn lengths of homogenous
+    chains are \SI{10.5}{\basepair} periodic in linker length, with each linker
+    length representing a distinct, discretized helical WLC\@. In the limit of
+    long linkers, the Kuhn length eventually approaches that of bare DNA,
+    \SI{100}{\nano\metre}. \protect\subref{fig:homo-kuhn-zoom} Compact,
+    superhelical structures afford more flexibility than non-compact fibres,
+    which have higher Kuhn lengths. Thus, the overall structure of chromatin is
+    extremely sensitive to changes in the nucleosome repeat
+    length.}\label{fig:homo-kuhn}
 \end{figure*}
 
 \section{\label{sec:model}Results}
 \subsection{\label{sec:homo-kuhn}Homogenous Nucleosome Spacing}
 
-%TODO make shorter
-We first consider the illustrative case of a homogenous chromatin chain, where
+We first revisit the illustrative case of a homogenous chromatin chain, where
     there is a constant linker length separating adjacent nucleosomes.
-Per Chasles's theorem, at zero temperature the nucleosomes in a homogenous chain
-    form a superhelix (hereafter, the ``nucleosomal superhelix''\footnote{%
-        This is distinct from the DNA superhelix that wraps each the nucleosome,
-        which is in turn distinct from the intrinsic double helix of the
-        underlying DNA itself.})
-    whose compactness is determined by the angle between adjacent linkers.
-Because the angle between linkers depends on the linker length (again, see
-    Figure~\ref{fig:linker-effect}), the shape of the nucleosomal helices formed by
-    the homogenous chains depend on the linker length, as shown in
-    Figure~\ref{fig:homo-kuhn-zoom}.
+At zero temperature, Chasles' theorem implies that these homogenous chains will
+    trace out a helix whose structure is determined by the spherical
+    angles $\theta$ and $\phi$ connecting adjacent linkers.
+The angle $\theta$ is fixed by the structure of the nucleosome
+    (Figure~\ref{fig:entry-exit}), but the angle $\phi$ between linkers depends
+    on the linker length (Figure~\ref{fig:linker-effect}).
 
-We can use Eq.~\ref{eq:moments} to compute the mean squared displacement, $\RR$,
-    of the homogenous chain as function of its linker length.
-%TODO check if equation looks pretty
-This allows us to extract the elasticity of homogenous chromatin via its Kuhn
-    length, $b = \lim_{N\to\infty} \frac{\RR}{\sum_{i=0}^N L_i}$, as shown in
-    Figure~\ref{fig:homo-kuhn-all}.
-We note that due to Chasles's theorem, this calculation corresponds exactly to
-    the Kuhn length of the approriate discrete helical wormlike chain, as first
-    done in~\cite{yamakawa1976}.
-The effects of dsDNA's \SI{10.5}{\basepair} helicity are evident in the
-    periodicity of the resulting Kuhn length of chromatin as shown in
-    Figures~\ref{fig:homo-kuhn-all}~and~\ref{fig:homo-kuhn-zoom}.
+In Figure~\ref{fig:homo-kuhn}, we show how this helical shape affects the
+    elasticity of the chromatin fiber.
+Since dsDNA has \SI{10.5}{\basepair} helical periodicity, every 21st linker
+    length will create an identical fiber.
+The Kuhn lengths (Figure~\ref{fig:homo-kuhn-all}) of the various homogenous
+    fibers reflect this.
+In the short-linker limit, the linker DNA is well approximated by a rigid rod,
+    and the Kuhn length is approximately \SI{10.5}{\basepair} periodic.
+In the limit as the linker length increases, the Kuhn length approaches that of
+    bare DNA\@.
+However, since the kink density is proportional to the inverse of the linker
+    length, this happens slowly (like $1/L_i$), and for realistic linker
+    lengths, only $\phi$ matters (Figure~\ref{fig:homo-kuhn-zoom}).
+
+
+%TODO NEW FIGURE 1a. It will simply show one $\RR$ curve and the best fit WLC
+    %near the start of the curve and the best fit gaussian chain nithe long
+    %chain limit.
+For a regular wormlike chain, the Kuhn length $b = 2 l_p$.
+However, Chasles' theorem makes homogenous chains of nucleosomes ``helical''
+    wormlike chains~\cite{yamakawa2016}.
+
+However, for the helical wormlike chain,
+    amount of DNA contained per unit of rise along the nucleosomal helix,
+    as shown in Figure~\ref{fig:homo-kuhn-zoom}.
+%TODO: add the example structures back in
+
+Perhaps most notably, the variability between the stiffest and most flexible
+    chromatin chains spans over an order of magnitude in Kuhn lengths.
+%TODO: color the inaccessible ones
+While some of the most compact configurations will sterically inaccesible, this
+    demonstrates the drastic effect that nucleosome binding can have on DNA's
+    elasticity.
 
 At short length scales, the $\RR$ behaves like a wormlike chain with reduced
     persistence length, due to the linkers being forced to traverse a helix.
@@ -532,25 +517,6 @@ It is noteworthy that the best fit persistence length at short scales and the
 Thus, our full theory is required even for calculations involving this
     simplified, homogenous chromatin chain.
 
-We find that, to first approximation, the Kuhn length is determined by the
-    amount of DNA contained per unit of rise along the nucleosomal superhelix,
-    as shown in Figure~\ref{fig:homo-kuhn-zoom}.
-%TODO Either: change this to explain the kuhn length fixing the length of the
-    %chain instead of fixing the lenght of the superhelical chain (per quinn) OR
-    %change the figure to have the same amount of superhelical chain
-For a given bend and twist persistance length $l_p$ and $l_t$, the flexibility
-    of a chain is proportional to the length of the chain.
-Because straighter structures---such as the \SI{41}{\basepair} linker chain
-    shown in Figure~\ref{fig:homo-kuhn-zoom}---have less chain legnth for a
-    given distance along  the nucleosomal superhelix, they stiffer, and
-    therefore have longer Kuhn lengths.
-
-Perhaps most notably, the variability between the stiffest and most flexible
-    chromatin chains spans over an order of magnitude in Kuhn lengths.
-%TODO: color the inaccessible ones
-While some of the most compact configurations will sterically inaccesible, this
-    demonstrates the drastic effect that nucleosome binding can have on DNA's
-    elasticity.
 
 \subsection{\label{sec:homo-kuhn}Heterogenous Nucleosome $\RR$}
 
@@ -588,6 +554,24 @@ As the heterogeneity in linker length increases, this means that the
     rotating chain (in the case when linker variability is high enough to make
     the distribution of $\phi$ approximately uniform over $[0, 2\pi]$).
 
+%TODO reincorporate somewhere around here
+%DEEPTI:it's not just random right? hasn't shlick done the Oct4 gene with
+   %nucleosome positioning data?
+%BRUNO:I assume you mean Bascom 2017? yeah but I mean they still use random linker
+   % lengths...just like we do
+Simulations of particular chromatin chains with random linker lengths have
+    suggested that heterogeneity in nucleosome spacing leads to largely
+    disordered chromatin architecture~\cite{woodcock1993,
+    collepardo-guevara2014, bascom2017a} reminiscent of modern electron
+    microscopy images~\cite{ou2017}.
+%DEEPTI:maybe it's just me, but why cite the older paper if more recent models do
+%include fluctuations?
+%BRUNO: if I have two citations, I always put the
+%"foundational" one and the "most recent" one. plus it's two different
+%groups, you kinda want one citation per group to independently do a thing.
+%alos, why not have all three citations? personally I feel like...just cite
+%everyone, why not? especially since there's so few peopel to cite
+
 \begin{figure}[t]
     \centering
     \label{fig:exp-kuhns}
@@ -600,7 +584,7 @@ As the heterogeneity in linker length increases, this means that the
     \caption{We compare the kuhn lengths of realistic chromatin fibers
     against those of the corresponding zero-temperature configurations (red
     triangles) and bare DNA (dashed line). Geometrical kinks and fluctuations
-    combine to drastically increase the elasticity of chromatin. With exponentially 
+    combine to drastically increase the elasticity of chromatin. With exponentially
     distributed linker lengths, the kuhn length smoothly increases as a function
     of the mean linker length, and dampens the chaotic oscillations in the kuhn
     lenghts of homogenous chains. Mean linker
@@ -671,6 +655,7 @@ This quantity quantifies the propensity for two loci on the same chromosome to
     come into contact with each other as a function of their genomic separation.
 As expected, the large length scale behavior matches the Gaussian chain scaling
     of $L^{-3/2}$, with the Kuhn length predicted by our earlier analysis.
+
 In comparison to bare DNA, we find that the looping propensity increases
     drastically along the entire chain, as expected due to intra-superhelical
     contacts induced by the nucleosomes' geometry, as well as due to the
@@ -734,12 +719,31 @@ We present a simplified model of the chromatin fiber that retains only the most
     connected by bare linker DNA.\@
 By taking a fully analytical approach, we are able to outline the effects of
     linker length and its heterogeneity on the structure of the chromatin fiber.
+
 Our model excludes various important facets of chromatin's structure.
 Most strikingly, we ignore the steric interactions between nucleosomes that is
     well known~\cite{widom1992} to constrain the space of possible linker
     lengths.
 In addition, our model ignores the finite size of the nucleosome, treating it as
     a point-like kink in the DNA backbone.
+
+It is interesting to note that the helical wormlike chain has been employed
+    in the past to explain the looping statistics of bare DNA~\cite{shimada1984,
+    liu2011a}.
+Along with the so-called ``kinked'' wormlike chain model~\cite{widom2005,
+    popov2005}---where kinks are flexible, and represent melted base
+    pairs---these models were created to explain the propensity for small DNA
+    loops \textit{in vivo}.
+Our model highlights that even without models of DNA more detailed than the WLC,
+    the looping probabilites for short segments of DNA can be increased by
+    orders of magnitude simply by the specific or non-specific binding of any
+    protein that promotes a kink in the DNA.\@
+
+    %TODO add this sentence into the flow somewhere around here
+DNA is known to partially unwrap from the nucleosome core dynamically \textit{in
+    vivo}, whether spontaneously (called nucleosome breathing~\cite{TODO}), due to
+    force on the DNA~\cite{TODO}, or through active
+    remodelling~\cite{dion2007,kulaeva2007,senavirathne2017}.
 
 While these choices constrain the ability of our model to make predictions that
     can be tested \textit{in vivo}, our bottom-up approach allows us to
