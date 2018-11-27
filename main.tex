@@ -148,11 +148,18 @@ Our results are broadly applicable to any semiflexible polymer with aperiodic
 %TODO propose more comprehensive understading of ability of chromatin
 % remodellers to affect structure using our model, instead of
 % e.g.~\cite{muller2014} where they only ``move'' one nucleosome
+% specifically, propose to add energetics for unwrapping explicity, remodeling
+% expclicitly.
 %TODO make sure we mention that although increasingly high-fidelity measurements
 %of nucelsoome position continue to suggest that linker lengths are
 %preferentially quantized, this does not exclude them not being perfectly
 %quantized. (probalby in introducetion to section on "uniformly dist" linker
 %lengths
+%TODO make figure 4 using 41bp kuhn lengths. two panels. in one, zoom into kuhn
+%lengths with geometrical comparison in main first panel, then make the
+%non-zoomed in kuhn an inset. in second panel (to left?) include the chain
+%instantiations outside the main plot.
+%TODO switch figures 3 adn 4 in order
 
 
 % \section{\label{sec:intro}Introduction}
@@ -205,8 +212,8 @@ The occupancy profiles of even the most well-positioned nucleosomes---such as
     %belongs in extra but i'm morally opposed to giving credit: schopflin2013
     }, and
     are merely excluded from certain areas~\cite{ozonov2013}.
-These models are referred to as the ``lattice gas'' picture of nucleosome
-    binding, after the Tonks gas they generalize.
+% These models are referred to as the ``lattice gas'' picture of nucleosome
+%     binding, after the Tonks gas they generalize.
 
 
 %BRUNO: consider including the following if there's space
@@ -235,8 +242,8 @@ In this paper, we extend our analytical theory to incorporate arbitrarily spaced
     on chromatin structure.
 We first discuss the properties of a chromatin fiber with delta-distributed
     linker lengths (periodic nucleosome spacing).
-We then show even with very little variance in nucleosome positions, the
-    structure rapidly develops univeral properties.
+We then show that even with very little variance in nucleosome spacing, the
+    structure structure of the chromatin fiber exhibits a kind of universality.
 More specifically, the statistics of the chain are shown to not depend on the
     particular distribution of linker lengths chosen, only on the average linker
     length.
@@ -252,7 +259,7 @@ This result allows us to calculate the looping probabilities and Kuhn length of
 % who will be skipping our methods to at least take away that one point. maybe
 % put it in intro instead?
 %First, we make rigorous our ``beads on a string'' model of chromatin.
-We treat linker DNA as separate WLC's and nucleosomes as the points where these
+We treat each linker DNA as a WLC and nucleosomes as the points where these
     WLC's connect.
 At each nucleosome, we impose the constraint that the incoming and outgoing
     linker DNA strands have a fixed relative orientation. This relative
@@ -313,7 +320,9 @@ In order to account for the kink introduced by the nucleosome, we rotate
     %unnecessary % to match first paragraph of intro
     %my derivation has this as Omega_kink inverse?
     $g_{l_0 m_0 j_0}^{lmj}$ in Eq.~\ref{eq:expansion} with $B_{l_{0}m_{0}j_{0}}^{lmj} =
-    \sqrt{\frac{8\pi}{2l+1}} \mathcal{D}_{l}^{jj_{0}}
+    \sqrt{8\pi/(2l+1)}%
+    %\sqrt{\frac{8\pi}{2l+1}}
+    \mathcal{D}_{l}^{jj_{0}}
     \left(\Omega_{kink}\right)g_{l_{0}m_{0}j_{0}}^{lmj}\left(L\right)$.
 The coefficients $B_{l_0 m_0 j_0}^{lmj}(\Omega_\text{kink}, L)$ were first computed
     % stole this citation from Lena's "systematic coarse graining" paper
@@ -324,19 +333,19 @@ The coefficients $B_{l_0 m_0 j_0}^{lmj}(\Omega_\text{kink}, L)$ were first compu
     \subfloat[]{\label{fig:entry-exit}
         \begin{overpic}[width=100pt]{./figures/fig-1a-nucleosome-geometry.png}
             \put(16,-3){\large$\displaystyle\theta$}
-            \put(22,59){\large$\displaystyle\Omega_\text{in}$}
-            \put(68,18.5){\large$\displaystyle\Omega_\text{out}$}
+            \put(10,59){\large$\displaystyle\Omega_\text{entry}$}
+            \put(62,17.5){\large$\displaystyle\Omega_\text{exit}$}
         \end{overpic}%
     }\hfill{}
     \subfloat[]{\label{fig:linker-effect}
         \begin{overpic}[width=130pt]{./figures/fig-1b-helicity-effect.png}
-            \put(18,12){\parbox{1.5cm}{\centering DNA Helicity}}
+            \put(17,11){\parbox{1.5cm}{\centering DNA Helicity}}
             \put(-2,47){\large$\displaystyle\phi$}
-            \put(-5,62){$\displaystyle\SI{33}{\basepair}$}
-            \put(10,75){$\displaystyle-\SI{2}{\basepair}$}
-            \put(40,79){$\displaystyle\SI{35}{\basepair}$}
-            \put(63,68){$\displaystyle+\SI{2}{\basepair}$}
-            \put(75,47){$\displaystyle\SI{37}{\basepair}$}
+            \put(-6,63){$\displaystyle\SI{33}{\basepair}$}
+            \put(11,77){$\displaystyle-\SI{2}{\basepair}$}
+            \put(40,81){$\displaystyle\SI{35}{\basepair}$}
+            \put(61,72){$\displaystyle+\SI{2}{\basepair}$}
+            \put(76,46.5){$\displaystyle\SI{37}{\basepair}$}
         \end{overpic}
     }%
     \caption{\protect\subref{fig:entry-exit} The structure of a
@@ -367,16 +376,14 @@ X-ray crystallography~\cite{white2001,richmond2003,cutter2015a} and
     octamer 1.7 times in a superhelix with radius \SI{4.19}{\nano\metre} and a
     pitch of \SI{2.59}{\nano\metre}~\cite{richmond2003}.
 This means that $\Omega_\text{in}$ and $\Omega_\text{out}$ are well defined as a
-    function of how many nucleotides are bound to to the histone core (see
-    Supplemental Materials for details). %what details were you envisioning?
-    % literally an explicit formula for our omega as a function of unwrapping
+    function of how many nucleotides are bound to to the histone core.
 %even though/While this process is important for allowing DNA-binding proteins to find
 %DNA~\cite{polach1995,anderson2000,li2004}, transcript~\cite{kulaeva2007} and replication
 %to take place...
 %even though it has been directly measured through cryoem in solution that
     % nucleosomes are on average less wrapped than this~\cite{
 In what follows, we fix the wrapping level to that found in the crystal
-    structure.
+    structure (\SI{147}{\basepair}).
 Using different values for the wrapping level does not substantially change our
     results (see Supplemental Figure XX).
     %do you think we should do a treatment of unwrapping for SI? maybe just for
@@ -467,7 +474,7 @@ Our propagator $G$ takes this property into account implicitly thanks to the
 We first revisit the illustrative case of a homogenous chromatin chain, where
     there is a constant linker length separating adjacent nucleosomes.
 At zero temperature, Chasles' theorem implies that these homogenous chains will
-    trace out a helix whose structure is determined by the spherical
+    trace out a helix whose structure is determined solely by the spherical
     angles $\theta$ and $\phi$ connecting adjacent linkers.
 The angle $\theta$ is fixed by the structure of the nucleosome
     (Figure~\ref{fig:entry-exit}), but the angle $\phi$ between linkers depends
@@ -477,8 +484,7 @@ In Figure~\ref{fig:homo-kuhn}, we show how this helical shape affects the
     elasticity of the chromatin fiber.
 Since dsDNA has \SI{10.5}{\basepair} helical periodicity, every 21st linker
     length will create an identical fiber.
-The Kuhn lengths (Figure~\ref{fig:homo-kuhn-all}) of the various homogenous
-    fibers reflect this.
+The Kuhn lengths  of the various homogenous fibers reflect this.
 In the short-linker limit, the linker DNA is well approximated by a rigid rod,
     and the Kuhn length is approximately \SI{10.5}{\basepair} periodic.
 In the limit as the linker length increases, the Kuhn length approaches that of
@@ -486,7 +492,6 @@ In the limit as the linker length increases, the Kuhn length approaches that of
 However, since the kink density is proportional to the inverse of the linker
     length, this happens slowly (like $1/L_i$), and for realistic linker
     lengths, only $\phi$ matters (Figure~\ref{fig:homo-kuhn-zoom}).
-
 
 %TODO NEW FIGURE 1a. It will simply show one $\RR$ curve and the best fit WLC
     %near the start of the curve and the best fit gaussian chain nithe long
