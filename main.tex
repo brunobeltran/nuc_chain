@@ -263,7 +263,7 @@ For a twistable WLC with no kinks, the Green's function is given by
 
 This equation can be solved analytically in Fourier space
     ($\vec{R} \rightarrow \vec{k}$) by expanding in Wigner
-    D-functions~\cite{spakowitz2006}, the eigenfunctions of the heat equation on
+    D-functions~\cite{spakowitz2006}, analogs of spherical harnomics for
     $SO(3)$.
 %TODO equation overflows if a period is added
 \begin{equation}\label{eq:expansion}
@@ -411,22 +411,27 @@ Our propagator $G$ takes this property into account implicitly thanks to the
 
 We first revisit the illustrative case of a homogenous chromatin chain, where
     there is a constant linker length separating adjacent nucleosomes.
-At zero temperature, where linkers are rigid rods, the nucleosomes
-    trace out a helix whose structure is determined solely by the spherical
-    angles $\theta$ and $\phi$ connecting adjacent linkers.
+In the simplifying limit of zero temperature, the linkers are rigid rods, and
+    our model is purely geometrical.
+The geometrical model with constant linker lengths traces out a helix whose
+    pitch is determined solely by the spherical angles $\theta$ and $\phi$
+    connecting adjacent linkers.
 The angle $\theta$ is fixed by the structure of the nucleosome
     (Figure~\ref{fig:entry-exit}), but the angle $\phi$ between linkers depends
     on the linker length (Figure~\ref{fig:linker-effect}).
 
-In Figure~\ref{fig:homo-kuhn}, we show how this helical shape affects the
-    elasticity of the chromatin fiber.
-Since dsDNA has \SI{10.5}{\basepair} helical periodicity, every 21st linker
-    length will create a similar fiber.
-The Kuhn lengths  of the various homogenous fibers reflect this.
-In the short-linker limit, the linker DNA is well approximated by a rigid rod,
-    and the Kuhn length is approximately \SI{10.5}{\basepair} periodic.
+In Figure~\ref{fig:homo-kuhn-zoom}, the Kuhn length of the
+    fluctuating homogenous chain is compared to the geometric model for
+    typical linker lengths.
+Since these linkers are much shorter than the \SI{150}{\basepair} persistence
+    length of bare DNA, the linkers are approximately rigid rods, and the Kuhn
+    length corresponds directly to the shape of the geometric model.
+
+In the short-length limit, the Kuhn length is approximately \SI{10.5}{\basepair}
+    periodic.
+This reflects the \SI{10.5}{\basepair} helical periodicity of dsDNA.\@
 In the limit as the linker length increases, the Kuhn length approaches that of
-    bare DNA\@.
+    bare DNA.\@
 However, since the kink density is proportional to the inverse of the linker
     length, this happens slowly (like $1/L_i$), and for realistic linker
     lengths, only $\phi$ matters (Figure~\ref{fig:homo-kuhn-zoom}).
