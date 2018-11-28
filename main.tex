@@ -83,8 +83,8 @@ showpacs,preprintnumbers,
              %  but any date may be explicitly specified
 
 \begin{abstract}
-% \textit{In vivo}, the myriad of proteins that bind DNA introduce heterogeneously-spaced
-%     kinks in the conformation of the semiflexible DNA double helix.
+\textit{In vivo}, the myriad of proteins that bind DNA introduce heterogeneously-spaced
+    kinks in the conformation of the semiflexible DNA double helix.
 % % theta given 0 unwrap...
 % Most notably, in a nucleosome, DNA winds around the histone octamer to form an
 %     effective \ang{62.7} bend, a conformation that is thermally inaccessible to
@@ -93,14 +93,17 @@ We present an analytical model for the effects of these rigid kinks on the
     physical organization of chromosomal DNA\@.
 For periodic kinks, the elasticity of chromatin chains is extremely sensitive to
     nucleosome repeat length.
-In contrast, we show that any heterogeneity in the nucleosome spacing
+In contrast, we show that any heterogeneity in nucleosome spacing
     eliminates this sensitivity, allowing us to robustly predict the Kuhn length
     of chromatin in various cell types.
 In addition, we show by merely rearranging the positions of intervening
     nucleosomes, it is possible to change the probability that two genomic
     loci loop together by up to 6 orders of magnitude.
-We discuss the effects of nucleosome repositioning on the structure and
-    topology of chromatin loops.
+Our results are broadly applicable to any semiflexible polymer with aperiodic
+    defects, and the their implications for the flexibility and cyclizability of
+    block copolymers are discussed.
+% We discuss the effects of nucleosome repositioning on the structure and
+%     topology of chromatin loops.
 \end{abstract}
 
 % PACS, the Physics and Astronomy Classification Scheme.
@@ -109,36 +112,6 @@ We discuss the effects of nucleosome repositioning on the structure and
 %\keywords{chromatin \| nucleosome \| kinked WLC}
 \maketitle
 
-%ANDY'S ORIGINAL HIGH LEVEL OUTLINE
-%1. structure of genome matters (define nucleosome, brief intro on chromatin)
-%2. heterogeneity plays a role in structure:
-%in vivo DNA has high propensity for random binding that leads to random
-%geometric organization;
-%nucleosomes and other DNA-binding proteins (such as HU in bacteria) are not always perfectly spaced along the DNA
-%3. Past analytical models of DNA have ommitted heterogeneity.
-% two categories of analytical models: fixed NRL, or approximate chromatin as
-% some effective wormlike chain to study local DNA mechanics (melting,
-% kinking, helical WLC, etc.) DNA's mechanical properties will undeniably
-% influence the various scales of physical behavior; however, approximating
-% nucleosome-bound DNA as a homogenous polymer fails to account for the
-% geometrical features that arise from heterogenous kinks imposed by
-% nucleosomes or other DNA-binding proteins.
-%4. In this paper, we present a model that includes the thermomechanical
-%properties of DNA as well as aperiodic binding of nucleosomes. In the
-%competition between these two factors, we find that the geometrical
-%configuration of the fiber dominates thermal fluctuations in DNA linkers. We demonstrate
-%that heterogeneity introduces order-of-magnitude differences in the elasticity
-%of the polymer. We also find that these differences are not simply a composite
-%average of the corresponding homogenous chains. We apply our model to the
-%latest in vivo nucleosome positioning data to show that realistic variability
-%in nucleosome spacing significantly affects the ability of chromatin to form
-%loops, which is vital to transcriptional regulation
-%DONE include discussion of how homogenous chain model is same as helical
-% chain previously used for dsDNA~\cite{liu2011a},
-%DONE how full model is related
-% to kinked chain~\cite{wiggins2005}, ....
-%DONE also note force response of our full polymer has previously been discussed
-% in~\cite{popov2005}.
 %TODO propose that we should use this new model to look at supercoiling effects
 % of nucleosome positions as proposed in~\cite{grigoryev1981} (some paradoxes
 % about this~\cite{prunell1998} were later solved in~\cite{nikitina2017}
@@ -170,33 +143,28 @@ This organization is known to play a role in a myriad of biological processes,
 The fundamental repeating unit of Eukaryotic chromatin organization is the
     nucleosome, which is formed by 147 basepairs of DNA wrapped around a histone
     octamer~\cite{cutter2015a}.
-Linker DNA connecting adjacent nucleosomes is typically much shorter than the
-    \SI{150}{\basepair} persistence length of bare DNA---ranging
-    from $<$\SI{10}{\basepair} on average in fission yeast~\cite{givens2012} to
-    \SI{50}{\basepair} in human cells~\cite{schones2008}.
-Therefore, the chromatin fiber is well approximated by a series of stiff rods
-    connected at angles determined by the structure of the nucleosome, as shown
-    in Figure~\ref{fig:nuc-geo}.
+Linker DNA connecting adjacent nucleosomes ranges from $<$\SI{10}{\basepair} on
+    average in fission yeast~\cite{givens2012} to \SI{50}{\basepair} in human
+    cells~\cite{schones2008}.
+Linker DNA along with the nucleosomes they join together collectively form the
+    beads on a string model of the chromatin fiber.
 
-While computational models of this chromatin fiber abound~\cite{bascom2017a,
-    collepardo-guevara2014, bascom2018, grigoryev2016, kepper2008, koslover2010,
-    langowski2007, muller2014, schiessel2001, scipioni2010, wedemann2002,
-    woodcock1993%
+
+While simulations have been used to study individual chromatin
+    fibers~\cite{bascom2017a, collepardo-guevara2014, bascom2018, grigoryev2016,
+    kepper2008, koslover2010, langowski2007, muller2014, schiessel2001,
+    scipioni2010, wedemann2002, woodcock1993%
     %these are "meh" norouzi2015, stolz2010,
-    }, few analytical models have attempted to explicitly incorporate the
-    geometrical effects of nucleosomes.
-As a result, very little is known about the properties of the chromatin fiber in
-    general, only about particular chains with specific linker lengths.
-Most models simply treat chromatin as an effective wormlike chain (WLC), where
-    the persistence length $l_p$ is either chosen to match that of bare DNA for
-    simplicity~\cite{benedetti2017, macphersonInPress, nuebler2018} or is chosen
-    to fit the quantity being measured~\cite{sanborn2015,pierro2017}.
+    }, the field lacks a systematic understanding of the effects of nucleosome
+    positioning on chromatin's structure.
+As a result, most models simply treat chromatin as an
+    effective wormlike chain (WLC), where the persistence length $l_p$ is
+    chosen to either match that of bare DNA~\cite{benedetti2017,
+    macpherson2018, nuebler2018} or to fit the quantity being
+    measured~\cite{sanborn2015,pierro2017}.
 
-In order to remedy this, our lab previously used the assumption of constant
-    linker lengths to coarse grain a chain of nucleosomes from first
-    principles~\cite{koslover2013a}.
-Chromatin was modeled via a wormlike chain backbone representing dsDNA with
-    periodically spaced rigid kinks representing nucleosomes.
+We have previously presented the analytical solution to the beads on a string
+    model for the special case of constant linker lengths~\cite{koslover2013a}.
 However, nucleosomes in the cell are almost never perfectly spaced.
 The occupancy profiles of even the most well-positioned nucleosomes---such as
     those near transcription start sites---are well described by a model where
@@ -240,7 +208,7 @@ In this paper, we extend our analytical theory to incorporate arbitrarily spaced
 We first discuss the properties of a chromatin fiber with delta-distributed
     linker lengths (periodic nucleosome spacing).
 We then show that even with very little variance in nucleosome spacing, the
-    structure structure of the chromatin fiber exhibits a kind of universality.
+    structure of the chromatin fiber exhibits a kind of universality.
 More specifically, the statistics of the chain are shown to not depend on the
     particular distribution of linker lengths chosen, only on the average linker
     length.
@@ -442,7 +410,7 @@ Our propagator $G$ takes this property into account implicitly thanks to the
 \begin{figure*}[th]
     \begin{centering}
     \subfloat[][]{\label{fig:mc-example}
-        \includegraphics[width=0.15\textwidth]{./figures/fig-2b-mc-example.png}
+        \includegraphics[width=0.14\textwidth]{./figures/fig-2b-mc-example.png}
     }%
     \subfloat[][]{\label{fig:homo-kuhn-all}
         \includegraphics[width=6.02cm]{./figures/fig2b_kuhn_length_homogenous_1to1000links_0unwraps.pdf}
@@ -465,7 +433,7 @@ Our propagator $G$ takes this property into account implicitly thanks to the
     length.}\label{fig:homo-kuhn}
 \end{figure*}
 
-\section{\label{sec:model}Results}
+\section{\label{sec:results}Results}
 \subsection{\label{sec:homo-kuhn}Homogenous Nucleosome Spacing}
 
 We first revisit the illustrative case of a homogenous chromatin chain, where
@@ -520,7 +488,8 @@ Thus, our full theory is required even for calculations involving this
     simplified, homogenous chromatin chain.
 
 
-\subsection{\label{sec:homo-kuhn}Heterogenous Nucleosome $\RR$}
+\subsection{\label{sec:hetero-kuhn}Heterogenous Nucleosome
+\texorpdfstring{$\RR$}{<R2>}}
 
 We now consider the more relevant scenario, when the nucleosomes are randomly
     spaced along the DNA backbone.
@@ -576,6 +545,25 @@ Simulations of particular chromatin chains with random linker lengths have
 
 \begin{figure}[t]
     \centering
+    \label{fig:box-kuhns}
+    %\subfloat[]{\label{fig:exp-kuhns}
+        \includegraphics[width=0.95\linewidth]{./figures/fig4_kuhn_length_vs_window_size_mu47bp.pdf}
+    %}%
+    %\subfloat[]{\label{fig:box-kuhns}
+    %    \includegraphics[width=0.45\linewidth]{./figures/fig3b-box-47bp-only.png}
+    %}%
+    \caption{Kuhn lengths for heterogenous chains as a function of
+     the amount of variance in the uniformly distributed linker lengths with a mean
+     of \SI{47}{\basepair}. Adding merely \SI{1}{\basepair} of variability causes the
+     zero-temperature configuration (red triangles) to resemble a random walk with ``Kuhn
+     length'' (i.e.\ diffusivity) drastically lower than that of bare DNA
+     (\SI{100}{\basepair}), explaining the heterogenous chain's increased
+    flexibility.}%\label{fig:het-kuhn}
+\end{figure}
+
+
+\begin{figure}[t]
+    \centering
     \label{fig:exp-kuhns}
     %\subfloat[]{\label{fig:exp-kuhns}
         \includegraphics[width=0.95\linewidth]{./figures/fig3_kuhn_exponential.pdf}
@@ -600,24 +588,6 @@ Simulations of particular chromatin chains with random linker lengths have
     % length'' (i.e.\ diffusivity) drastically lower than bare DNA's
     % \SI{100}{\basepair}, explaining the heterogenous chain's increased
     %flexibility.}%\label{fig:het-kuhn}
-\end{figure}
-
-\begin{figure}[t]
-    \centering
-    \label{fig:box-kuhns}
-    %\subfloat[]{\label{fig:exp-kuhns}
-        \includegraphics[width=0.95\linewidth]{./figures/fig4_kuhn_length_vs_window_size_mu47bp.pdf}
-    %}%
-    %\subfloat[]{\label{fig:box-kuhns}
-    %    \includegraphics[width=0.45\linewidth]{./figures/fig3b-box-47bp-only.png}
-    %}%
-    \caption{Kuhn lengths for heterogenous chains as a function of
-     the amount of variance in the uniformly distributed linker lengths with a mean
-     of \SI{47}{\basepair}. Adding merely \SI{1}{\basepair} of variability causes the
-     zero-temperature configuration (red triangles) to resemble a random walk with ``Kuhn
-     length'' (i.e.\ diffusivity) drastically lower than that of bare DNA
-     (\SI{100}{\basepair}), explaining the heterogenous chain's increased
-    flexibility.}%\label{fig:het-kuhn}
 \end{figure}
 
 As expected, for short linker lengths, $<\SI{20}{\basepair}$, the
