@@ -151,13 +151,13 @@ Nucleosomes, along with their intervening linkers, collectively form the
     beads on a string model of the chromatin fiber.
 
 While simulations have historically highlighted huge discrepancies in chromatin
-    organization as a function of nucleosome repeat length~\cite{bascom2017a,
+    organization as a function of linker lengths~\cite{bascom2017a,
     collepardo-guevara2014, bascom2018, grigoryev2016, kepper2008, koslover2010,
     langowski2007, muller2014, schiessel2001, scipioni2010, wedemann2002,
     woodcock1993%
     %these are "meh" norouzi2015, stolz2010,
     }, the field still lacks a systematic understanding of the effects of
-    nucleosome positioning on chromatin's structure.
+    linker length on chromatin's structure.
 As a result, most models simply treat chromatin as an effective wormlike chain
     (WLC), where the persistence length $l_p$ is chosen to either arbitrarily
     match that of bare DNA~\cite{benedetti2017, macpherson2018, nuebler2018} or
@@ -386,11 +386,11 @@ Our propagator $G$ takes this property into account implicitly thanks to the
         \includegraphics[width=0.14\textwidth]{./figures/fig-2b-mc-example.png}
     }%
     \subfloat[][]{\label{fig:homo-kuhn-all}
-        \includegraphics[width=6.02cm]{./figures/fig2b_kuhn_length_homogenous_1to1000links_0unwraps.pdf}
+        \includegraphics{./figures/fig2b_kuhn_length_homogenous_1to1000links_0unwraps.pdf}
 
     }%
     \subfloat[][]{\label{fig:homo-kuhn-zoom}
-        \includegraphics[width=8.6cm]{./figures/fig2c_kuhn_length_in_nm_31to51links_0unwraps.pdf}
+        \includegraphics{./figures/fig2c_kuhn_length_in_nm_31to51links_0unwraps.pdf}
     }%
     \end{centering}
     \caption{\protect\subref{fig:mc-example} Zero-temperature structure vs.
@@ -523,7 +523,7 @@ Simulations of particular chromatin chains with random linker lengths have
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\linewidth]{./figures/fig4_kuhn_length_vs_window_size_mu47bp.pdf}
+    \includegraphics{./figures/fig4_kuhn_length_vs_window_size_mu47bp.pdf}
     \caption{Kuhn lengths for heterogenous chains as a function of
      the amount of variance in the uniformly distributed linker lengths with a mean
      of \SI{47}{\basepair}. Adding merely \SI{1}{\basepair} of variability causes the
@@ -536,7 +536,7 @@ Simulations of particular chromatin chains with random linker lengths have
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\linewidth]{./figures/fig3_kuhn_exponential.pdf}
+    \includegraphics{./figures/fig3_kuhn_exponential.pdf}
     \caption{We compare the kuhn lengths of realistic chromatin fibers
     against those of the corresponding zero-temperature configurations (red
     triangles) and bare DNA (dashed line). Geometrical kinks and fluctuations
@@ -602,7 +602,7 @@ This has profound implications for the ability of chromatin remodelers to act in
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\linewidth]{./figures/fig5_looping_hetero31to52bp.pdf}
+    \includegraphics{./figures/fig5_looping_hetero31to52bp.pdf}
     %\includegraphics[width=0.35\linewidth]{./figures/fig-5b-looping-features.png}
     \caption{Each purple line designates an individual chain configuration
     with uniformly random linker lengths between 31 and \SI{51}{\basepair}, with
