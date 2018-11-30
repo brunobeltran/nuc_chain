@@ -294,8 +294,8 @@ In order to account for the kink introduced by the nucleosome, we rotate
     \sqrt{8\pi/(2l+1)}%
     %\sqrt{\frac{8\pi}{2l+1}}
     \mathcal{D}_{l}^{jj_{0}}
-    \left(\Omega_{kink}\right)g_{l_{0}m_{0}j_{0}}^{lmj}\left(L\right)$.
-The coefficients $B_{l_0 m_0 j_0}^{lmj}(\Omega_\text{kink}, L)$ were first
+    \left(\Omega_\text{kink}^{-1}\right)g_{l_{0}m_{0}j_{0}}^{lmj}\left(L\right)$.
+The coefficients $B_{l_0 m_0 j_0}^{lmj}(\Omega_\text{kink}^{-1}, L)$ were first
     computed in~\cite{zhou2003}, and an alternative derivation can be found in
     the supplement.
 
@@ -346,7 +346,7 @@ X-ray crystallography~\cite{white2001,richmond2003,cutter2015a} and
     well approximated by a deformed B-DNA structure, wrapping the histone
     octamer 1.7 times in a superhelix with radius \SI{4.19}{\nano\metre} and a
     pitch of \SI{2.59}{\nano\metre}~\cite{richmond2003}.
-This means that $\Omega_\text{in}$ and $\Omega_\text{out}$ are well defined as a
+This means that $\Omega_\text{entry}$ and $\Omega_\text{exit}$ are well defined as a
     function of how many nucleotides are bound to to the histone core.
 %even though/While this process is important for allowing DNA-binding proteins to find
 %DNA~\cite{polach1995,anderson2000,li2004}, transcript~\cite{kulaeva2007} and replication
@@ -354,18 +354,19 @@ This means that $\Omega_\text{in}$ and $\Omega_\text{out}$ are well defined as a
 %even though it has been directly measured through cryoem in solution that
     % nucleosomes are on average less wrapped than this~\cite{
 In what follows, we fix the wrapping level to that found in the crystal
-    structure (\SI{147}{\basepair}).
+    structure (\SI{146}{\basepair}).
 Using different values for the wrapping level does not substantially change our
+qualitative
 %TODO add different unwrapping example to supplement
     results (see Supplemental Figure XX).
 To compose monomers of the nucleosome chain with perscribed linker lengths, we
     perform an iterated convolution of the Green's function in
     equation~\ref{eq:expansion}.
-% The position and orientation of the $n$th nucleosome exit site is given by
-% \begin{equation}\label{eq:conv}
-%     \greens{\vec{R},\Omega} = \greens[L_n]{\cdot} * \cdots{} * \greens[L_1]{\cdot},
-% \end{equation}
-%     where $L = \sum L_i$.
+The position and orientation of the $n$th nucleosome exit site is given by
+\begin{equation}\label{eq:conv}
+    \greens{\vec{R},\Omega} = \greens[L_n]{\cdot} * \cdots{} * \greens[L_1]{\cdot},
+\end{equation}
+    where $L = \sum L_i$.
 In Fourier space, this corresponds to multiplying the matrices $B(L_i)$
     from Eq.~\ref{eq:expansion}.
 
@@ -374,14 +375,20 @@ Moments of the chain can be computed by noticing that
     $\lim_{k\to0} \frac{\partial^n B_{00}^{00}}{\partial k} = i^n \left\langle
     R^n\right\rangle$.
 % \end{equation}
-In particular, we extract the elasticity of the chain chromatin via its Kuhn
+In particular, we extract the elasticity of the chromatin chain via its Kuhn
     length, $b = \lim_{N\to\infty} \RR/\sum_{i=0}^N L_i$.
-%DEEPTI:still think we should include equation for the inversion
+%DEEPTI:still think we should include equation for the inversion, since it's not
+    %purely numerical. Like we did the orientation integrals analytically using the plane
+    %wave expansion of spherical harmonics befor computing the numerical k
+    %integral.
 %BRUNO: which one?
 To calculate the propensity for two loci to loop, we numerically invert
-    the Fourier transform to evaluate $\greens[L]{\vec{R}}$ at $\vec{R} = 0$.
-We note that this corresponds to a modified $J$-factor with no orientational
-    component.
+    the Fourier transform to evaluate $\greens[L]{\vec{R}}$ at $\vec{R} = 0$,
+    where the real-space Green's function is given by
+\begin{equation}\label{eq:realgreens}
+    \greens[L]{\vec{R}} = \frac{1}{2\pi^2}\int_0^\infty dk~k^2 j_0(kR) B_{00}^{00}(k;L)
+\end{equation}
+We note that $P_\text{loop}=\greens[L]{\vec{R}=0}$ corresponds to a modified $J$-factor with no orientational component.
 
 A key property of our model is that the relative orientation of adjacent
     nucleosomes is not just determined by $\Omega_\text{kink}$ and the thermal
