@@ -432,139 +432,174 @@ Our propagator $G$ takes this property into account implicitly thanks to the
 Recall that the Kuhn length, $b$, is a universal measure of the long-length
 scale behavior of any polymer.
 %why do we care about the kuhn length?
-More specifically, for any polymer model the end to end distance $\RR$ will
-always take the form $\RR = bL$ for large enough $L$.
-For the wormlike chain, this length is directly related to the elasticity of
-the chain through it's persistence length $b = 2l_p$.
+More specifically, the end to end distance $\RR$ is linearly related to the
+underlying chain length, $L$, by $\RR = bL$ for large enough $L$.
+For the wormlike chain, the Kuhn length is directly related to the elasticity of
+the chain through it's persistence length $b = 2l_p$. 
 
+First, we examine the illustrative case of homogenous chains with fixed linker
+lengths.
 %here's where the chain becomes described only by the kuhn length
-In FIG, we see that $\RR$ approaches the Gaussian chain regime after just a
-DISTANCE.
-This will also hold true for heterogenous chains (FIGS).
-
+%only issue with this problem is that the length scale becomes Gaussian at
+%different points depending on the chain configuration. going to delay this
+%discussion until we make universality point
+%In the long-length regime, $b$ characterizes the
+% variance of the end-to-end distribution of a Gaussian chain.
+% In FIG, we see that $\RR$ approaches the Gaussian chain regime after just a
+% DISTANCE.
+% This will also hold true for heterogenous chains (FIGS).
 %make this paragraph into a paranthetical statemetn that WLC doesn't match short
 %\RR
-The first question we seek to answer is, how well can we capture the average
-end-to-end behavior of the chain by treating chromatin as an effective WLC?
-
+%The first question we seek to answer is, how well can we capture the average
+%end-to-end behavior of the chain by treating chromatin as an effective WLC?
 %here's what determines the kuhn length: zero temperature picture
-The Kuhn length of the kinked chain has a simple explanation, shown in FIG.
-For various linker lengths, we plot the Kuhn length of the chain along with
-the minimum energy state of the chain.
-In practice, the chain fluctuates thermally around this minimum energy
+In Fig 2a, we plot the Kuhn length of the kinked chain along with select minimum
+energy structures of the chain for various linker lengths.
+In our model, the chain fluctuates thermally around this minimum energy
 configuration by an amount determined by $l_p$, and it is this fluctuating
 chain that the Kuhn length is measuring.
-However, as can be seen in FIG, the Kuhn length is well explained by how
+However, as can be seen in FIG 2a, the Kuhn length is well explained by how
 processive the chain is at zero temperature.
 
 %% what determines zero temperature pictures for homogenous chain
 More precisely, notice that every homogenous chain at zero temperature forms a
-helix of nucleosomes (as a consequence of Chasles' theorem).
+superhelix of nucleosomes (as a consequence of Chasles' theorem).
 The rise per basepair of the helix is determined by the spherical angles
 $\theta$ and $\phi$ connecting adjacent linkers.
-As shown in Figure~\ref{fig:entry-exit}, $\theta$ depends solely on the
-structure of the nucleosome and the number of base pairs bound to the
-nucleosome.
-On the other hand, Figure~\ref{fig:linker-effect} show how $\phi$ depends
-linearly on the linker length because of the intrinsic helicity of DNA, and the
-fact that the nucleosome must be positioned to bind the major groove of the DNA
-double helix.
-
-Because $\phi$ depends on the DNA's helicity, the rise/bp of the helix formed by
-the nucleosomes of our homogenous chain is \SI{10.5}{\basepair} periodic,
-matching the DNA's helical periodicity.
+%we already discuss this in model section and in figure caption
+% As shown in Figure~\ref{fig:entry-exit}, $\theta$ depends solely on the
+% structure of the nucleosome and on the number of base pairs bound to the
+% nucleosome.
+Since $\phi$ depends linearly on the linker length due to the intrinsic helicity
+of DNA, the rise/bp of the superhelix is \SI{10.5}{\basepair} periodic,
+matching the DNA's helical periodicity (see Supp. Fig. XX).
 Therefore, for two different linker lengths, we can predict which will have a
 larger Kuhn length by using $\phi$ to compute the rise per basepair of its zero
-temperature configuration.
+temperature configuration. A larger rise/bp corresponds to a more processive
+chain with a higher Kuhn length, whereas a smaller rise/bp creates a more
+compact and therefore more flexible structure with a lower Kuhn length.
+
+This geometrical explanation causes the Kuhn lengths of the fluctuating chains
+to be extremely sensitive to the particular choice of linker length. As a
+result, we hypothesized that introducing modest amounts of heterogeneity in the
+linker length could significantly affect the geometric and physical organization of
+heterogenous nucleosome chains.
 
 %% ? transition to heterogenous chains (maybe b.c. Kuhn is so sensitive to NRL,
 %% we suspect there will be large effect for introducing small heterogeneity
-While the full theory is required to compute absolute values for the Kuhn length
-(see Supp Fig), %as is the long linker limit of kuhn length goes in supp
-the geometric intuition for the behavior of the fluctuating
-chains is conserved when we move to heterogenous nucleosome spacing.
+%While the full theory is required to compute exact values for the Kuhn length
+%(see Supp Fig), %as is the long linker limit of kuhn length goes in supp.
+%not sure how the above phrase is referring the long linker limit figure?
+%the geometric intuition for the behavior of the fluctuating
+%chains is conserved when we move to heterogenous nucleosome spacing.
 
-%% what determines zero temperature picture for het chains
+%% what determines zero temperature picture for het chains, how do zero temp and
+% fluct pictures compare
 We apply our fluctuating theory to study the chains first considered
 in~\cite{woodcock1993}, where the linker lengths are drawn uniformly from a
 range $\mu \pm \sigma$.
+As in the homogenous case, the processivity of the zero-temperature
+configuration qualitatively explains the Kuhn length of the fluctuating chain. 
 In FIG, we see that as we increase $\sigma$, the zero-temperature configuration
-of the chain interpolates between a helix at $\sigma = 0$ to a an increasingly
+of the chain interpolates between a helix at $\sigma = 0$ to an increasingly
 random walk at larger $\sigma$.
-This is because as we increase $\sigma$, the distribution of $\phi$ connecting
-adjacent linkers also becomes broader.
-Since $\phi \in [0, 2\pi]$, the distribution of $\phi$ quickly becomes
-approximately uniform as $\sigma$ increases.
-This is evident in FIG, where we show how Kuhn length of the chains changes as
-$\sigma$ increases.
-
-%% how do zero temp and fluct pictures compare?
-As in the homogenous case, the processivity of this random walk qualitatively
-explains the Kuhn length of the chain overall. Since random linker lengths leads
-to random $\phi$, even at zero temperature, the chain is equivalent to a
-generalized ``hindered rotating chain'', and so it has a Kuhn length. This
-allows us to quantify our geometric notion of ``processivity'', and we show in
-FIG how it qualitatively predicts the Kuhn length of the heterogenous chains.
-This stands in contrast to models based on combining the thermal fluctuations of
-their individual homogenous chains to compute the heterogenous chain's Kuhn
-length, which fail dramatically (Supp FIG). We conclude that for realistic
+This is because as we increase $\sigma$, the distribution of $\phi \in [0, 2\pi]$ connecting
+adjacent linkers becomes approximately uniform.
+% This is evident in FIG, where we show how Kuhn lengths of the zero-temperature
+% and fluctuating chains change as
+% $\sigma$ increases.
+As a result, the zero-temperature chain is equivalent to a modified ``hindered
+rotating chain'' in which the bond angle $\theta$ is fixed, but the angle $\phi$
+is random but correlated to the length of the rigid linkers. The Kuhn
+length of this hindered rotating chain allows us to quantify our geometric notion of ``processivity'', and we show in
+FIG how it qualitatively predicts the Kuhn length of the fluctuating chains.
+This stands in contrast to models based on averaging the thermal fluctuations of
+individual homogenous chains to compute the heterogenous chain's Kuhn
+length, which fail dramatically (Supp FIG). 
+We conclude that for realistic
 linker lengths, the geometric effects imposed by stochastic nucleosome spacing
 dominate the thermal fluctuations of the polymer when determining the structure
 of the chromatin chain.
 
+%%% how do zero temp and fluct pictures compare?
+As can be seen in Inlet figure, the functional
+dependece of the Kuhn length on $\sigma$ is that of a dampened harmonic
+oscillator. The decay rate is smaller in the fluctuating case than in the purely
+geometrical picture due to thermal fluctuations in the linkers. However, both
+cases converge to the same Kuhn length of $b=___$ in the limit of infinite
+variance.
+%thoughts on just cutting the harmonic averaging thing, or leaving it for
+%discussion? I feel like it's going
+%to need more words to make it more clear
+
 % unversality
-If we consider the homogenous case to be simply the minimum entropy arrangement
+If we consider the homogenous case to be the minimum entropy arrangement
 of nucleosomes for a given mean linker length, then we can predict the Kuhn
 % exponential distribution justification from Bayesianness/universality
-length that the chains converge to by considering the maximum entropy
-distribution for a given average linker length.
+length to which the chains converge by considering the maximum entropy
+distribution of nucleosome positions. This corresponds to the case
+where nucleosomes are spaced uniformly along the DNA backbone, resulting in
+exponentially distributed linker lengths. 
 % exponential distibution justification from data
 This is exactly the distribution
 implied by state-of-the-art models of nucleosome positioning~\cite{beshnova2014}.
 % approach to universality
 For many average linker lengths, the Kuhn length converges to this value with as
-little as $\sigma = \SI{1}{\basepair}$ of variability (Supp FIG).
+little as $\sigma = \SI{1}{\basepair}$ of variability (Supp FIG). 
 
 % this makes our model robust to NRL
-Thus, by isolating the dependence of chromatin's structure on the distribution of
-$\phi$, we are able to conclude that the structure of the homogenous chromatin
-chain is unbiological, due to it being unstable to perturbations in the
-nucleosome arrangement.
+As can be seen in FIG 4, the universal behavior of this maximally entropic
+polymer allows our model to robustly predict the Kuhn length of chromatin as a
+function of just the average linker length in a given organism. The resulting
+predictions eliminate the oscillatory dependence of the Kuhn length of
+homogenous chromatin chains on the linker length.
+Thus, we can conclude that the structure of the homogenous chromatin chain is unbiological, due to it being unstable to perturbations in the nucleosome arrangement.
+By isolating the dependence of chromatin's structure on the distribution of
+$\phi$, we find that physical properties of the heterogenous chain are
+independent of the choice of linker length distribution.
 
+%due to universality, can approximate by WLC with renormalized b
+In fact, we find that the short and long length scale behavior of the
+heterogenous chain is well-captured by a wormlike chain with a renormalized Kuhn
+length. As in FIG 5, we see that the $\RR$ approaches the Gaussian chain regime after just 2
+linkers, again due to the fact that $\phi$ is drawn from a uniform
+distribution. Thus, mesoscopic models can approximate chromatin as a WLC using
+the Kuhn lengths reported in FIG 4. 
 
-% trans
-Since the geometric effects of nucleosomes dominate the structure of the
-chromatin chain, we wondered how much rearranging the nucleosomes between two
+% trans to looping
+Next, we wondered how much rearranging the nucleosomes between two
 loci could affect the ability of function chromatin loops to form.
 Since our theory allows an analytical solution, we can probe this question
 systematically for the first time.
 In FIG, we compute the propensity of individual chromatin chains drawn from the maximum
 entropy distribution to form loops as a function of the loop size.
 
-We immediately see that the typical model of chromatin as bare DNA
-systematically underestimates the looping propensity.
+%slow nucleosome turnover
+In the limit of slow nucleosome turnover, in which the positions of nucleosomes
+are effectively fixed, we find that the looping probability significantly varies
+depending on the particular spacings of intervening nucleosomes.
+In particular, we note that the typical model of chromatin as bare DNA with
+$lp=50\text{nm}$ systematically underestimates the looping propensity. We find
+that heterogenity most significantly affects the looping probability at short
+length scales.
 Strikingly, we observe that the difference between the most and least-likely to
 loop loci spans six orders of magnitude.
 As suggested by our previous results, this huge inter-chain variability is
 driven primarily by the different geometrical properties of individual chromatin
-chains (Supp FIG showing compact and straight homo chains looping).
+chains (Supp FIG showing compact and straight homo chains looping). Thus, our
+model predicts that in the limit of slow nucleosome turnover, the cell can allow or prevent certain loci from coming into contact by locally rearranging the positions of intervening
+nucleosomes.
 
-We notice that the effects of this heterogeneity are greatest at short length
-scales. In fact, as can be seen in FIG, for length scales longer than DISTANCE,
-the Gaussian chain probabilities predicted by the Kuhn length of the polymer are
-sufficient to quantitatively predict the looping probabilities.
-
-%make sure to mention that you can't fit short length scales (can you?) with an
-%effective WLC.
-On the other hand, we see that the WLC whose Kuhn length matches the kinked
-chain does not have similar short-length scale behavior, even on average.
-This suggests that while an effective WLC might be sufficient to capture short
-length scale behavior approximately, and a Rouse chain will be sufficient to
-treat the chain at intermediate to long length scales, %% make this units bp
-the full theory is required for multi-scale models that care about both long
-and short range chromatin contacts.
-
-%TODO continue
+%fast nucleosome turnover, implications for multiscale modeling
+In the limit of fast nucleosome turnover, we can approximate the heterogenous
+chain by the average over individual chain configurations, shown in black. 
+We note that the kilobase-range peak of the average chain exactly corresponds to the length-scale of enhancer-promoter contacts. 
+As can be seen in FIG, our full theory is needed to calculate
+the probability of internucleosomal contacts for short chains composed of 3-5
+nucleosomes. Howeer, for length scales longer than a kilobase,
+the WLC chain with Kuhn length given by our model sufficiently captures the looping probabilities of the average chain obtained from our full theory. At length scales
+longer than \SI{1300}{\basepair}, the looping probability approaches that of a
+Gaussian chain with the familiar $L^{-3/2}$ scaling.
 
 \section{New Discussion}
 
