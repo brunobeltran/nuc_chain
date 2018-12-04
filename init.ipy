@@ -1,0 +1,37 @@
+%matplotlib
+
+import pickle
+import functools
+from functools import partial
+import itertools
+import imp
+import multiprocessing
+import re
+import os
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from mpl_toolkits.mplot3d import Axes3D
+#import seaborn as sns
+#sns.set()
+import numpy as np
+import scipy
+import pandas as pd
+from mayavi import mlab
+
+import bruno_util
+from bruno_util import pandas_util
+from bruno_util import pickle_variables
+from nuc_chain import geometry as ncg
+from nuc_chain import data as ncd
+from nuc_chain import rotations as ncr
+from nuc_chain import wignerD as wd
+from nuc_chain import fluctuations as wlc
+from MultiPoint import propagator
+from nuc_chain import linkers as ncl
+from nuc_chain import math as ncm
+
+#plotting parameters
+params = {'axes.edgecolor': 'black', 'axes.facecolor': 'white', 'axes.grid': False, 'axes.linewidth': 0.75, 'backend': 'pdf','axes.labelsize': 12,'legend.fontsize': 10,'xtick.labelsize': 10,'ytick.labelsize': 10,'text.usetex': False,'figure.figsize': [7, 5], 'mathtext.fontset': 'stixsans', 'savefig.format': 'pdf', 'xtick.major.pad': 4, 'xtick.major.size': 5, 'xtick.major.width': 0.5,'ytick.major.pad': 4, 'ytick.major.size': 5, 'ytick.major.width': 0.5,}
+plt.rcParams.update(params)

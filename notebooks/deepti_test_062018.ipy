@@ -1,0 +1,93 @@
+
+#import statements
+%run init.ipy
+
+
+def tangent_propogator_heatmap_in_piball_space(links, w_ins=63, w_outs=63, unwrap=None, color="linker"):
+	"""Plots entry orientations of second nucleosome in each chain starting at the origin
+	oriented in the z direction, in pi ball space, given a certain linker length and 
+	unwrapping amount.
+
+	Parameters
+	----------
+	links : (N,) array_like
+	lengths of each linker segment for each of N dinucleosome chains
+	w_ins : float or (N,) array_like
+	amount of DNA wrapped on entry side of second nucleosome for each of N dinucleosome chains
+	w_outs : float or (N,) array_like
+	amount of DNA wrapped on exit side of first nucleosome for each of N dinucleosome chains
+	unwrap : float or (N,) array_like
+	amount of DNA unwrapped on both sides for each of the N dinucleosome chains
+	color : string, "linker" or "unwrap"
+	whether to color the points by linker length or unwrapping amount
+
+	Returns
+	-------
+	mfig : mlab.figure
+	Figure containing the heatmap.
+	"""
+	# Create a sphere
+	pi = np.pi
+	r = pi
+	cos = np.cos
+	sin = np.sin
+	theta, phi = np.mgrid[0:pi:101j, 0:2*pi:101j]
+	x = r * sin(theta) * cos(phi)
+	y = r * sin(theta) * sin(phi)
+	z = r * cos(theta)
+
+	#draw a translucent pi ball 
+	mlab.mesh(x,y,z,color=(0.67, 0.77, 0.93), opacity=0.5)
+
+	#first generate axis angle representations of orientations from given linker lengths
+	num_chains = links.size
+	nodes = np.zeros((num_chains, 3)) #points in pi ball space
+
+	#parameters
+	tau_n = ncg.dna_params['tau_n']
+	tau_d = ncg.dna_params['tau_d']
+
+	w_ins = np.atleast_1d(w_ins)
+	w_outs = np.atleast_1d(w_outs)
+	if len(w_ins) == 1:
+		w_ins = np.tile(w_ins, (num_chains,))
+	if len(w_outs) == 1:
+		w_outs = np.tile(w_outs, (num_chains,))
+	assert(len(w_ins) == num_chains)
+	assert(len(w_outs) == num_chains)
+
+	if unwrap is not None:
+		unwraps = np.atleast_1d(unwrap)
+		if len(unwraps) == 1:
+			unwraps = np.tile(unwraps, (num_chains,))
+		for i in range(len(unwraps)):
+			w_ins[i], w_outs[i] = ncg.resolve_unwrap(unwraps[i], None, None)
+
+	for i in range(num_chains):
+		#compute orientation of second nucleosome in dinucleosome chain (assumes
+		#first entry orientation is the identity)
+		Onext = ncg.OmegaNextEntry(links[i], tau_n=tau_n, tau_d=tau_d,
+				w_in=w_ins[i], w_out=w_outs[i], helix_params=ncg.helix_params_best)
+		axis, angle = ncr.axis_angle_from_matrix(Onext)
+		#scale unit vector by angle of rotation
+		nodes[i] = axis*angle
+
+	#plot points in pi ball space
+	pts = mlab.points3d(nodes[:, 0], nodes[:, 1], nodes[:, 2], scale_factor = 0.1)
+	pts.glyph.scale_mode = 'scale_by_vector'
+	#color by linker length
+	if color == "linker":
+		colors = 1.0 * (links - min(links))/max((links - min(links)))
+	else:
+		unwraps = 1.0 * (unwraps - min(unwraps))/(max(unwraps) - min(unwraps))
+
+	pts.mlab_source.dataset.point_data.scalars = colors
+	mlab.axes()
+	mlab.show()
+
+
+
+
+
+
+
