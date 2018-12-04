@@ -27,20 +27,59 @@ from multiprocessing import Pool
 from functools import partial
 from scipy import interpolate
 
-params = {'axes.edgecolor': 'black', 'axes.facecolor': 'white', 'axes.grid': False, 'axes.titlesize': 18.0,
-'axes.linewidth': 0.75, 'backend': 'pdf','axes.labelsize': 18,'legend.fontsize': 18,
-'xtick.labelsize': 14,'ytick.labelsize': 14,'text.usetex': False,'figure.figsize': [7, 5], 
-'mathtext.fontset': 'stixsans', 'savefig.format': 'pdf', 'xtick.bottom':True, 'xtick.major.pad': 5, 'xtick.major.size': 5, 'xtick.major.width': 0.5,
-'ytick.right':True, 'ytick.major.pad': 5, 'ytick.major.size': 5, 'ytick.major.width': 0.5, 'ytick.minor.right':False, 'ytick.minor.left':False, 'lines.linewidth':2}
+cm_in_inch = 2.54
+#column size is 8.6 cm
+col_size = 8.6 / cm_in_inch
+path_to_cmr = '/Users/deepti/miniconda3/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/cmr10.ttf'
+params = {'axes.edgecolor': 'black', 'axes.grid': False, 'axes.titlesize': 8.0,
+'axes.linewidth': 0.75, 'backend': 'pdf','axes.labelsize': 8.5,'legend.fontsize': 8,
+'xtick.labelsize': 7,'ytick.labelsize': 7,'text.usetex': False,'figure.figsize': [col_size, col_size*(5/7)], 
+'font.family': 'sans-serif', 'font.sans-serif': 'Arial',
+'mathtext.fontset': 'stixsans', 'savefig.format': 'pdf', 'xtick.bottom':True, 'xtick.major.pad': 2, 'xtick.major.size': 4, 'xtick.major.width': 0.5,
+'xtick.minor.width': 0.5, 'ytick.minor.width': 0.5, 'xtick.minor.size': 2, 'ytick.minor.size': 2,
+'ytick.left':True, 'ytick.right':False, 'ytick.major.pad': 2, 'ytick.major.size': 4, 'ytick.major.width': 0.5, 'ytick.minor.right':False, 'lines.linewidth':1}
 
-plt.rcParams.update(params)
+inter_params = {
+    'axes.edgecolor': 'black',
+    'axes.grid': False,
+    'axes.titlesize': 8.0,
 
-"""All variables needed for analysis"""
-Klin = np.linspace(0, 10**5, 20000)
-Klog = np.logspace(-3, 5, 10000)
-Kvals = np.unique(np.concatenate((Klin, Klog)))
-#convert to little k -- units of inverse bp (this results in kmax = 332)
-kvals = Kvals / (2*wlc.default_lp)
+    'axes.linewidth': 0.75,
+    'backend': 'pdf',
+    'axes.labelsize': 7,
+    'legend.fontsize': 6,
+
+    'xtick.labelsize': 6,
+    'ytick.labelsize': 6,
+    'text.usetex': False,
+    'figure.figsize': [col_size, col_size*(5/7)],
+
+    'font.family': 'sans-serif',
+    'font.sans-serif': 'Arial',
+
+    'mathtext.fontset': 'stixsans',
+    'savefig.format': 'pdf',
+    'xtick.bottom':True,
+    'xtick.major.pad': 2,
+    'xtick.major.size': 4,
+    'xtick.major.width': 0.5,
+    'xtick.minor.width': 0.5, 
+    'ytick.minor.width': 0.5, 
+    'xtick.minor.size': 2, 
+    'ytick.minor.size': 2,
+    'ytick.left':True,
+    'ytick.right':False,
+    'ytick.major.pad': 2,
+    'ytick.major.size': 4,
+    'ytick.major.width': 0.5,
+    'ytick.minor.right':False,
+    'lines.linewidth':1
+}
+
+plt.rcParams.update(inter_params)
+teal_flucts = '#387780'
+red_geom = '#E83151'
+dull_purple = '#755F80'
 
 def compute_looping_statistics_heterogenous_chains(nucmin=2):
 	"""Compute and save looping probabilities for all 'num_chains' heterogenous chains
@@ -52,7 +91,7 @@ def compute_looping_statistics_heterogenous_chains(nucmin=2):
 	#Create one data frame per chain and add to this list; concatenate at end
 	list_dfs = []
 
-	# #first load in chains of length 100 nucs
+	#first load in chains of length 100 nucs
 	# for j in range(1, 6):
 	# 	df = pd.DataFrame(columns=['num_nucs', 'chain_id', 'ldna', 'rmax', 'ploops'])
 	# 	chaindir = f'100nucs_chain{j}'
@@ -108,65 +147,66 @@ def compute_looping_statistics_heterogenous_chains(nucmin=2):
 	df.to_csv(dirpath/'looping_probs_heterochains_links31to52_0unwraps.csv')
 	return df
 
-def plot_looping_probs_hetero_avg(df, **kwargs):
-	#df2 = df.sort_values('ldna')
-	fig, ax = plt.subplots(figsize=(7.21, 5.19))
-	#first just plot all chains
-	palette = sns.cubehelix_palette(n_colors=np.unique(df['chaindir']).size)
-	#palette = sns.color_palette("husl", np.unique(df['chaindir']).size)
-	sns.lineplot(data=df, x='ldna', y='ploops', hue='chaindir', palette=palette,
-		legend=None, ci=None, ax=ax, alpha=0.5, lw=1)
+def plot_fig5_looping_probs_hetero_avg(df, **kwargs):
+    #df2 = df.sort_values('ldna')
+    fig, ax = plt.subplots(figsize=(0.95*col_size, 0.95*(1/2)*col_size))
+    #first just plot all chains (translucent)
+    palette = sns.cubehelix_palette(n_colors=np.unique(df['chaindir']).size)
+    #palette = sns.color_palette("husl", np.unique(df['chaindir']).size)
+    sns.lineplot(data=df, x='ldna', y='ploops', hue='chaindir', palette=palette,
+        legend=None, ci=None, ax=ax, alpha=0.25, lw=0.5)
 
-	#Then plot running average
-	df2 = df.sort_values('ldna')
-	df3 = df2.drop(columns=['chaindir'])
-	df4 = df3.rolling(75).mean()
-	df4.plot(x='ldna', y='ploops', legend=False, color='k', linewidth=3, ax=ax, label='Average')
-	
-	#try plotting average of linear interpolations
-	# xvals = np.linspace(np.min(df.ldna), np.max(df.ldna), 1000)
-	# dflin = pd.DataFrame(columns=['chaindir', 'ldna', 'ploops'])
-	# for i, dfs in df.groupby('chaindir'):
-	# 	f = interpolate.interp1d(dfs.ldna, dfs.ploops)
-	# 	ax.plot(xvals, f(xvals), linewidth=1)
-		#dflin[]
-		#dfs.plot(x='ldna', y='ploops', legend=False, color=palette[i], linewidth=1, ax=ax)
+    #select 3 chains to bold
+    df_ind = df.set_index(['num_nucs', 'chain_id'])
+    #chains_to_bold = [1, 3, 5]
+    #chains_to_bold = [1, 3, 8]
+    chains_to_bold = [1, 5, 8]
+    for i in chains_to_bold:
+    	ax.plot(df_ind.loc[50, i].ldna, df_ind.loc[50, i].ploops, label='_nolegend_', lw=1, color=palette[50-i])
+        #df_ind.loc[50, i].plot(x='ldna', y='ploops', legend=False, ax=ax, lw=1)
 
-	#plot power law scaling
-	xvals = np.linspace(4675, 9432, 1000)
-	gaussian_prob = 10**-1.4*np.power(xvals, -1.5)
-	ax.loglog(xvals, gaussian_prob, 'k')
-	#vertical line of triangle
-	ax.vlines(9432, gaussian_prob[-1], gaussian_prob[0])
-	#print(gaussian_prob[0])
-	#print(gaussian_prob[-1])
-	ax.hlines(gaussian_prob[0], 4675, 9432)
-	#ax.text(9500, 8.4*10**(-8), "-3", fontsize=18)
-	ax.text(7053.5, 10**(-6.5), '$L^{-3/2}$', fontsize=18)
+    #Then plot running average
+    df2 = df.sort_values('ldna')
+    df3 = df2.drop(columns=['chaindir'])
+    df4 = df3.rolling(75).mean()
+    df4.plot(x='ldna', y='ploops', legend=False, color='k', linewidth=1.5, ax=ax, label='Average')
 
-	#compare to bare WLC
-	indmin = 1
-	bare41 = np.load('csvs/Bprops/0unwraps/41link/bareWLC_greens_41link_0unwraps_1000rvals_50nucs.npy')
-	ldna = convert.genomic_length_from_links_unwraps(np.tile(41, 50), unwraps=0)
-	ax.loglog(ldna[indmin:], bare41[0, indmin:], '--', 
-            color='#387780', label='Straight chain', **kwargs)
-	
-	#plot gaussian probability from analytical kuhn length calculation
-	#Kuhn length for mu = 41, box variance = 10 (in nm)
-	b = 27.525 / ncg.dna_params['lpb']
-	#b = 
-	analytical_gaussian_prob = (3.0 / (2*np.pi*df4['rmax']*b))**(3/2)
-	ax.loglog(df4['ldna'], analytical_gaussian_prob, ':', label='Gaussian chain with $b=27.5$nm')
-	plt.legend()
-	plt.xlabel('Genomic distance (bp)')
-	plt.ylabel('$P_{loop}$ ($bp^{-3}$)')
-	plt.title(f'Uniformly random linkers 31-51bp')
-	plt.xscale('log')
-	plt.yscale('log')
-	plt.tick_params(left=True, right=False, bottom=True)
-	plt.subplots_adjust(left=0.15, bottom=0.16, top=0.91, right=0.95)
-	return df4
-	#plt.savefig('plots/loops/looping_hetero31to52bp_vs_bareWLC.png')
+    #plot power law scaling
+    xvals = np.linspace(4675, 9432, 1000)
+    gaussian_prob = 10**-1.4*np.power(xvals, -1.5)
+    ax.loglog(xvals, gaussian_prob, 'k')
+    #vertical line of triangle
+    ax.vlines(9432, gaussian_prob[-1], gaussian_prob[0])
+    ax.hlines(gaussian_prob[0], 4675, 9432)
+    #ax.text(9500, 8.4*10**(-8), "-3", fontsize=18)
+    ax.text(6800, 10**(-6.5), '$L^{-3/2}$', fontsize=8)
+
+    #compare to bare WLC with lp = 50 nm
+    indmin = 1
+    bare41 = np.load('csvs/Bprops/0unwraps/41link/bareWLC_greens_41link_0unwraps_1000rvals_50nucs.npy')
+    ldna = convert.genomic_length_from_links_unwraps(np.tile(41, 50), unwraps=0)
+    ax.loglog(ldna[indmin+1:], bare41[0, indmin+1:], '--', lw=1.5,
+            color='#387780', label='Straight chain, $b=100nm$', **kwargs)
+
+    #compare to bare WLC with lp = 13.7625 nm
+    bare41_sameKuhn = np.load(f'csvs/Bprops/0unwraps/heterogenous/links31to52/bareWLC_greens_41bp_100nucs_lp13.762_try2.npy')
+    ldna = convert.genomic_length_from_links_unwraps(np.tile(41, 100), unwraps=0)
+    ax.loglog(ldna[indmin:50], bare41_sameKuhn[0, indmin:50], '--', lw=1.5,
+            color='#E83151', label='Straight chain, $b=27.5nm$', **kwargs)
+    #plot gaussian probability from analytical kuhn length calculation
+    #Kuhn length for mu = 41, box variance = 10 (in nm)
+    # b = 27.525 / ncg.dna_params['lpb']
+    # analytical_gaussian_prob = (3.0 / (2*np.pi*df4['rmax']*b))**(3/2)
+    # ax.loglog(df4['ldna'], analytical_gaussian_prob, ':', lw=1.5, label='Gaussian chain, $b=27.5nm$')
+    plt.legend(loc=4, fontsize=8)
+    plt.xlabel('Genomic distance (bp)')
+    plt.ylabel('$P_{loop}$ ($bp^{-3}$)')
+    #plt.title(f'Uniformly random linkers 31-51bp')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.tick_params(left=True, right=False, bottom=True)
+    plt.subplots_adjust(left=0.15, bottom=0.22, top=0.98, right=0.99)
+    plt.savefig('../deepti/plots/PRL/fig5_looping_hetero31to52bp_bold3curves.pdf')
 
 def plot_gaussian_kinkedAverage_intersection(df4, ldna_min=4675):
 	fig, ax = plt.subplots(figsize=(7.21, 5.19))
@@ -225,4 +265,29 @@ def fit_persistance_length_to_gaussian_looping_prob(df4, ldna_min=4675):
 	lp = 3 / (4*np.pi*np.exp(intercept/np.abs(m)))
 	lp = lp * ncg.dna_params['lpb']
 	return m, lp
+
+def bareWLC_greens(lp=27.525/2, props=None):
+	"""Calculate greens functions for different bare WLC persistance lengths.
+	Ran this function with lpvals = [20, 30, 40, 60, 70, 80]
+	"""
+	if props is None:
+		props = wlc.tabulate_bareWLC_propagators(Kvals)
+
+	Klin = np.linspace(0, 10**5, 20000)
+	Klog = np.logspace(-3, 5, 10000)
+	Kvals = np.unique(np.concatenate((Klin, Klog)))
+	#convert to little k -- units of inverse bp (this results in kmax = 332)
+	lp_in_bp = lp / ncg.dna_params['lpb']
+	kvals = Kvals / (2*lp_in_bp)
+	links = np.tile(41, 100)
+	unwrap = 0
+	file = Path(f'csvs/Bprops/0unwraps/heterogenous/links31to52/bareWLC_greens_41bp_100nucs_lp{lp:.3f}.npy')
+	if (file.is_file() is False):
+		#bare WLC propagators -- kvals doesnt matter here since we already pass in propagators 
+		#calculated with dimensionless Ks
+		qprop = wlc.bareWLC_gprop(kvals, links, unwrap, props=props, lp=lp_in_bp)
+		#bare WLC greens
+		qintegral = wlc.BRN_fourier_integrand_splines(kvals, links, unwrap, Bprop=qprop)
+		np.save(file, qintegral)
+	print(f'Saved G(R;L) for bare WLC with 41bp linkers and with lp={lp}nm')
 
