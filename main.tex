@@ -466,7 +466,7 @@ Linker lengths whose $\phi$ leads to a more compact zero-temperature structure
 
 For arbitrarily long linker lengths, $\meanli\to\infty$, this relationship breaks
     down as thermal fluctuations begin to dominate the linker behavior (see
-    Figure~\ref{fig:homo-kuhn}).
+    Figure~\ref{fig:homo-kuhn-large}).
 However, this breakdown is slow, since the kink density decreases like a power law
     (as $1/\meanli$).
 
@@ -560,29 +560,36 @@ A table of these Kuhn lengths is available in Supplemental Table XX, and we
     the purposes of coarse-graining.
 
 %% trans to looping
-Since the geometric effects of nucleosomes dominate the structure of the
-    chromatin chain, we wondered how much rearranging the nucleosomes between
-    two loci could affect the ability of function chromatin loops to form.
+Next, we wondered how much rearranging the nucleosomes between two
+    loci could affect the ability of function chromatin loops to form.
 Since our theory allows an analytical solution, we can probe this question
     systematically for the first time.
-In FIG, we compute the propensity of individual chromatin chains drawn from the
-    maximum entropy distribution to form loops as a function of the loop size.
+In Figure~\ref{fig:looping}, we compute the propensity of individual chromatin
+    chains drawn from the maximum entropy distribution to form loops as a
+    function of the loop size.
 
 %% general features
 As expected, the typical model of chromatin as bare DNA systematically
     underestimates the looping propensity, because of the reduced Kuhn length of
     the chromatin chain.
-
 %% slow nucleosome turnover
-Strikingly, we observe that the difference between the most and least-likely to
+Strikingly, we observe that the difference between the most- and least-likely to
     loop loci spans six orders of magnitude.
 As suggested by our previous results, this huge inter-chain variability is
     driven primarily by the different geometrical properties of individual
     chromatin chains (Supplemental Figure XX showing compact and straight homo chains
     looping).
+These results imply that loop formation on time scales shorter than nucleosome
+    turnover can be dramatically influenced by local changes to nucleosome
+    positioning.
 
-%% fast nucleosome turnover
-
+%%fast nucleosome turnover, implications for multiscale modeling
+For time scales much longer than nucleosome turnover, our results mirror those
+    in Figure~\ref{fig:hetero-kuhns}.
+As can be seen in Figure~\ref{fig:looping}, the best fit wormlike chain is able
+    to capture the probability of DNA contacts as function of genomic separation.
+We note that the kilobase-range peak of the average chain exactly corresponds to
+    the characteristic length-scale of enhancer-promoter contacts.
 At longer length scales, the looping probability approaches that of a Gaussian
     chain with the familiar $L^{-3/2}$ scaling.
 %TODO continue
