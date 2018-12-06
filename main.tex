@@ -218,7 +218,7 @@ At each nucleosome, we impose the constraint that the incoming and outgoing
     determined by the nucleosome structure, as shown in
     Figure~\ref{fig:nuc-geo}.
 
-We represent this sequence of WLC's as a space curve $\vec{R}(s)$, $s\in[0,L]$. 
+We represent this sequence of WLC's as a space curve $\vec{R}(s)$, $s\in[0,L]$.
     The chain's orientation at each point along this curve, $\Omega(s)$ is
     represented by the orthonormal triad
     $\vec{t_i}$, where $\vec{t_3} \coloneqq \partial_s \vec{R}(s)$.
@@ -425,9 +425,14 @@ For the wormlike chain, the Kuhn length is directly related to the elasticity of
     the chain via it's persistence length $b = 2l_p$.
 
 \begin{figure}
-    \mbox{\includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig2a_r2_homogenous_vs_wlc-scaled.pdf}
-    \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig2b_kuhn_length_in_nm_31to51links_0unwraps-with-renderings.pdf}}
-    \caption{homogenous chain stuff.}\label{fig:homo-chain}
+    \mbox{%
+        \subfloat[][]{\label{fig:r2-homo-wlc}
+            \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig2a_r2_homogenous_vs_wlc-scaled.pdf}
+        }%
+        \subfloat[][]{\label{fig:homo-kuhn-zoom}
+            \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig2b_kuhn_length_in_nm_31to51links_0unwraps-with-renderings.pdf}
+        }%
+    }\caption{homogenous chain stuff.}\label{fig:homo-chain}
 \end{figure}
 
 %% homo-chain r2 example, compare to WLC, notice don't match
@@ -475,7 +480,7 @@ lengths.
 
 For arbitrarily long linker lengths, $\meanli\to\infty$, this relationship breaks
     down as thermal fluctuations begin to dominate the linker behavior (see
-    Figure~\ref{fig:homo-kuhn-large}).
+    Supplemental Figure~XX).%~\ref{fig:homo-kuhn-large}).
 However, this breakdown is slow, since the kink density decreases as $1/\meanli$.
 
 %% conclusion on sensitivity of Kuhn length to NRL for homo case,
@@ -489,7 +494,7 @@ Because of this sensitivity, we hypothesized that introducing modest amounts of
 \begin{figure}
     \centering
     \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig-3-kuhn_length_vs_window_size_41_sigma0to40-v4.pdf}
-    \caption{Increasing sigma}
+    \caption{Increasing sigma}\label{fig:hetero-geom}
 \end{figure}
 
 %% what determines zero temperature picture for het chains
@@ -542,19 +547,24 @@ maximally entropic linker length distribution. The homogenous case ($\sigma=0$) 
     the lattice. For a sufficiently large lattice, the distances separating the
     molecules are well-approximated by exponential, i.i.d.\ random variables.
 This is also exactly the distribution implied by  state-of-the-art models of nucleosome
-    positioning ~\cite{beshnova2014}.
+    positioning~\cite{beshnova2014}.
 
 %%universality, justify exponential
 We find that the Kuhn lengths for chains sampled from a
 uniform linker length distribution rapidly converge to this
-maximum entropy limit as $\sigma\to\infty$.  
+maximum entropy limit as $\sigma\to\infty$.
 The fact that the limiting value is distribution-free suggests that even if nucleosomes were  positioned more precisely than predicted by current models, exponentially distributed linker lengths would remain an excellent approximation, as long as $\phi$ remains approximately uniform.
 
 \begin{figure}
     \centering
-    \mbox{\includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig4a_r2_exp_vs_wlc-scaled.pdf}
-    \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig4b_kuhn_exponential-with-images.pdf}}
-    \caption{universal chain Kuhn length}\label{fig:exp-chain}
+    \mbox{%
+        \subfloat[][]{\label{fig:exp-r2}
+            \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig4a_r2_exp_vs_wlc-scaled.pdf}
+        }%
+        \subfloat[][]{\label{fig:hetero-kuhn}
+            \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig4b_kuhn_exponential-with-images.pdf}
+        }%
+    }\caption{universal chain Kuhn length}\label{fig:exp-chain}
 \end{figure}
 
 
@@ -592,7 +602,7 @@ In Figure~\ref{fig:looping}, we compute the propensity of individual chromatin
 \begin{figure}
     \centering
     \includegraphics[width=0.95\linewidth,height=0.4\linewidth]{../../deepti/nuc_chain_tmp/plots/PRL/fig5_looping_hetero31to52bp_bold3curves.pdf}
-    \caption{looping stuff.}
+    \caption{looping stuff.}\label{fig:looping}
 \end{figure}
 
 %% general features
@@ -619,7 +629,6 @@ We note that the kilobase-range peak of the average chain exactly corresponds to
     the characteristic length-scale of enhancer-promoter contacts.
 At longer length scales, the looping probability approaches that of a Gaussian
     chain with the familiar $L^{-3/2}$ scaling.
-%TODO continue
 
 \section{\label{sec:discussion}Discussion}
 %this feels redundant with the intro
@@ -663,8 +672,8 @@ We expect that our central conclusions---that nucleosomes can modulate
     remodelling~\cite{dion2007,kulaeva2007,senavirathne2017}. Stochastic
     unwrapping will cause the angle $\theta \in [0, \pi]$ between adjacent nucleosomes to
     also become approximate uniform. In this limit, the nucleosome chain is an
-    ideal chain with bond-length-phi correlation and fluctuating linkers. 
-    
+    ideal chain with bond-length-phi correlation and fluctuating linkers.
+
     In future work, we plan to explicitly incorporate the energetics of nucleosome unwrapping
     and repositioning to predict how these quantities affect the dynamic
     organization of chromatin. In particular, this will allow us to more
