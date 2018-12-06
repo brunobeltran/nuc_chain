@@ -534,8 +534,8 @@ This is also exactly the distribution implied by  state-of-the-art models of nuc
 
 %%universality, justify exponential
 We find that the Kuhn lengths for chains sampled from a
-uniform linker length distribution rapidly converge to the value predicted by
-this maximum entropy model as $\sigma\to\infty$.  
+uniform linker length distribution rapidly converge to this
+maximum entropy limit as $\sigma\to\infty$.  
 The fact that the limiting value is distribution-free suggests that even if nucleosomes were  positioned more precisely than predicted by current models, exponentially distributed linker lengths would remain an excellent approximation, as long as $\phi$ remains approximately uniform.
 
 %% R^2 of exponential chains, match WLC, that's also good, need only Kuhn length
@@ -593,15 +593,16 @@ We note that the kilobase-range peak of the average chain exactly corresponds to
     the characteristic length-scale of enhancer-promoter contacts.
 At longer length scales, the looping probability approaches that of a Gaussian
     chain with the familiar $L^{-3/2}$ scaling.
+%TODO continue
 
 \section{\label{sec:discussion}Discussion}
-
-The dependence of chromatin's structure on the length of its linkers has been
-    widely discussed since at least the 70's~\cite{finch1976}.
-%ugh, phrase this better
-However, likely because of a lack of a unifying analytical theory, models
-    including heterogenously spaced nucleosomes have been comparably
-    rare~\cite{woodcock1993,collepardo-guevara2014}.
+%this feels redundant with the intro
+%The dependence of chromatin's structure on the length of its linkers has been
+%    widely discussed since at least the 70's~\cite{finch1976}.
+%%ugh, phrase this better
+%However, likely because of a lack of a unifying analytical theory, models
+%    including heterogenously spaced nucleosomes have been comparably
+%    rare~\cite{woodcock1993,collepardo-guevara2014}.
 
 We present a simplified model of the chromatin fiber that retains only the most
     basic geometrical and physical properties of a chain of nucleosomes
@@ -616,14 +617,6 @@ Most strikingly, we ignore the steric interactions between nucleosomes that is
 In addition, our model ignores the finite size of the nucleosome, treating it as
     a point-like kink in the DNA backbone.
 
-    %TODO add this sentence into the flow somewhere around here
-DNA is known to partially unwrap from the nucleosome core dynamically \textit{in
-% I have tons of citations for these two statements in zotero, just have to
-% separate them from each other tediously to make two lists
-    vivo}, whether spontaneously (called nucleosome breathing~\cite{TODO}), due to
-    force on the DNA~\cite{TODO}, or through active
-    remodelling~\cite{dion2007,kulaeva2007,senavirathne2017}.
-
 While these choices constrain the ability of our model to make predictions that
     can be tested \textit{in vivo}, our bottom-up approach allows us to
     formalize both new and existing intuition for how linker length affects the
@@ -635,13 +628,29 @@ We expect that our central conclusions---that nucleosomes can modulate
     through their positioning---will only gain nuance as these details are added
     to future analytical works.
 
-While the quantitative values may yet change, we suspect that our estimate of
-    chromatin's Kuhn length and looping probabilities will already provide
-    guidance to future work relying on coarse-grained models of chromatin.
-In particular we show that the common practice~\cite{macphersonInPress,nuebler2018}
+    %TODO add this sentence into the flow somewhere around here
+    For example, DNA is known to partially unwrap from the nucleosome core dynamically \textit{in
+% I have tons of citations for these two statements in zotero, just have to
+% separate them from each other tediously to make two lists
+    vivo}, whether spontaneously (called nucleosome breathing~\cite{TODO}), due to
+    force on the DNA~\cite{TODO}, or through active
+    remodelling~\cite{dion2007,kulaeva2007,senavirathne2017}. Stochastic
+    unwrapping will cause the angle $\theta \in [0, \pi]$ between adjacent nucleosomes to
+    also become approximate uniform. In this limit, the nucleosome chain is an
+    ideal chain with bond-length-phi correlation and fluctuating linkers. 
+    
+    In future work, we plan to explicitly incorporate the energetics of nucleosome unwrapping
+    and repositioning to predict how these quantities affect the dynamic
+    organization of chromatin. In particular, this will allow us to more
+    precisely understand how chromatin remodelers affect chromatin loop
+    formation.
+
+While the quantitative values may yet change from these additions, we suspect that our estimate of chromatin's Kuhn length and looping probabilities will already provide
+    guidance to future coarse-grained models of chromatin.
+We show that the common practice~\cite{macphersonInPress,nuebler2018}
     of using a Kuhn length of \SI{100}{\nano\metre}, simply because that is the
     Kuhn length of bare DNA, will likely lead to at least a four-fold
-    overestimation of the polymer's stiffness.
+    overestimation of the polymer's stiffness. %is this verified?
 In large-scale models of chromatin organization, this could mean the difference
     between heterochromatin and euchromatin segregation recapitulating
     \textit{in vivo} observations, and the chromosomes instead being uniformly
@@ -675,26 +684,26 @@ In addition, our results imply that the observed persistence lengths of block
     copolymer could vary drastically from that predicted from the Kuhn lengths
     of their constituent blocks, depending on the block size.
 
-%TODO
+%TODO: not sure if this needs to go in discussion for this paper
 propose that we should use this new model to look at supercoiling effects
 of nucleosome positions as proposed in~\cite{grigoryev1981} (some paradoxes
 about this~\cite{prunell1998} were later solved in~\cite{nikitina2017}
 
-%TODO
+%TODO: added this
 propose more comprehensive understading of ability of chromatin
 remodellers to affect structure using our model, instead of
 e.g.~\cite{muller2014} where they only ``move'' one nucleosome
 specifically, propose to add energetics for unwrapping explicity, remodeling
 expclicitly.
 
-%TODO
+%TODO: not sure if we need this
 make sure we mention that although increasingly high-fidelity measurements
 of nucelsoome position continue to suggest that linker lengths are
 preferentially quantized, this does not exclude them not being perfectly
 quantized. (probalby in introducetion to section on "uniformly dist" linker
 lengths
 
-%TODO
+%TODO: added this
 discuss how our universal chain is like the hindered rotating chain, and
 how unwrapping would make that like an ideal cahin, and in both cases the
 difference with our model is that there's 1) bond length-phi correlation 2)
