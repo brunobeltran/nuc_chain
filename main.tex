@@ -385,31 +385,31 @@ As demonstrated in Figure~\ref{fig:linker-effect}, changing the length of the
 Our propagator $G$ takes this property into account implicitly thanks to the
     inclusion of $\tau$ in Eq.~\ref{eq:energy}.
 
-\begin{figure*}[th]
-    \begin{centering}
-    \subfloat[][]{\label{fig:mc-example}
-        \includegraphics[width=0.14\textwidth]{./figures/fig-2b-mc-example.png}
-    }%
-    \subfloat[][]{\label{fig:homo-kuhn-all}
-        \includegraphics{./figures/fig2b_kuhn_length_homogenous_1to1000links_0unwraps.pdf}
+% \begin{figure*}[th]
+%     \begin{centering}
+%     \subfloat[][]{\label{fig:mc-example}
+%         \includegraphics[width=0.14\textwidth]{./figures/fig-2b-mc-example.png}
+%     }%
+%     \subfloat[][]{\label{fig:homo-kuhn-all}
+%         \includegraphics{./figures/fig2b_kuhn_length_homogenous_1to1000links_0unwraps.pdf}
 
-    }%
-    \subfloat[][]{\label{fig:homo-kuhn-zoom}
-        \includegraphics{./figures/fig2c_kuhn_length_in_nm_31to51links_0unwraps.pdf}
-    }%
-    \end{centering}
-    \caption{\protect\subref{fig:mc-example} Zero-temperature structure vs.
-    Monte Carlo simulation snapshot of nucleosome chain with \SI{38}{\basepair}
-    linkers.  \protect\subref{fig:homo-kuhn-all} The Kuhn lengths of homogenous
-    chains are \SI{10.5}{\basepair} periodic in linker length, with each linker
-    length representing a distinct, discretized helical WLC\@. In the limit of
-    long linkers, the Kuhn length eventually approaches that of bare DNA,
-    \SI{100}{\nano\metre}. \protect\subref{fig:homo-kuhn-zoom} Compact,
-    superhelical structures afford more flexibility than non-compact fibres,
-    which have higher Kuhn lengths. Thus, the overall structure of chromatin is
-    extremely sensitive to changes in the nucleosome repeat
-    length.}\label{fig:homo-kuhn}
-\end{figure*}
+%     }%
+%     \subfloat[][]{\label{fig:homo-kuhn-zoom}
+%         \includegraphics{./figures/fig2c_kuhn_length_in_nm_31to51links_0unwraps.pdf}
+%     }%
+%     \end{centering}
+%     \caption{\protect\subref{fig:mc-example} Zero-temperature structure vs.
+%     Monte Carlo simulation snapshot of nucleosome chain with \SI{38}{\basepair}
+%     linkers.  \protect\subref{fig:homo-kuhn-all} The Kuhn lengths of homogenous
+%     chains are \SI{10.5}{\basepair} periodic in linker length, with each linker
+%     length representing a distinct, discretized helical WLC\@. In the limit of
+%     long linkers, the Kuhn length eventually approaches that of bare DNA,
+%     \SI{100}{\nano\metre}. \protect\subref{fig:homo-kuhn-zoom} Compact,
+%     superhelical structures afford more flexibility than non-compact fibres,
+%     which have higher Kuhn lengths. Thus, the overall structure of chromatin is
+%     extremely sensitive to changes in the nucleosome repeat
+%     length.}\label{fig:homo-kuhn}
+% \end{figure*}
 
 \section{\label{sec:results}Results}
 %% introduce our strategy: zero-temperature to build intuition
@@ -423,6 +423,12 @@ For any polymer model, the mean end to end distance $\RR$ is linearly related to
     underlying chain length, $L$, by $\RR = bL$ for large enough $L$.
 For the wormlike chain, the Kuhn length is directly related to the elasticity of
     the chain via it's persistence length $b = 2l_p$.
+
+\begin{figure}
+    \mbox{\includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig2a_r2_homogenous_vs_wlc-scaled.pdf}
+    \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig2b_kuhn_length_in_nm_31to51links_0unwraps-with-renderings.pdf}}
+    \caption{homogenous chain stuff.}\label{fig:homo-chain}
+\end{figure}
 
 %% homo-chain r2 example, compare to WLC, notice don't match
 We compare $\sqrt{\RR}$ as a
@@ -479,6 +485,12 @@ Kuhn length is extremely  sensitive to the particular choice of linker length.
 Because of this sensitivity, we hypothesized that introducing modest amounts of
     heterogeneity in the linker length could significantly affect the geometric
     and physical organization of the chromatin chain.
+
+\begin{figure}
+    \centering
+    \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig-3-kuhn_length_vs_window_size_41_sigma0to40-v4.pdf}
+    \caption{Increasing sigma}
+\end{figure}
 
 %% what determines zero temperature picture for het chains
 We apply our fluctuating theory to study the chains first considered
@@ -538,6 +550,14 @@ uniform linker length distribution rapidly converge to this
 maximum entropy limit as $\sigma\to\infty$.  
 The fact that the limiting value is distribution-free suggests that even if nucleosomes were  positioned more precisely than predicted by current models, exponentially distributed linker lengths would remain an excellent approximation, as long as $\phi$ remains approximately uniform.
 
+\begin{figure}
+    \centering
+    \mbox{\includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig4a_r2_exp_vs_wlc-scaled.pdf}
+    \includegraphics{../../deepti/nuc_chain_tmp/plots/PRL/fig4b_kuhn_exponential-with-images.pdf}}
+    \caption{universal chain Kuhn length}\label{fig:exp-chain}
+\end{figure}
+
+
 %% R^2 of exponential chains, match WLC, that's also good, need only Kuhn length
 Motivated by this fact, we compare the $\RR$ for various
     ``exponential'' chains  with a WLC with the same Kuhn length in Figure~\ref{fig:exp-r2}.
@@ -568,6 +588,12 @@ Since our theory allows an analytical solution, we can probe this question
 In Figure~\ref{fig:looping}, we compute the propensity of individual chromatin
     chains drawn from the maximum entropy distribution to form loops as a
     function of the loop size.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.95\linewidth,height=0.4\linewidth]{../../deepti/nuc_chain_tmp/plots/PRL/fig5_looping_hetero31to52bp_bold3curves.pdf}
+    \caption{looping stuff.}
+\end{figure}
 
 %% general features
 As expected, the typical model of chromatin as bare DNA systematically
@@ -710,383 +736,383 @@ difference with our model is that there's 1) bond length-phi correlation 2)
 thermal fluctuations of the linkers
 
 
-\subsection{\label{sec:homo-chain}Homogenous Chains}
+% \subsection{\label{sec:homo-chain}Homogenous Chains}
 
-We first revisit the illustrative case of a homogenous chromatin chain, where
-    there is a constant linker length separating adjacent nucleosomes.
-In the simplifying limit of zero temperature, the linkers are rigid rods, and
-    our model is purely geometrical.
-The geometrical model with constant linker lengths traces out a helix whose
-    pitch is determined solely by the spherical angles $\theta$ and $\phi$
-    connecting adjacent linkers.
-The angle $\theta$ is fixed by the structure of the nucleosome
-    (Figure~\ref{fig:entry-exit}), but the angle $\phi$ between linkers depends
-    on the linker length (Figure~\ref{fig:linker-effect}).
+% We first revisit the illustrative case of a homogenous chromatin chain, where
+%     there is a constant linker length separating adjacent nucleosomes.
+% In the simplifying limit of zero temperature, the linkers are rigid rods, and
+%     our model is purely geometrical.
+% The geometrical model with constant linker lengths traces out a helix whose
+%     pitch is determined solely by the spherical angles $\theta$ and $\phi$
+%     connecting adjacent linkers.
+% The angle $\theta$ is fixed by the structure of the nucleosome
+%     (Figure~\ref{fig:entry-exit}), but the angle $\phi$ between linkers depends
+%     on the linker length (Figure~\ref{fig:linker-effect}).
 
-In Figure~\ref{fig:homo-kuhn-zoom}, the Kuhn length of the
-    fluctuating homogenous chain is compared to the geometric model for
-    typical linker lengths.
-Since these linkers are much shorter than the \SI{150}{\basepair} persistence
-    length of bare DNA, the linkers are approximately rigid rods, and the Kuhn
-    length corresponds directly to the shape of the geometric model.
+% In Figure~\ref{fig:homo-kuhn-zoom}, the Kuhn length of the
+%     fluctuating homogenous chain is compared to the geometric model for
+%     typical linker lengths.
+% Since these linkers are much shorter than the \SI{150}{\basepair} persistence
+%     length of bare DNA, the linkers are approximately rigid rods, and the Kuhn
+%     length corresponds directly to the shape of the geometric model.
 
-In the short-length limit, the Kuhn length is approximately \SI{10.5}{\basepair}
-    periodic.
-This reflects the \SI{10.5}{\basepair} helical periodicity of dsDNA.\@
-In the limit as the linker length increases, the Kuhn length approaches that of
-    bare DNA.\@
-However, since the kink density is proportional to the inverse of the linker
-    length, this happens slowly (like $1/L_i$), and for realistic linker
-    lengths, only $\phi$ matters (Figure~\ref{fig:homo-kuhn-zoom}).
+% In the short-length limit, the Kuhn length is approximately \SI{10.5}{\basepair}
+%     periodic.
+% This reflects the \SI{10.5}{\basepair} helical periodicity of dsDNA.\@
+% In the limit as the linker length increases, the Kuhn length approaches that of
+%     bare DNA.\@
+% However, since the kink density is proportional to the inverse of the linker
+%     length, this happens slowly (like $1/L_i$), and for realistic linker
+%     lengths, only $\phi$ matters (Figure~\ref{fig:homo-kuhn-zoom}).
 
-%TODO NEW FIGURE 1a. It will simply show one $\RR$ curve and the best fit WLC
-    %near the start of the curve and the best fit gaussian chain nithe long
-    %chain limit.
-For a regular wormlike chain, the Kuhn length $b = 2 l_p$.
-However, Chasles' theorem makes homogenous chains of nucleosomes ``helical''
-    wormlike chains~\cite{yamakawa2016}.
+% %TODO NEW FIGURE 1a. It will simply show one $\RR$ curve and the best fit WLC
+%     %near the start of the curve and the best fit gaussian chain nithe long
+%     %chain limit.
+% For a regular wormlike chain, the Kuhn length $b = 2 l_p$.
+% However, Chasles' theorem makes homogenous chains of nucleosomes ``helical''
+%     wormlike chains~\cite{yamakawa2016}.
 
-However, for the helical wormlike chain, amount of DNA contained per unit of
-    rise along the nucleosomal helix, as shown in
-    Figure~\ref{fig:homo-kuhn-zoom}.
-%TODO: add the example structures back in
+% However, for the helical wormlike chain, amount of DNA contained per unit of
+%     rise along the nucleosomal helix, as shown in
+%     Figure~\ref{fig:homo-kuhn-zoom}.
+% %TODO: add the example structures back in
 
-Perhaps most notably, the variability between the stiffest and most flexible
-    chromatin chains spans over an order of magnitude in Kuhn lengths.
-%TODO: color the inaccessible ones
-While some of the most compact configurations will sterically inaccesible, this
-    demonstrates the drastic effect that nucleosome binding can have on DNA's
-    elasticity.
+% Perhaps most notably, the variability between the stiffest and most flexible
+%     chromatin chains spans over an order of magnitude in Kuhn lengths.
+% %TODO: color the inaccessible ones
+% While some of the most compact configurations will sterically inaccesible, this
+%     demonstrates the drastic effect that nucleosome binding can have on DNA's
+%     elasticity.
 
-At short length scales, the $\RR$ behaves like a wormlike chain with reduced
-    persistence length, due to the linkers being forced to traverse a helix.
-At long length scales, the chain predictably asymptotes to a Gaussian
-    chain, again with reduced Kuhn length compared to the underlying linkers.
-It is noteworthy that the best fit persistence length at short scales and the
-    best fit Kuhn length at long scales are quite different (Supplemental Figure
-    XX).
-Thus, our full theory is required even for calculations involving this
-    simplified, homogenous chromatin chain.
-
-
-\subsection{\label{sec:hetero-kuhn}Heterogenous Nucleosome
-\texorpdfstring{$\RR$}{<R2>}}
-
-We now consider the more relevant scenario, when the nucleosomes are randomly
-    spaced along the DNA backbone.
-%TODO say what we do first, then why we do it
-While certain DNA sequences have higher affinities for
-    nucleosomes~\cite{something widom}, in practice the most striking features
-    of nucleosome positioning data are nucleosome phasing near promoters, CTCF
-    sites, and other sites that sterically inhibit nucleosome
-    binding~\cite{widom1992}.
-These features are predicted to occur by the simplest model of nucleosome
-    positioning, one where nucleosomes are positioned uniformly along the DNA
-    backbone, and simply sterically excluded from certain sites.
-In terms of linker lengths, this model corresponds approximately to the case
-    where linker lengths are independent and exponentially distributed about
-    their mean.
-Thus, while the exact statistics of \textit{in vivo} linker lengths remain to be
-    determined, we use the case of independent, exponentially distributed
-    linkers as a reference point to show the effect of linker heterogeneity on
-    the statistical mechanics of the chromatin fiber.
-
-In analogy to the case of homogenous chains, we find that the zero temperature
-    structure provides good intuition for the behavior of the chromatin chain
-    when thermal fluctuations are added.
-At zero temperature, a chain with random linker lengths is going to have a
-    structure determined purely by the interactions between the nucleosome geometry
-    and the DNA's intrinsic twist.
-In our model, the angle $\theta$ in Figure~\ref{fig:entry-exit} is fixed by the
-    nucleosome geometry, but the angle $\phi$ in Figure~\ref{fig:linker-effect}
-    is determined by linker length.
-As the heterogeneity in linker length increases, this means that the
-    zero temperature heterogenous chain will interpolate between a rigid helix
-    (in the case of zero linker length variability) and a modified freely
-    rotating chain (in the case when linker variability is high enough to make
-    the distribution of $\phi$ approximately uniform over $[0, 2\pi]$).
-
-%TODO reincorporate somewhere around here
-%DEEPTI:it's not just random right? hasn't shlick done the Oct4 gene with
-   %nucleosome positioning data?
-%BRUNO:I assume you mean Bascom 2017? yeah but I mean they still use random linker
-   % lengths...just like we do
-Simulations of particular chromatin chains with random linker lengths have
-    suggested that heterogeneity in nucleosome spacing leads to largely
-    disordered chromatin architecture~\cite{woodcock1993,
-    collepardo-guevara2014, bascom2017a} reminiscent of modern electron
-    microscopy images~\cite{ou2017}.
-%DEEPTI:maybe it's just me, but why cite the older paper if more recent models do
-%include fluctuations?
-%BRUNO: if I have two citations, I always put the
-%"foundational" one and the "most recent" one. plus it's two different
-%groups, you kinda want one citation per group to independently do a thing.
-%alos, why not have all three citations? personally I feel like...just cite
-%everyone, why not? especially since there's so few peopel to cite
-
-\begin{figure}[t]
-    \centering
-    \includegraphics{./figures/fig4_kuhn_length_vs_window_size_mu47bp.pdf}
-    \caption{Kuhn lengths for heterogenous chains as a function of
-     the amount of variance in the uniformly distributed linker lengths with a mean
-     of \SI{47}{\basepair}. Adding merely \SI{1}{\basepair} of variability causes the
-     zero-temperature configuration (red triangles) to resemble a random walk with ``Kuhn
-     length'' (i.e.\ diffusivity) drastically lower than that of bare DNA
-     (\SI{100}{\basepair}), explaining the heterogenous chain's increased
-    flexibility.}\label{fig:box-kuhns}
-\end{figure}
+% At short length scales, the $\RR$ behaves like a wormlike chain with reduced
+%     persistence length, due to the linkers being forced to traverse a helix.
+% At long length scales, the chain predictably asymptotes to a Gaussian
+%     chain, again with reduced Kuhn length compared to the underlying linkers.
+% It is noteworthy that the best fit persistence length at short scales and the
+%     best fit Kuhn length at long scales are quite different (Supplemental Figure
+%     XX).
+% Thus, our full theory is required even for calculations involving this
+%     simplified, homogenous chromatin chain.
 
 
-\begin{figure}[t]
-    \centering
-    \includegraphics{./figures/fig3_kuhn_exponential.pdf}
-    \caption{We compare the kuhn lengths of realistic chromatin fibers
-    against those of the corresponding zero-temperature configurations (red
-    triangles) and bare DNA (dashed line). Geometrical kinks and fluctuations
-    combine to drastically increase the elasticity of chromatin. With exponentially
-    distributed linker lengths, the kuhn length smoothly increases as a function
-    of the mean linker length, and dampens the chaotic oscillations in the kuhn
-    lenghts of homogenous chains. Mean linker
-    lengths in \textit{S.  cerivisiae}[Chereji] (A), mice embryonic stem cells
-    [Voong] (B), and human T cells  [Valouev] (C)  are marked.}\label{fig:exp-kuhns}
-\end{figure}
+% \subsection{\label{sec:hetero-kuhn}Heterogenous Nucleosome
+% \texorpdfstring{$\RR$}{<R2>}}
 
-As expected, for short linker lengths, $<\SI{20}{\basepair}$, the
-    zero-temperature, ``geometric'' model predicts the Kuhn length of the chain
-    extremely well (Figure~\ref{fig:exp-kuhns}).
-As the average linker length
-    increases, the geometric picture becomes increasingly processive since each
-    linker is still a rigid rod.
-On the other hand, the fluctuating chain's Kuhn length stays markedly below the
-    \SI{100}{\nano\metre} Kuhn length of the underlying DNA backbone.
-While the Kuhn length approaches \SI{100}{\nano\metre} as the linker length
-    increases to infinity, this approach is power-law slow (difference shrinks
-    as inverse of the linker lengths, see Supplemental Figure XX).
-In fact, for realistic linker lengths, the effect is at least a factor of 2.
+% We now consider the more relevant scenario, when the nucleosomes are randomly
+%     spaced along the DNA backbone.
+% %TODO say what we do first, then why we do it
+% While certain DNA sequences have higher affinities for
+%     nucleosomes~\cite{something widom}, in practice the most striking features
+%     of nucleosome positioning data are nucleosome phasing near promoters, CTCF
+%     sites, and other sites that sterically inhibit nucleosome
+%     binding~\cite{widom1992}.
+% These features are predicted to occur by the simplest model of nucleosome
+%     positioning, one where nucleosomes are positioned uniformly along the DNA
+%     backbone, and simply sterically excluded from certain sites.
+% In terms of linker lengths, this model corresponds approximately to the case
+%     where linker lengths are independent and exponentially distributed about
+%     their mean.
+% Thus, while the exact statistics of \textit{in vivo} linker lengths remain to be
+%     determined, we use the case of independent, exponentially distributed
+%     linkers as a reference point to show the effect of linker heterogeneity on
+%     the statistical mechanics of the chromatin fiber.
 
-While exponentially-distributed linker lengths seem like the most natural
-    baseline to take, it is equally natural to ask how much variability in the
-    nucleosome spacing is needed to create this effect.
-While the answer varies depending on the mean linker length to some degree (see
-    Supplemental Figure XX for more examples), we show in
-    Figure~\ref{fig:box-kuhns} that as little as one base pair of variability
-%TODO this statement is almost certainly too strong
-    can lead to the chromatin fiber's structure being governed by the
-    nucleosome's geometrical properties.
+% In analogy to the case of homogenous chains, we find that the zero temperature
+%     structure provides good intuition for the behavior of the chromatin chain
+%     when thermal fluctuations are added.
+% At zero temperature, a chain with random linker lengths is going to have a
+%     structure determined purely by the interactions between the nucleosome geometry
+%     and the DNA's intrinsic twist.
+% In our model, the angle $\theta$ in Figure~\ref{fig:entry-exit} is fixed by the
+%     nucleosome geometry, but the angle $\phi$ in Figure~\ref{fig:linker-effect}
+%     is determined by linker length.
+% As the heterogeneity in linker length increases, this means that the
+%     zero temperature heterogenous chain will interpolate between a rigid helix
+%     (in the case of zero linker length variability) and a modified freely
+%     rotating chain (in the case when linker variability is high enough to make
+%     the distribution of $\phi$ approximately uniform over $[0, 2\pi]$).
 
-\subsection{\label{sec:looping}Effects of Nucleosome Spacing on Chromatin
-Looping}
+% %TODO reincorporate somewhere around here
+% %DEEPTI:it's not just random right? hasn't shlick done the Oct4 gene with
+%    %nucleosome positioning data?
+% %BRUNO:I assume you mean Bascom 2017? yeah but I mean they still use random linker
+%    % lengths...just like we do
+% Simulations of particular chromatin chains with random linker lengths have
+%     suggested that heterogeneity in nucleosome spacing leads to largely
+%     disordered chromatin architecture~\cite{woodcock1993,
+%     collepardo-guevara2014, bascom2017a} reminiscent of modern electron
+%     microscopy images~\cite{ou2017}.
+% %DEEPTI:maybe it's just me, but why cite the older paper if more recent models do
+% %include fluctuations?
+% %BRUNO: if I have two citations, I always put the
+% %"foundational" one and the "most recent" one. plus it's two different
+% %groups, you kinda want one citation per group to independently do a thing.
+% %alos, why not have all three citations? personally I feel like...just cite
+% %everyone, why not? especially since there's so few peopel to cite
 
-Chromatin looping is central to biological processes from transcriptional
-    control (e.g.\ via promoter-enhancer search) to DNA damage repair (e.g.\ via
-    homologous recombination).
-In Figure~\ref{fig:looping}, we evaluate our Green's function at $\vec{R} = 0$
-    for an ensemble of chains with linker lengths drawn from an exponential
-    distribution with mean \SI{54}{\basepair} (using a uniform distribution
-    yields similar results, see Supplemental Figure XX).
-This quantity quantifies the propensity for two loci on the same chromosome to
-    come into contact with each other as a function of their genomic separation.
-As expected, the large length scale behavior matches the Gaussian chain scaling
-    of $L^{-3/2}$, with the Kuhn length predicted by our earlier analysis.
-
-In comparison to bare DNA, we find that the looping propensity increases
-    drastically along the entire chain, as expected due to intra-superhelical
-    contacts induced by the nucleosomes' geometry, as well as due to the
-    increased elasticity predicted by the model.
-More striking than the increase in the looping propensity is the nearly four
-    orders of magnitude over which specific rearrangement of nucleosomes can
-    modulate the ability of two loci to loop together.
-Even at long length scales, where the chain is approximately Gaussian, it is
-    possible to increase or decrease the rate of looping by over an order of
-    magnitude.
-This has profound implications for the ability of chromatin remodelers to act in
-    way that can bring together or keep apart related chromosomal loci based on
-    the epigenetic environment.
-
-\begin{figure}[t]
-    \centering
-    \includegraphics{./figures/fig5_looping_hetero31to52bp.pdf}
-    %\includegraphics[width=0.35\linewidth]{./figures/fig-5b-looping-features.png}
-    \caption{Each purple line designates an individual chain configuration
-    with uniformly random linker lengths between 31 and \SI{51}{\basepair}, with
-    the black line representing the average over individual chains. Thus, modulating nucleosome positions can allow the cell to change
-    the probability of inter-nucleosomal contacts by up to 6 orders of
-    magnitude. The peak in the average curve occurs at around a kilobase, the
-    length scale of enhancer-promoter contacts. Although the average,
-    heterogenous chain tends towards a Gaussian chain with a shorter
-    effective Kuhn length, individual configurations retain memory of rigid kinks
-    at intermediate length scales, as indicated by residual peaks in the looping
-    probability.}\label{fig:looping}
-\end{figure}
-
-Like the Kuhn length, our looping function is largely determined by the
-    geometrical properties of the underlying zero-temperature chain.
-In Figure~\ref{fig:looping}, two examples of homogenous chains with extremely
-    compact or extremely linear geometries are provided to show this.
-This suggests that \textit{in vivo}, looping propensity might be largely
-    determined by geometrical considerations, at least much more than it is
-    determined by the thermal fluctuations in the chromatin fiber.
-
-We notice that the size scale at which this is most true, around
-    \SI{1}{\kilo\basepair}, is concommitant with the sizes of loops that must
-    %TODO honestly i'm out of brain juice to word this carefully
-    often form to construct the transcription initiation complex.
-This suggests that the aforementioned phasing of nucleosomes near promoters
-    might play a causal role in transcription initiation or repression, and not
-    just be a side effect of steric exclusion.
-
-Finally, we note that even though the polymer rapidly approaches the Gaussian
-    scaling of $L^\alpha$ where $\alpha \approx -3/2$, the chain is slightly
-    non-Gaussian (i.e.\ $\alpha \gtrapprox -3/2$) for size scales even
-    approaching that of a full chromosome.
-This means that even large-scale, coarse-grained models of chromatin are likely
-    to fall short if they rely on Rouse (or WLC) looping probabilities.
-This is especially relevant to modeling epigenetic spreading, which requires
-    understanding the propensity nucleosomes at various distances have to loop with
-    each other.
-
-\section{PRL Guidelines}
-
-Must be submitted to a section, closest fit seems to be
-L8--81: Biological and Medical Physics
-
-Other options:
-L0--06: Statistical Physics and Thermodynamics
-L3--30: Dynamics and Structure of Atoms and Molecules
-L6--60: Chemical Physics
-but espeically these two:
-L8--78: Liquid Crystals and Polymers
+% % \begin{figure}[t]
+% %     \centering
+% %     \includegraphics{./figures/fig4_kuhn_length_vs_window_size_mu47bp.pdf}
+% %     \caption{Kuhn lengths for heterogenous chains as a function of
+% %      the amount of variance in the uniformly distributed linker lengths with a mean
+% %      of \SI{47}{\basepair}. Adding merely \SI{1}{\basepair} of variability causes the
+% %      zero-temperature configuration (red triangles) to resemble a random walk with ``Kuhn
+% %      length'' (i.e.\ diffusivity) drastically lower than that of bare DNA
+% %      (\SI{100}{\basepair}), explaining the heterogenous chain's increased
+% %     flexibility.}\label{fig:box-kuhns}
+% % \end{figure}
 
 
-3750 words
+% % \begin{figure}[t]
+% %     \centering
+% %     \includegraphics{./figures/fig3_kuhn_exponential.pdf}
+% %     \caption{We compare the kuhn lengths of realistic chromatin fibers
+% %     against those of the corresponding zero-temperature configurations (red
+% %     triangles) and bare DNA (dashed line). Geometrical kinks and fluctuations
+% %     combine to drastically increase the elasticity of chromatin. With exponentially
+% %     distributed linker lengths, the kuhn length smoothly increases as a function
+% %     of the mean linker length, and dampens the chaotic oscillations in the kuhn
+% %     lenghts of homogenous chains. Mean linker
+% %     lengths in \textit{S.  cerivisiae}[Chereji] (A), mice embryonic stem cells
+% %     [Voong] (B), and human T cells  [Valouev] (C)  are marked.}\label{fig:exp-kuhns}
+% % \end{figure}
 
-Include:
+% As expected, for short linker lengths, $<\SI{20}{\basepair}$, the
+%     zero-temperature, ``geometric'' model predicts the Kuhn length of the chain
+%     extremely well (Figure~\ref{fig:exp-kuhns}).
+% As the average linker length
+%     increases, the geometric picture becomes increasingly processive since each
+%     linker is still a rigid rod.
+% On the other hand, the fluctuating chain's Kuhn length stays markedly below the
+%     \SI{100}{\nano\metre} Kuhn length of the underlying DNA backbone.
+% While the Kuhn length approaches \SI{100}{\nano\metre} as the linker length
+%     increases to infinity, this approach is power-law slow (difference shrinks
+%     as inverse of the linker lengths, see Supplemental Figure XX).
+% In fact, for realistic linker lengths, the effect is at least a factor of 2.
 
-Any text in the body of the article;
-Any text in a figure caption or table caption;
-Any text in a footnote or an endnote
+% While exponentially-distributed linker lengths seem like the most natural
+%     baseline to take, it is equally natural to ask how much variability in the
+%     nucleosome spacing is needed to create this effect.
+% While the answer varies depending on the mean linker length to some degree (see
+%     Supplemental Figure XX for more examples), we show in
+%     Figure~\ref{fig:box-kuhns} that as little as one base pair of variability
+% %TODO this statement is almost certainly too strong
+%     can lead to the chromatin fiber's structure being governed by the
+%     nucleosome's geometrical properties.
 
-Exclude:
+% \subsection{\label{sec:looping}Effects of Nucleosome Spacing on Chromatin
+% Looping}
 
-Title;
-Author and affiliation listing;
-Abstract;
-Receipt date, published date, and other publication history;
-PACS or Keywords and DOI;\@
-References;
-Author byline footnotes;
-Acknowledgments
+% Chromatin looping is central to biological processes from transcriptional
+%     control (e.g.\ via promoter-enhancer search) to DNA damage repair (e.g.\ via
+%     homologous recombination).
+% In Figure~\ref{fig:looping}, we evaluate our Green's function at $\vec{R} = 0$
+%     for an ensemble of chains with linker lengths drawn from an exponential
+%     distribution with mean \SI{54}{\basepair} (using a uniform distribution
+%     yields similar results, see Supplemental Figure XX).
+% This quantity quantifies the propensity for two loci on the same chromosome to
+%     come into contact with each other as a function of their genomic separation.
+% As expected, the large length scale behavior matches the Gaussian chain scaling
+%     of $L^{-3/2}$, with the Kuhn length predicted by our earlier analysis.
 
-Estimating the word equivalent for figures can be simplified by using the aspect
-ratio (width / height) of the figure. The estimates would be ((150 / aspect
-ratio) + 20 words) for single-column figures, and ((300 / (0.5 * aspect ratio))
-+ 40 words) for double column figures.
+% In comparison to bare DNA, we find that the looping propensity increases
+%     drastically along the entire chain, as expected due to intra-superhelical
+%     contacts induced by the nucleosomes' geometry, as well as due to the
+%     increased elasticity predicted by the model.
+% More striking than the increase in the looping propensity is the nearly four
+%     orders of magnitude over which specific rearrangement of nucleosomes can
+%     modulate the ability of two loci to loop together.
+% Even at long length scales, where the chain is approximately Gaussian, it is
+%     possible to increase or decrease the rate of looping by over an order of
+%     magnitude.
+% This has profound implications for the ability of chromatin remodelers to act in
+%     way that can bring together or keep apart related chromosomal loci based on
+%     the epigenetic environment.
 
-The word equivalent for displayed math is 16 words per row for single-column
-equations. Two-column equations count as 32 words per row.
+% % \begin{figure}[t]
+% %     \centering
+% %     \includegraphics{./figures/fig5_looping_hetero31to52bp.pdf}
+% %     %\includegraphics[width=0.35\linewidth]{./figures/fig-5b-looping-features.png}
+% %     \caption{Each purple line designates an individual chain configuration
+% %     with uniformly random linker lengths between 31 and \SI{51}{\basepair}, with
+% %     the black line representing the average over individual chains. Thus, modulating nucleosome positions can allow the cell to change
+% %     the probability of inter-nucleosomal contacts by up to 6 orders of
+% %     magnitude. The peak in the average curve occurs at around a kilobase, the
+% %     length scale of enhancer-promoter contacts. Although the average,
+% %     heterogenous chain tends towards a Gaussian chain with a shorter
+% %     effective Kuhn length, individual configurations retain memory of rigid kinks
+% %     at intermediate length scales, as indicated by residual peaks in the looping
+% %     probability.}\label{fig:looping}
+% % \end{figure}
 
-% \section{\label{sec:level1}First-level heading}
+% Like the Kuhn length, our looping function is largely determined by the
+%     geometrical properties of the underlying zero-temperature chain.
+% In Figure~\ref{fig:looping}, two examples of homogenous chains with extremely
+%     compact or extremely linear geometries are provided to show this.
+% This suggests that \textit{in vivo}, looping propensity might be largely
+%     determined by geometrical considerations, at least much more than it is
+%     determined by the thermal fluctuations in the chromatin fiber.
 
-% This sample document demonstrates proper use of REV\TeX~4.1 (and
-% \LaTeXe) in mansucripts prepared for submission to APS
-% journals. Further information can be found in the REV\TeX~4.1
-% documentation included in the distribution or available at
-% \url{http://authors.aps.org/revtex4/}.
+% We notice that the size scale at which this is most true, around
+%     \SI{1}{\kilo\basepair}, is concommitant with the sizes of loops that must
+%     %TODO honestly i'm out of brain juice to word this carefully
+%     often form to construct the transcription initiation complex.
+% This suggests that the aforementioned phasing of nucleosomes near promoters
+%     might play a causal role in transcription initiation or repression, and not
+%     just be a side effect of steric exclusion.
 
-% When commands are referred to in this example file, they are always
-% shown with their required arguments, using normal \TeX{} format. In
-% this format, \verb+#1+, \verb+#2+, etc. stand for required
-% author-supplied arguments to commands. For example, in
-% \verb+\section{#1}+ the \verb+#1+ stands for the title text of the
-% author's section heading, and in \verb+\title{#1}+ the \verb+#1+
-% stands for the title text of the paper.
+% Finally, we note that even though the polymer rapidly approaches the Gaussian
+%     scaling of $L^\alpha$ where $\alpha \approx -3/2$, the chain is slightly
+%     non-Gaussian (i.e.\ $\alpha \gtrapprox -3/2$) for size scales even
+%     approaching that of a full chromosome.
+% This means that even large-scale, coarse-grained models of chromatin are likely
+%     to fall short if they rely on Rouse (or WLC) looping probabilities.
+% This is especially relevant to modeling epigenetic spreading, which requires
+%     understanding the propensity nucleosomes at various distances have to loop with
+%     each other.
 
-% Line breaks in section headings at all levels can be introduced using
-% \textbackslash\textbackslash. A blank input line tells \TeX\ that the
-% paragraph has ended. Note that top-level section headings are
-% automatically uppercased. If a specific letter or word should appear in
-% lowercase instead, you must escape it using \verb+\lowercase{#1}+ as
-% in the word ``via'' above.
+% \section{PRL Guidelines}
 
-% \subsection{\label{sec:level2}Second-level heading: Formatting}
+% Must be submitted to a section, closest fit seems to be
+% L8--81: Biological and Medical Physics
 
-% This file may be formatted in either the \texttt{preprint} or
-% \texttt{reprint} style. \texttt{reprint} format mimics final journal output.
-% Either format may be used for submission purposes. \texttt{letter} sized paper should
-% be used when submitting to APS journals.
+% Other options:
+% L0--06: Statistical Physics and Thermodynamics
+% L3--30: Dynamics and Structure of Atoms and Molecules
+% L6--60: Chemical Physics
+% but espeically these two:
+% L8--78: Liquid Crystals and Polymers
 
-% \subsubsection{Wide text (A level-3 head)}
-% The \texttt{widetext} environment will make the text the width of the
-% full page, as on page~\pageref{eq:wideeq}. (Note the use the
-% \verb+\pageref{#1}+ command to refer to the page number.)
-% \paragraph{Note (Fourth-level head is run in)}
-% The width-changing commands only take effect in two-column formatting.
-% There is no effect if text is in a single column.
 
-% \subsection{\label{sec:citeref}Citations and References}
-% A citation in text uses the command \verb+\cite{#1}+ or
-% \verb+\onlinecite{#1}+ and refers to an entry in the bibliography.
-% An entry in the bibliography is a reference to another document.
+% 3750 words
 
-% \subsubsection{Citations}
-% Because REV\TeX\ uses the \verb+natbib+ package of Patrick Daly,
-% the entire repertoire of commands in that package are available for your document;
-% see the \verb+natbib+ documentation for further details. Please note that
-% REV\TeX\ requires version 8.31a or later of \verb+natbib+.
+% Include:
 
-% \paragraph{Syntax}
-% The argument of \verb+\cite+ may be a single \emph{key},
-% or may consist of a comma-separated list of keys.
-% The citation \emph{key} may contain
-% letters, numbers, the dash (-) character, or the period (.) character.
-% New with natbib 8.3 is an extension to the syntax that allows for
-% a star (*) form and two optional arguments on the citation key itself.
-% The syntax of the \verb+\cite+ command is thus (informally stated)
-% \begin{quotation}\flushleft\leftskip1em
-% \verb+\cite+ \verb+{+ \emph{key} \verb+}+, or\\
-% \verb+\cite+ \verb+{+ \emph{optarg+key} \verb+}+, or\\
-% \verb+\cite+ \verb+{+ \emph{optarg+key} \verb+,+ \emph{optarg+key}\ldots \verb+}+,
-% \end{quotation}\noindent
-% where \emph{optarg+key} signifies
-% \begin{quotation}\flushleft\leftskip1em
-% \emph{key}, or\\
-% \texttt{*}\emph{key}, or\\
-% \texttt{[}\emph{pre}\texttt{]}\emph{key}, or\\
-% \texttt{[}\emph{pre}\texttt{]}\texttt{[}\emph{post}\texttt{]}\emph{key}, or even\\
-% \texttt{*}\texttt{[}\emph{pre}\texttt{]}\texttt{[}\emph{post}\texttt{]}\emph{key}.
-% \end{quotation}\noindent
-% where \emph{pre} and \emph{post} is whatever text you wish to place
-% at the beginning and end, respectively, of the bibliographic reference
-% (see Ref.~[\onlinecite{witten2001}] and the two under Ref.~[\onlinecite{feyn54}]).
-% (Keep in mind that no automatic space or punctuation is applied.)
-% It is highly recommended that you put the entire \emph{pre} or \emph{post} portion
-% within its own set of braces, for example:
-% \verb+\cite+ \verb+{+ \texttt{[} \verb+{+\emph{text}\verb+}+\texttt{]}\emph{key}\verb+}+.
-% The extra set of braces will keep \LaTeX\ out of trouble if your \emph{text} contains the comma (,) character.
+% Any text in the body of the article;
+% Any text in a figure caption or table caption;
+% Any text in a footnote or an endnote
 
-% The star (*) modifier to the \emph{key} signifies that the reference is to be
-% merged with the previous reference into a single bibliographic entry,
-% a common idiom in APS and AIP articles (see below, Ref.~[\onlinecite{epr}]).
-% When references are merged in this way, they are separated by a semicolon instead of
-% the period (full stop) that would otherwise appear.
+% Exclude:
 
-% \paragraph{Eliding repeated information}
-% When a reference is merged, some of its fields may be elided: for example,
-% when the author matches that of the previous reference, it is omitted.
-% If both author and journal match, both are omitted.
-% If the journal matches, but the author does not, the journal is replaced by \emph{ibid.},
-% as exemplified by Ref.~[\onlinecite{epr}].
-% These rules embody common editorial practice in APS and AIP journals and will only
-% be in effect if the markup features of the APS and AIP Bib\TeX\ styles is employed.
+% Title;
+% Author and affiliation listing;
+% Abstract;
+% Receipt date, published date, and other publication history;
+% PACS or Keywords and DOI;\@
+% References;
+% Author byline footnotes;
+% Acknowledgments
 
-% \paragraph{The options of the cite command itself}
-% Please note that optional arguments to the \emph{key} change the reference in the bibliography,
-% not the citation in the body of the document.
-% For the latter, use the optional arguments of the \verb+\cite+ command itself:
-% \verb+\cite+ \texttt{*}\allowbreak
-% \texttt{[}\emph{pre-cite}\texttt{]}\allowbreak
-% \texttt{[}\emph{post-cite}\texttt{]}\allowbreak
-% \verb+{+\emph{key-list}\verb+}+.
+% Estimating the word equivalent for figures can be simplified by using the aspect
+% ratio (width / height) of the figure. The estimates would be ((150 / aspect
+% ratio) + 20 words) for single-column figures, and ((300 / (0.5 * aspect ratio))
+% + 40 words) for double column figures.
+
+% The word equivalent for displayed math is 16 words per row for single-column
+% equations. Two-column equations count as 32 words per row.
+
+% % \section{\label{sec:level1}First-level heading}
+
+% % This sample document demonstrates proper use of REV\TeX~4.1 (and
+% % \LaTeXe) in mansucripts prepared for submission to APS
+% % journals. Further information can be found in the REV\TeX~4.1
+% % documentation included in the distribution or available at
+% % \url{http://authors.aps.org/revtex4/}.
+
+% % When commands are referred to in this example file, they are always
+% % shown with their required arguments, using normal \TeX{} format. In
+% % this format, \verb+#1+, \verb+#2+, etc. stand for required
+% % author-supplied arguments to commands. For example, in
+% % \verb+\section{#1}+ the \verb+#1+ stands for the title text of the
+% % author's section heading, and in \verb+\title{#1}+ the \verb+#1+
+% % stands for the title text of the paper.
+
+% % Line breaks in section headings at all levels can be introduced using
+% % \textbackslash\textbackslash. A blank input line tells \TeX\ that the
+% % paragraph has ended. Note that top-level section headings are
+% % automatically uppercased. If a specific letter or word should appear in
+% % lowercase instead, you must escape it using \verb+\lowercase{#1}+ as
+% % in the word ``via'' above.
+
+% % \subsection{\label{sec:level2}Second-level heading: Formatting}
+
+% % This file may be formatted in either the \texttt{preprint} or
+% % \texttt{reprint} style. \texttt{reprint} format mimics final journal output.
+% % Either format may be used for submission purposes. \texttt{letter} sized paper should
+% % be used when submitting to APS journals.
+
+% % \subsubsection{Wide text (A level-3 head)}
+% % The \texttt{widetext} environment will make the text the width of the
+% % full page, as on page~\pageref{eq:wideeq}. (Note the use the
+% % \verb+\pageref{#1}+ command to refer to the page number.)
+% % \paragraph{Note (Fourth-level head is run in)}
+% % The width-changing commands only take effect in two-column formatting.
+% % There is no effect if text is in a single column.
+
+% % \subsection{\label{sec:citeref}Citations and References}
+% % A citation in text uses the command \verb+\cite{#1}+ or
+% % \verb+\onlinecite{#1}+ and refers to an entry in the bibliography.
+% % An entry in the bibliography is a reference to another document.
+
+% % \subsubsection{Citations}
+% % Because REV\TeX\ uses the \verb+natbib+ package of Patrick Daly,
+% % the entire repertoire of commands in that package are available for your document;
+% % see the \verb+natbib+ documentation for further details. Please note that
+% % REV\TeX\ requires version 8.31a or later of \verb+natbib+.
+
+% % \paragraph{Syntax}
+% % The argument of \verb+\cite+ may be a single \emph{key},
+% % or may consist of a comma-separated list of keys.
+% % The citation \emph{key} may contain
+% % letters, numbers, the dash (-) character, or the period (.) character.
+% % New with natbib 8.3 is an extension to the syntax that allows for
+% % a star (*) form and two optional arguments on the citation key itself.
+% % The syntax of the \verb+\cite+ command is thus (informally stated)
+% % \begin{quotation}\flushleft\leftskip1em
+% % \verb+\cite+ \verb+{+ \emph{key} \verb+}+, or\\
+% % \verb+\cite+ \verb+{+ \emph{optarg+key} \verb+}+, or\\
+% % \verb+\cite+ \verb+{+ \emph{optarg+key} \verb+,+ \emph{optarg+key}\ldots \verb+}+,
+% % \end{quotation}\noindent
+% % where \emph{optarg+key} signifies
+% % \begin{quotation}\flushleft\leftskip1em
+% % \emph{key}, or\\
+% % \texttt{*}\emph{key}, or\\
+% % \texttt{[}\emph{pre}\texttt{]}\emph{key}, or\\
+% % \texttt{[}\emph{pre}\texttt{]}\texttt{[}\emph{post}\texttt{]}\emph{key}, or even\\
+% % \texttt{*}\texttt{[}\emph{pre}\texttt{]}\texttt{[}\emph{post}\texttt{]}\emph{key}.
+% % \end{quotation}\noindent
+% % where \emph{pre} and \emph{post} is whatever text you wish to place
+% % at the beginning and end, respectively, of the bibliographic reference
+% % (see Ref.~[\onlinecite{witten2001}] and the two under Ref.~[\onlinecite{feyn54}]).
+% % (Keep in mind that no automatic space or punctuation is applied.)
+% % It is highly recommended that you put the entire \emph{pre} or \emph{post} portion
+% % within its own set of braces, for example:
+% % \verb+\cite+ \verb+{+ \texttt{[} \verb+{+\emph{text}\verb+}+\texttt{]}\emph{key}\verb+}+.
+% % The extra set of braces will keep \LaTeX\ out of trouble if your \emph{text} contains the comma (,) character.
+
+% % The star (*) modifier to the \emph{key} signifies that the reference is to be
+% % merged with the previous reference into a single bibliographic entry,
+% % a common idiom in APS and AIP articles (see below, Ref.~[\onlinecite{epr}]).
+% % When references are merged in this way, they are separated by a semicolon instead of
+% % the period (full stop) that would otherwise appear.
+
+% % \paragraph{Eliding repeated information}
+% % When a reference is merged, some of its fields may be elided: for example,
+% % when the author matches that of the previous reference, it is omitted.
+% % If both author and journal match, both are omitted.
+% % If the journal matches, but the author does not, the journal is replaced by \emph{ibid.},
+% % as exemplified by Ref.~[\onlinecite{epr}].
+% % These rules embody common editorial practice in APS and AIP journals and will only
+% % be in effect if the markup features of the APS and AIP Bib\TeX\ styles is employed.
+
+% % \paragraph{The options of the cite command itself}
+% % Please note that optional arguments to the \emph{key} change the reference in the bibliography,
+% % not the citation in the body of the document.
+% % For the latter, use the optional arguments of the \verb+\cite+ command itself:
+% % \verb+\cite+ \texttt{*}\allowbreak
+% % \texttt{[}\emph{pre-cite}\texttt{]}\allowbreak
+% % \texttt{[}\emph{post-cite}\texttt{]}\allowbreak
+% % \verb+{+\emph{key-list}\verb+}+.
 
 \bibliography{chromatin}
 
