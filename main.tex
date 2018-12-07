@@ -206,8 +206,8 @@ However, at shorter time scales, when individual nucleosome positions are
 
 % Our simple model fills an important gap by providing physical intuition for how
 %     nucleosome positioning guides chromatin organization.
-
-\section{\label{sec:model}Model}
+%
+%\section{\label{sec:model}Model}
 First, we make rigorous our ``beads on a string'' model of chromatin.
 We treat each DNA linker as a WLC and nucleosomes as the points where these
     WLC's are connected.
@@ -354,25 +354,6 @@ To compose monomers of the nucleosome chain with perscribed linker lengths, we
 In Fourier space, this corresponds to multiplying the matrices $B(L_i)$
     from Eq.~\ref{eq:coeffs}.
 
-Moments of the chain can be computed by noticing that
-% \begin{equation}\label{eq:moments}
-    $\lim_{k\to0} \frac{\partial^n B_{00}^{00}}{\partial k} = i^n \left\langle
-    R^n\right\rangle$.
-% \end{equation}
-In particular, we extract the elasticity of the chromatin chain via its Kuhn
-    length, $b = \lim_{N\to\infty} \RR/\sum_{i=0}^N L_i$.
-%DEEPTI:still think we should include equation for the inversion, since it's not
-    %purely numerical. Like we did the orientation integrals analytically using the plane
-    %wave expansion of spherical harmonics befor computing the numerical k
-    %integral.
-%BRUNO: which one?
-To calculate the propensity for two loci to loop, we numerically invert
-    the Fourier transform to evaluate $\greens[L]{\vec{R}}$ at $\vec{R} = 0$,
-    where the real-space Green's function is given by
-\begin{equation}\label{eq:realgreens}
-    \greens[L]{\vec{R}} = \frac{1}{2\pi^2}\int_0^\infty dk~k^2 j_0(kR) B_{00}^{00}(k;L)
-\end{equation}
-We note that $P_\text{loop}=\greens[L]{\vec{R}=0}$ corresponds to a modified $J$-factor with no orientational component.
 
 A key property of our model is that the relative orientation of adjacent
     nucleosomes is not just determined by $\Omega_\text{kink}$ and the thermal
@@ -410,17 +391,29 @@ Our propagator $G$ takes this property into account implicitly thanks to the
 %     extremely sensitive to changes in the nucleosome repeat
 %     length.}\label{fig:homo-kuhn}
 % \end{figure*}
-
-\section{\label{sec:results}Results}
+%
+%\section{\label{sec:results}Results}
 %% introduce our strategy: zero-temperature to build intuition
-We begin by comparing the Kuhn length of chains with various linker length
-    distributions to their zero-temperature (i.e.\ minimum-energy) structure.
+
+% In particular, we extract the elasticity of the chromatin chain via its Kuhn
+%     length, $b = \lim_{N\to\infty} \RR/\sum_{i=0}^N L_i$.
+%DEEPTI:still think we should include equation for the inversion, since it's not
+    %purely numerical. Like we did the orientation integrals analytically using the plane
+    %wave expansion of spherical harmonics befor computing the numerical k
+    %integral.
+%BRUNO: which one?
+
+We begin by extracting the elasticity of the chromatin via its Kuhn length,
 %% what is a kuhn length
-Recall that the Kuhn length, $b$, is a universal measure of the long-length
-    scale behavior of a polymer.
+$b = \lim_{N\to\infty} \RR/\sum_{i=0}^N L_i$, a universal measure of the long-length scale behavior of a polymer.
 %%why do we care about the kuhn length?
-For any polymer model, the mean end to end distance $\RR$ is linearly related to the
-    underlying chain length, $L$, by $\RR = bL$ for large enough $L$.
+Moments of the chain can be computed by noticing that
+% \begin{equation}\label{eq:moments}
+    $\lim_{k\to0} \frac{\partial^n B_{00}^{00}}{\partial k} = i^n \left\langle
+    R^n\right\rangle$.
+% \end{equation}
+%For any polymer model, the mean end to end distance $\RR$ is linearly related to the
+%    underlying chain length, $L$, by $\RR = bL$ for large enough $L$.
 For the wormlike chain, the Kuhn length is directly related to the elasticity of
     the chain via it's persistence length $b = 2l_p$.
 
@@ -593,6 +586,13 @@ Next, we wondered how much rearranging the nucleosomes between two
     loci could affect the ability of chromatin loops to form.
 Since our theory allows an analytical solution, we can probe this question
     systematically for the first time.
+We numerically invert the Fourier transform in equation \ref{eq:expansion} to evaluate
+    $\greens[L]{\vec{R}}$ at $\vec{R} = 0$.
+    % where the real-space Green's function is given by
+% \begin{equation}\label{eq:realgreens}
+    % \greens[L]{\vec{R}} = \frac{1}{2\pi^2}\int_0^\infty dk~k^2 j_0(kR) B_{00}^{00}(k;L)
+% \end{equation}
+We note that $P_\text{loop}=\greens[L]{\vec{R}=0}$ corresponds to a modified $J$-factor with no orientational component.
 In Figure~\ref{fig:looping}, we compute the propensity of individual chromatin
     chains drawn from the maximum entropy distribution to form loops as a
     function of the loop size.
