@@ -501,59 +501,57 @@ Because of this sensitivity, we hypothesized that introducing modest amounts of
 We apply our fluctuating theory to study the chains first considered
     in~\cite{woodcock1993}, where the linker lengths are drawn uniformly from a
     range $\mu \pm \sigma$.
-As in the homogenous case, the processivity of the zero-temperature
-    configuration qualitatively explains the Kuhn length of the fluctuating chain.
 In Figure~\ref{fig:hetero-geom}, we see that as we increase $\sigma$, the
     zero-temperature configuration of the chain interpolates between a helix at
     $\sigma = 0$ and a random walk at larger $\sigma$.
 This is because as we increase $\sigma$, the distribution of $\phi \in [0, 2\pi]$ connecting
     adjacent linkers quickly becomes approximately uniform.
-A random walk where steps are taken with fixed $\theta$ and uniformly
-    random $\phi$ is known as a freely-jointed chain.
-Our zero-temperature structures are a generalization of this concept where step
-    sizes and $\phi$ are correlated.
-
+% A random walk where steps are taken with fixed $\theta$ and uniformly
+%     random $\phi$ is known as a freely-jointed chain.
+% Our zero-temperature structures are a generalization of this concept where step
+%     sizes and $\phi$ are correlated.
+%
 %% how do zero temp and fluct pictures compare?
-Since the zero temperature structure becomes a random walk at long length
-    scales, we use its diffusivity (i.e.\ its effective Kuhn length) as our
-    measure of processivity.
-Figure~\ref{fig:hetero-kuhn-unif} shows how the Kuhn lengths of the
-zero-temperature and fluctuating structures qualitatively follow the same trend
-as $\sigma$ increases.
+As a result, the zero-temperature structure itself has a Kuhn length, which measurse
+the chain's processivity.
+As in the homogenous case, the Kuhn length of the
+zero-temperature chain qualitatively predicts that of the fluctuating structure,
+as seen in Figure.
 %thoughts on cutting the next sentence? if we include it, think it needs more
 %explanation. or we could just put this in the discussion.
 %This stands in contrast to existing methods for combining the Kuhn lengths of
 %    heterogenous polymer chains based on Rouse theory (Supplemental Figure XX).
-Thus, we conclude that the geometric effects imposed by
-    stochastic nucleosome spacing dominate the thermal fluctuations of the
-    polymer when determining the structure of the chromatin chain.
+%We say this same statement when discussing homogenous chains, and I think above
+%setnence makes it pretty clear that this is the case
+% Thus, we conclude that the geometric effects imposed by
+%     stochastic nucleosome spacing dominate the thermal fluctuations of the
+%     polymer when determining the structure of the chromatin chain.
 
 %% universality and it's approached quickly
-We also notice that the Kuhn length rapidly converges to
-a constant value as $\sigma\to\infty$.
-The convergence rate corresponds to how quickly $\phi$ becomes approximately
-    uniform as $\sigma$ increases.
-In order to highlight the transition from rigid helix to a random walk, a slowly
-    converging case was chosen.
-However, for many average linker lengths, the Kuhn length has essentially
-    converged with as little as $\sigma = \SI{1}{\basepair}$ of variability in
-    linker lengths (Supplemental Figure XX).
-
+%We also notice that the Kuhn length rapidly converges to
+Next, we analyze the limiting case where $\phi$ is uniform.
+% The convergence rate corresponds to how quickly $\phi$ becomes approximately
+%     uniform as $\sigma$ increases.
+% In order to highlight the transition from rigid helix to a random walk, a slowly
+%     converging case was chosen.
+% However, for many average linker lengths, the Kuhn length has essentially
+%     converged with as little as $\sigma = \SI{1}{\basepair}$ of variability in
+%     linker lengths (Supplemental Figure XX).
 %% introduce maximum entropy limit
-We can understand the structure to which our heterogenous chains converge by studying the
-maximally entropic linker length distribution. The homogenous case ($\sigma=0$) is the
+%This limiting case corresponds to a chain with approximately uniform $\phi$. 
+The homogenous case ($\sigma=0$) is the
     minimum entropy arrangement of nucleosomes for a given $\meanli$. In
     contrast, in the maximum entropy arrangement, molecules bind uniformly to
-    the lattice. For a sufficiently large lattice, the distances separating the
+    the DNA lattice. For a sufficiently large lattice, the distances separating the
     molecules are well-approximated by exponential, i.i.d.\ random variables.
 This is also exactly the distribution implied by  state-of-the-art models of nucleosome
     positioning~\cite{beshnova2014}.
 
 %%universality, justify exponential
-We find that the Kuhn lengths for chains sampled from a
-uniform linker length distribution rapidly converge to this
-maximum entropy limit as $\sigma\to\infty$.
-The fact that the limiting value is distribution-free suggests that even if nucleosomes were  positioned more precisely than predicted by current models, exponentially distributed linker lengths would remain an excellent approximation, as long as $\phi$ remains approximately uniform.
+We find that the Kuhn lengths for chains with uniformly random linker lengths rapidly converge to this
+maximum entropy limit as $\sigma\to\infty$. For many average linker lengths,
+convergence occurs with as little as $\sigma=\SI{1}{\basepair}$ of variability. 
+The fact that the limiting value is distribution-free suggests that even if nucleosomes were positioned more precisely than predicted by current models, exponentially distributed linker lengths would remain an excellent approximation, as long as $\phi$ remains approximately uniform.
 
 \begin{figure}
     \centering
