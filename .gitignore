@@ -56,3 +56,16 @@ dist
 # Data files not tracked #
 ##########################
 csvs/gprops
+
+
+# LateX Files #
+###############
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+mainNotes.bib
+main.pdf
+test.*
+.*.sw*
