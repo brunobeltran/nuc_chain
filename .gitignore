@@ -55,4 +55,4 @@ dist
 
 # Data files not tracked #
 ##########################
-csvs/gprops
+csvs
