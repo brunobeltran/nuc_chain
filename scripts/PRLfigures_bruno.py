@@ -19,7 +19,7 @@ from MultiPoint import propagator
 from nuc_chain import fluctuations as wlc
 from nuc_chain.linkers import convert
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from PIL import Image
+#from PIL import Image
 
 # Plotting parameters
 # PRL Font preference: computer modern roman (cmr), medium weight (m), normal shape
@@ -134,8 +134,10 @@ dull_purple = '#755F80'
 def plot_fig2a():
     """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
-    plt.rcParams.update(inter_params)
-    fig, ax = plt.subplots(figsize=(0.32*col_size, 0.21*col_size))
+    plt.rcParams.update(medium_params)
+    fig, ax = plt.subplots(figsize=(col_size, 0.43*col_size))
+
+    #36 bp
     hdf = pd.read_csv('./csvs/r2/r2-fluctuations-mu_36-sigma_0_10_0unwraps.csv')
     try:
         del hdf['Unnamed: 0']
@@ -144,18 +146,29 @@ def plot_fig2a():
     hdf = hdf.set_index(['variance', 'chain_id']).loc[0.0, 0.0]
     hdf.iloc[0,0] = 1
     hdf.iloc[0,1] = 1
-    plt.plot(hdf['rmax'], hdf['r2'], color=dull_purple)
+    plt.plot(hdf['rmax'], hdf['r2'], color=red_geom, lw=1.5)
+
+    #comparison to WLC that matches long length scale
     x = np.logspace(0, 7, 100)
     y = wlc.r2wlc(x, hdf['kuhn'].mean()/2)
-    plt.plot(x, y, '-.', color=teal_flucts, markersize=1)
+    plt.plot(x, y, '-.', color=teal_flucts, markersize=1, lw=1.5)
+
+    #comparison to WLC that matches short length sclae
+    x = np.logspace(0, 7, 100)
+    y = wlc.r2wlc(x, 50)
+    plt.plot(x, y, ':', color=teal_flucts, markersize=1, lw=1.5)
+
+    #legend    
     plt.xscale('log')
     plt.yscale('log')
     plt.xlim([0.5, 2000])
     plt.ylim([0.5, 20000])
+    plt.minorticks_off()
     plt.xlabel('Total Linker Length (nm)')
     plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
-    plt.legend([r'$L_i = 36bp$', r'$WLC, l_p \approx 3 nm$'],
-               bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
+    plt.legend([r'$L_i = 36bp$', r'$WLC,$' '\n' r'$b = 5.6nm$', r'$WLC,$' '\n' r'$b = 100nm$'],
+        bbox_to_anchor=(1.02, 0), loc=3, borderaxespad=0.)
+    plt.subplots_adjust(left=0.16, bottom=0.28, top=0.98, right=0.7)
     plt.savefig('plots/PRL/fig2a_r2_homogenous_vs_wlc.pdf', bbox_inches='tight')
 
 # this ended up being supplemental after all
@@ -175,18 +188,22 @@ def plot_fig2a():
 #     plt.savefig('plots/PRL/fig2b_kuhn_length_homogenous_1to1000links_0unwraps.pdf')
 
 def plot_fig2b():
-    plt.rcParams.update(inter_params)
+    """ Homogenous kuhn lengths 31-51bp """
+    plt.rcParams.update(medium_params)
     kuhns = np.load('csvs/kuhns_1to250links_0to146unwraps.npy')
-    fig, ax = plt.subplots(figsize=(0.45*col_size, 0.45*(5/7)*col_size))
+    fig, ax = plt.subplots(figsize=(0.95*col_size, 0.42*col_size))
     plt.xlabel('Fixed linker length (bp)')
     plt.ylabel('Kuhn length (nm)')
     links = np.arange(31, 52)
     ax.plot(links, kuhns[links-1, 0], '--o', markersize=4, lw=1.5, color=teal_flucts)
+    #color 36bp dot red to match fig2a
+    redlink = 36
+    ax.plot(redlink, kuhns[redlink-1, 0], 'o', markersize=4, color=red_geom)
     plt.xticks(np.arange(31, 52, 2))
-    plt.xlim([30, 48])
-    plt.subplots_adjust(left=0.12, bottom=0.25, top=0.98, right=0.99)
+    plt.xlim([31, 51])
+    plt.subplots_adjust(left=0.12, bottom=0.25, top=0.98, right=0.98)
     plt.tick_params(left=True, right=False, bottom=True, length=4)
-    plt.savefig('plots/PRL/fig2b_kuhn_length_in_nm_31to51links_0unwraps.pdf')
+    plt.savefig('plots/PRL/fig2b_kuhn_length_31to51links_0unwraps.pdf')
 
 #def plot_fig3_kuhn_length_vs_variance(sigmas=np.arange(0, 11), ax=None):
 #    kuhnsf41 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_0_10_0unwraps.npy')
@@ -214,19 +231,19 @@ def plot_fig2b():
 #    #plt.savefig('plots/PRL/fig4_kuhn_length_vs_window_size_mu47bp.pdf')
 
 def plot_fig3(sigmas=np.arange(0, 41)):
-    plt.rcParams.update(inter_params)
-    fig, ax = plt.subplots(figsize=(0.95*col_size, 0.95*(5/7)*col_size))
+    plt.rcParams.update(medium_params)
+    fig, ax = plt.subplots(figsize=(col_size, 0.7*col_size))
     kuhnsf41_sig0to10 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_0_10_0unwraps.npy')
     kuhnsf41_sig11to40 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_11_40_0unwraps.npy')
     kuhnsf41 = np.concatenate((kuhnsf41_sig0to10, kuhnsf41_sig11to40))
     kuhnsg41_sig0to10 = np.load(f'csvs/r2/kuhns-geometrical-mu41-sigma_0_10_0unwraps.npy')
     kuhnsg41_sig11to40 = np.load(f'csvs/r2/kuhns-geometrical-mu41-sigma_11_40_0unwraps.npy')
     kuhnsg41 = np.concatenate((kuhnsg41_sig0to10, kuhnsg41_sig11to40))
-    ax.plot(sigmas, kuhnsf41, '-o', markersize=3, label='Fluctuations',
-            color=teal_flucts)
 
     ax.plot(sigmas, kuhnsg41, '--^', markersize=3, label='Geometrical',
             color=red_geom)
+    ax.plot(sigmas, kuhnsf41, '-o', markersize=3, label='Fluctuations',
+            color=teal_flucts)
     rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_41-0unwraps.csv')
     b = rdf['kuhn'].mean()
     xlim = plt.xlim()
@@ -235,48 +252,51 @@ def plot_fig3(sigmas=np.arange(0, 41)):
     ax.set_ylim([0, 100])
     plt.xlabel('$\sigma$ (bp)')
     plt.ylabel('Kuhn length (nm)')
-    plt.legend()
-    fig.text(1.3, 0, r'$\pm 0 bp$', size=9)
-    fig.text(1.6, 0, r'$\pm 2 bp$', size=9)
-    fig.text(1.9, 0, r'$\pm 6 bp$', size=9)
-    plt.subplots_adjust(left=0.07, bottom=0.15, top=0.92, right=0.97)
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, borderaxespad=0.)
+    fig.text(0.02, 0.9, r'$\pm 0 bp$', size=9)
+    fig.text(0.54, 0.82, r'$\pm 2 bp$', size=9)
+    fig.text(0.82, 0.55, r'$\pm 6 bp$', size=9)
+    plt.subplots_adjust(left=0.13, bottom=0.16, top=0.6, right=0.8)
     plt.savefig('./plots/PRL/fig-3-kuhn_length_vs_window_size_41_sigma0to40.pdf')
 
 def plot_fig4a(ax=None):
-    """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
+    """The r2 of the 36bp exponential chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
-    plt.rcParams.update(inter_params)
-    fig, ax = plt.subplots(figsize=(0.32*col_size, 0.21*col_size))
+    plt.rcParams.update(medium_params)
+    fig, ax = plt.subplots(figsize=(0.95*col_size, 0.5*col_size))
     rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_36-0unwraps.csv')
     try:
         del rdf['Unnamed: 0']
     except:
         pass
+    #palette = sns.cubehelix_palette(n_colors=np.unique(df['chaindir']).size)
     for i, chain in rdf.groupby(['mu', 'chain_id']):
         chain.iloc[0,0] = 1
         chain.iloc[0,1] = 1
-        plt.plot(chain['rmax'], chain['r2'], color=dull_purple, alpha=0.4)
+        plt.plot(chain['rmax'], chain['r2'], color=teal_flucts, alpha=0.4, lw=0.5)
         break
     x = np.logspace(0, 7, 100)
     y = wlc.r2wlc(x, rdf['kuhn'].mean()/2)
-    plt.plot(x, y, '-', color='k')
-    plt.legend([r'$\langle L_i \rangle= 36bp$', r'$WLC, l_p \approx 15 nm$'],
-               bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
+    plt.plot(x, y, '-', color='k', lw=1.5)
     for i, chain in rdf.groupby(['mu', 'chain_id']):
         chain.iloc[0,0] = 1
         chain.iloc[0,1] = 1
-        plt.plot(chain['rmax'], chain['r2'], color=dull_purple, alpha=0.4)
+        plt.plot(chain['rmax'], chain['r2'], color=teal_flucts, alpha=0.4, lw=0.5)
     plt.plot(x, y, '-', color='k')
     plt.xscale('log')
     plt.yscale('log')
-    plt.xlim([0.5, 100000])
-    plt.ylim([0.5, 10000000])
+    plt.xlim([0.5, 10010])
+    plt.ylim([0.5, 1000000])
     plt.xlabel('Total Linker Length (nm)')
     plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
+    plt.legend([r'$\langle L_i \rangle= 36bp$', r'$WLC, b \approx 30 nm$'],
+        bbox_to_anchor=(1.02, 0), loc=3, borderaxespad=0.)
+    plt.minorticks_off()
+    plt.subplots_adjust(left=0.16, bottom=0.23, top=0.95, right=0.62)
     plt.savefig('plots/PRL/fig4a_r2_exp_vs_wlc.pdf', bbox_inches='tight')
 
 def plot_fig4b(ax=None):
-    plt.rcParams.update(inter_params)
+    plt.rcParams.update(medium_params)
     kuhnsf = np.load(f'csvs/r2/kuhns_exponential_fluctuations_mu2to180.npy')
     kuhnsg = np.load(f'csvs/r2/kuhns_exponential_geometrical_mu2to149.npy')
     kuhns_homo = np.load('csvs/kuhns_homogenous_so_far.npy')
@@ -286,16 +306,15 @@ def plot_fig4b(ax=None):
     kuhnsf = kuhnsf[1:99] #only plot first 149 points
     kuhns_homo = kuhns_homo[3:101]
     if ax is None:
-        fig, ax = plt.subplots(figsize=(0.45*col_size, 0.45*(5/7)*col_size))
+        fig, ax = plt.subplots(figsize=(0.95*col_size, 0.95*(5/7)*col_size))
     #geometrical vs fluctuating
     #dashed line at 100 nm
-    ax.plot(np.linspace(0, max(mug), 1000), np.tile(100, 1000), '--', lw=0.75,
+    ax.plot(np.linspace(0, max(mug), 1000), np.tile(100, 1000), '--', lw=1,
             label='Bare WLC', color=teal_flucts)
     # ax.plot(mug[0:94], kuhnsg[0:94], '^', markersize=1, label='Geometrical', color=red_geom)
-    ax.plot(mug, kuhnsf, label='Exponential', color=teal_flucts)
+    ax.plot(mug, kuhnsf, label='Exponential', color=teal_flucts, lw=1.5)
     #homogenous kuhn lengths faded in background
-    ax.plot(mug, kuhns_homo, color=dull_purple, alpha=0.5, lw=0.75, label='Homogenous')
-
+    ax.plot(mug, kuhns_homo, color=dull_purple, alpha=0.5, lw=1, label='Homogenous')
 
     #lines for yeast, mice, human
     yeast = 15
@@ -313,7 +332,7 @@ def plot_fig4b(ax=None):
     # ax.plot(xvals, best_fit(xvals), ':', lw=0.75, color=red_geom)
     plt.ylim([0, 110])
     plt.legend(loc=(0.05, 0.6))
-    plt.subplots_adjust(left=0.14, bottom=0.15, top=0.98, right=0.99)
+    plt.subplots_adjust(left=0.14, bottom=0.17, top=0.98, right=0.99)
     plt.xlabel(r'$\langle L_i \rangle$ (bp)')
     plt.ylabel(r'Kuhn length (nm)')
     plt.savefig('plots/PRL/fig4b_kuhn_exponential.pdf', bbox_inches='tight')
