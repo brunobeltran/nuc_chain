@@ -26,7 +26,10 @@ from PIL import Image
 cm_in_inch = 2.54
 # column size is 8.6 cm
 col_size = 8.6 / cm_in_inch
-inter_params = {
+default_width = 0.95*col_size
+aspect_ratio = 5/7
+default_height = aspect_ratio*default_width
+plot_params = {
     'axes.edgecolor': 'black',
     'axes.grid': False,
     'axes.titlesize': 8.0,
@@ -59,74 +62,7 @@ inter_params = {
     'ytick.minor.right':False,
     'lines.linewidth':1
 }
-medium_params = {
-    'axes.edgecolor': 'black',
-    'axes.grid': False,
-    'axes.titlesize': 8.0,
-
-    'axes.linewidth': 0.75,
-    'backend': 'pdf',
-    'axes.labelsize': 8.5,
-    'legend.fontsize': 8,
-
-    'xtick.labelsize': 7,
-    'ytick.labelsize': 7,
-    'text.usetex': False,
-    'figure.figsize': [col_size, col_size*(5/7)],
-
-    'font.family': 'sans-serif',
-    'font.sans-serif': 'Arial',
-
-    'mathtext.fontset': 'stixsans',
-    'savefig.format': 'pdf',
-    'xtick.bottom':True,
-    'xtick.major.pad': 2,
-    'xtick.major.size': 4,
-    'xtick.major.width': 0.5,
-
-    'ytick.left':True,
-    'ytick.right':False,
-    'ytick.major.pad': 2,
-    'ytick.major.size': 4,
-    'ytick.major.width': 0.5,
-    'ytick.minor.right':False,
-    'lines.linewidth':1
-}
-plt.rcParams.update(inter_params)
-
-small_params = {
-    'axes.edgecolor': 'black',
-    'axes.grid': False,
-    'axes.titlesize': 8.0,
-
-    'axes.linewidth': 0.75,
-    'backend': 'pdf',
-    'axes.labelsize': 6,
-    'legend.fontsize': 6,
-
-    'xtick.labelsize': 5,
-    'ytick.labelsize': 5,
-    'text.usetex': False,
-    'figure.figsize': [col_size, col_size*(5/7)],
-
-    'font.family': 'sans-serif',
-    'font.sans-serif': 'Arial',
-
-    'mathtext.fontset': 'stixsans',
-    'savefig.format': 'pdf',
-    'xtick.bottom':True,
-    'xtick.major.pad': 2,
-    'xtick.major.size': 4,
-    'xtick.major.width': 0.5,
-
-    'ytick.left':True,
-    'ytick.right':False,
-    'ytick.major.pad': 2,
-    'ytick.major.size': 4,
-    'ytick.major.width': 0.5,
-    'ytick.minor.right':False,
-    'lines.linewidth':1
-}
+plt.rcParams.update(plot_params)
 teal_flucts = '#387780'
 red_geom = '#E83151'
 dull_purple = '#755F80'
@@ -134,8 +70,7 @@ dull_purple = '#755F80'
 def plot_fig2a():
     """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
-    plt.rcParams.update(inter_params)
-    fig, ax = plt.subplots(figsize=(0.32*col_size, 0.21*col_size))
+    fig, ax = plt.subplots(figsize=(default_width, default_height))
     hdf = pd.read_csv('./csvs/r2/r2-fluctuations-mu_36-sigma_0_10_0unwraps.csv')
     try:
         del hdf['Unnamed: 0']
@@ -156,7 +91,7 @@ def plot_fig2a():
     plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
     plt.legend([r'$L_i = 36bp$', r'$WLC, l_p \approx 3 nm$'],
                bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
-    plt.savefig('plots/PRL/fig2a_r2_homogenous_vs_wlc.pdf', bbox_inches='tight')
+    plt.savefig('./plots/PRL/fig2a_r2_homogenous_vs_wlc.pdf', bbox_inches='tight')
 
 # this ended up being supplemental after all
 # def plot_fig2b():
@@ -175,9 +110,8 @@ def plot_fig2a():
 #     plt.savefig('plots/PRL/fig2b_kuhn_length_homogenous_1to1000links_0unwraps.pdf')
 
 def plot_fig2b():
-    plt.rcParams.update(inter_params)
     kuhns = np.load('csvs/kuhns_1to250links_0to146unwraps.npy')
-    fig, ax = plt.subplots(figsize=(0.45*col_size, 0.45*(5/7)*col_size))
+    fig, ax = plt.subplots(figsize=(default_width, default_height))
     plt.xlabel('Fixed linker length (bp)')
     plt.ylabel('Kuhn length (nm)')
     links = np.arange(31, 52)
@@ -214,8 +148,7 @@ def plot_fig2b():
 #    #plt.savefig('plots/PRL/fig4_kuhn_length_vs_window_size_mu47bp.pdf')
 
 def plot_fig3(sigmas=np.arange(0, 41)):
-    plt.rcParams.update(inter_params)
-    fig, ax = plt.subplots(figsize=(0.55*col_size, 0.55*(4/7)*col_size))
+    fig, ax = plt.subplots(figsize=(default_width, default_height))
     kuhnsf41_sig0to10 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_0_10_0unwraps.npy')
     kuhnsf41_sig11to40 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_11_40_0unwraps.npy')
     kuhnsf41 = np.concatenate((kuhnsf41_sig0to10, kuhnsf41_sig11to40))
@@ -245,8 +178,7 @@ def plot_fig3(sigmas=np.arange(0, 41)):
 def plot_fig4a(ax=None):
     """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
-    plt.rcParams.update(inter_params)
-    fig, ax = plt.subplots(figsize=(0.32*col_size, 0.21*col_size))
+    fig, ax = plt.subplots(figsize=(default_width, default_height))
     rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_36-0unwraps.csv')
     try:
         del rdf['Unnamed: 0']
@@ -276,7 +208,6 @@ def plot_fig4a(ax=None):
     plt.savefig('plots/PRL/fig4a_r2_exp_vs_wlc.pdf', bbox_inches='tight')
 
 def plot_fig4b(ax=None):
-    plt.rcParams.update(inter_params)
     kuhnsf = np.load(f'csvs/r2/kuhns_exponential_fluctuations_mu2to180.npy')
     kuhnsg = np.load(f'csvs/r2/kuhns_exponential_geometrical_mu2to149.npy')
     kuhns_homo = np.load('csvs/kuhns_homogenous_so_far.npy')
@@ -286,7 +217,7 @@ def plot_fig4b(ax=None):
     kuhnsf = kuhnsf[1:99] #only plot first 149 points
     kuhns_homo = kuhns_homo[3:101]
     if ax is None:
-        fig, ax = plt.subplots(figsize=(0.45*col_size, 0.45*(5/7)*col_size))
+        fig, ax = plt.subplots(figsize=(default_width, default_height))
     #geometrical vs fluctuating
     #dashed line at 100 nm
     ax.plot(np.linspace(0, max(mug), 1000), np.tile(100, 1000), '--', lw=0.75,
