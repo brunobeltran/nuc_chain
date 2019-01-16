@@ -83,17 +83,15 @@ showpacs,preprintnumbers,
              %  but any date may be explicitly specified
 
 \begin{abstract}
-Within a living cell, the myriad of proteins that bind DNA introduce heterogeneously spaced
+Within a living cell, the binding of DNA by nucleosomes introduces heterogeneously spaced
     kinks into an otherwise semiflexible DNA double helix.
-In order to model the effect of these geometric constraints on the physical organization of
-    chromosomal DNA, we extend the wormlike chain (WLC) model to include arbitrarily spaced,
+In order to investigate the effects of heterogenous nucleosome binding on chromatin organization, we extend the wormlike chain (WLC) model to include arbitrarily spaced,
     rigid kinks.
-At time scales where nucleosome positions are essentially fixed, we find that local
-    rearrangements of intervening nucleosomes can change the probability of genomic contacts by up to 6 orders of magnitude.
-On time scales longer than nucleosome rearrangement, we show that chromatin traces out an
-    effective WLC whose Kuhn length depends only on the average nucleosome repeat length.
-This effective WLC is significantly more flexible than bare DNA, suggesting that local
-    nucleosome geometry can control global chromatin organization.
+On time scales where nucleosome locations are fixed, we find that the probability of chromatin loop formation can differ by up to six orders of magnitude between two sets of randomly chosen nucleosome positions.
+On longer time scales, we show that continuous re-randomization due to nucleosome turnover results in chromatin tracing out an effective WLC with a dramatically smaller Kuhn length than bare DNA.
+Together, these observations demonstrate that heterogeneity in nucleosome spacing
+    is the dominant source of chromatin elasticity and governs both local and
+    global chromatin organization.
 \end{abstract}
 
 % PACS, the Physics and Astronomy Classification Scheme.
@@ -133,18 +131,18 @@ To address this gap, our lab previously developed an analytical treatment that
     retains the most basic geometrical and physical properties of chromatin,
     modeling nucleosomes as perfectly spaced kinks in a WLC
     backbone~\cite{koslover2013a}.
-This model reproduced the helical, ``30nm fiber'' structures observed in early
-    \textit{in vitro} electron microscopy images of chromatin.
+This model was able to reproduce the regular, ``30nm fiber'' structures observed
+    in early \textit{in vitro} electron microscopy images of chromatin.
 
 However, more modern measurements suggest that \textit{in vivo}, chromatin is largely
-    disordered (see Fig.~\ref{fig:ou2017})~\cite{ou2017}.
+    disordered~\cite{ou2017}.
 In addition, the latest \textit{in vivo} nucleosome positioning data suggest that nucleosome
     spacing is extremely heterogenous.
 The occupancy profiles of even the most well-positioned nucleosomes---such as those near
     transcription start sites---are well described by a model where nucleosomes bind
     uniformly along the DNA~\cite{kornberg1988, chevereau2009, chereji2011,
     beshnova2014, chou2007, kornberg1981, mavrich2008, mobius2010, mobius2013,
-    teif2010, tesoro2016%
+    teif2010, tesoro2016, muller2014%
     }, and are merely excluded from certain areas~\cite{ozonov2013}.
 
 In this paper, we extend our analytical theory to incorporate the effects of realistic
@@ -153,13 +151,12 @@ Our results provide guidance for modeling any polymer composed of aperiodic unit
 For example, block copolymers typically have a dihedral ``kink'' at the junctions between
     blocks, analogous to DNA linkers, and their block sizes can be as heterogeneous as linker
     lengths.
-We demonstrate how quenched heterogeneity introduced by polymer assembly (in our case,
-    nucleosome positioning), can dominate thermal fluctuations when determining the polymer's structure.
+We demonstrate how quenched geometric heterogeneity introduced by polymer assembly (in our case,
+    nucleosome positioning), can dominate over thermal fluctuations when determining the polymer's structure.
 
 
 %\section{\label{sec:model}Model}
 
-%First, we make rigorous our ``beads on a string'' model of chromatin.
 We model each DNA linker as a twistable wormlike chain (TWLC), and the nucleosomes as the
     points where these linker strands connect.
 At each nucleosome, we impose the constraint that the incoming and outgoing
@@ -180,7 +177,7 @@ The chain orientation at each point along this curve, $\Omega(s)$ is represented
 We track the bend and twist of our polymer via the angular ``velocity'' vector
     $\vec{\omega}(s)$, which operates as $\partial_s \vec{t}_{i}(s) =
     \vec{\omega}(s) \times \vec{t}_{i}(s)$.
-The Green's function of the first linker represents the probability for a
+The Green's function of the first linker represents the probability that a
     polymer of length $L_1$ that begins at the origin with fixed initial
     orientation $\Omega_0$ will end at position $\vec{R}$ with fixed end
     orientation $\Omega$.
@@ -201,18 +198,18 @@ For a TWLC with no kinks, the Green's function is given by
     is quadratic in bending and twisting deformation.
 The natural twist of DNA gives $\tau = 2 \pi \cdot {(\SI{10.5}{\basepair})}^{-1}$,
     and we set the persistence length $l_p = \SI{50}{\nano\metre}$ and twist
-    persistence length {$l_t = \SI{100}{\nano\metre}$} based on \emph{in vitro}
-    measurements of DNA elasticity~\cite{hagerman1988,rittman2009,bryant2003}.
+    persistence length {$l_t = \SI{100}{\nano\metre}$} to match
+    measurements of DNA elasticity~\cite{hagerman1988,bustamante1994,bryant2003}.
 
 Equation~\ref{eq:energy} can be solved analytically in Fourier space
     ($\vec{R} \rightarrow \vec{k}$) by expanding in Wigner
     D-functions~\cite{spakowitz2006}, analogs of spherical harmonics for
     $SO(3)$.
-%TODO equation overflows if a period is added
-\begin{equation}\label{eq:expansion}
-    \ghat{\vec{k}, \Omega} = \sum_{l m j}\sum_{l_0 m_0 j_0} \!\! g_{l_0 m_0 j_0}^{lmj}
+\begin{gather}\label{eq:expansion}
+    \ghat{\vec{k}, \Omega} = \sum_{\substack{ l_0 m_0 j_0 \\ l m j}} \!\! g_{l_0 m_0 j_0}^{lmj}
         \wigD_{l}^{mj}(\Omega)\wigD_{l_0}^{m_0 j_0 *}(\Omega_0)
-\end{equation}
+\raisetag{1\baselineskip}
+\end{gather}
 To account for the kink introduced by the nucleosome, we rotate
     the final orientation of the linker DNA ${\Omega = \Omega_\text{entry}}$ to
     $\Omega_\text{exit}$ by replacing
@@ -223,8 +220,7 @@ To account for the kink introduced by the nucleosome, we rotate
         B_{l_{0}m_{0}j_{0}}^{lmj} = %\sqrt{8\pi/(2l+1)}
         \sum_{j'}
         \sqrt{\frac{8\pi}{2l+1}}
-        \mathcal{D}_{l}^{jj'}
-        \left(\Omega_\text{kink}\right)g_{l_{0}m_{0}j_{0}}^{lmj'}\left(L\right).
+        \mathcal{D}_{l}^{jj'}\!\!\left(\Omega_\text{kink}\right)g_{l_{0}m_{0}j_{0}}^{lmj'}\!\left(L\right).
     \end{equation}
 The resulting Green's function combines the effects of a linker DNA and a nucleosome.
 The coefficients $B_{l_0 m_0 j_0}^{lmj}$ were first computed in Ref.~\cite{zhou2003}.
@@ -307,9 +303,10 @@ Our propagator $G$ takes this property into account implicitly due to the inclus
 %\section{\label{sec:results}Results}
 
 We begin by computing the end-to-end distance $\sqrt{\RR}$ of the nucleosome
-    chain, from which we extract the Kuhn length $b = \lim_{N\to\infty} \RR/\sum_{i=0}^N L_i$,
+    chain.
+From this, we extract the Kuhn length $b = \lim_{N\to\infty} \RR/\sum_{i=0}^N L_i$,
     which gives a universal measure of the long-length scale behavior of a polymer.
-We compute moments of our chain analytically by noting that
+The moments of our chain can be extracted analytically by noting that
     $\lim_{k\to0} \frac{\partial^{n} B_{00}^{00}}{\partial k^{n}} = i^n \left\langle
     R^n\right\rangle$.
 
@@ -355,7 +352,7 @@ To build a geometric intuition for how the kinks create this modified Kuhn
 Figure~\ref{fig:homo-kuhn-zoom} shows that the chains with more ``processive''
     zero-temperature structures are exactly those with larger Kuhn lengths.
 More precisely, every homogeneous chain at zero temperature forms a
-    helix of nucleosomes (as a consequence of Chasles' theorem (citation needed)).
+    helix of nucleosomes (as a consequence of Chasles' theorem).
 The rise per basepair of the helix is determined by the spherical angles
     $\theta$ and $\phi$ connecting adjacent linkers (see Fig.~\ref{fig:nuc-geo}).
 The nucleosome structure fixes $\theta$, but $\phi$ depends linearly on the
@@ -369,12 +366,6 @@ In Fig.~\ref{fig:homo-kuhn-zoom}, we see that the periodicity in $\phi$ determin
 For long linkers ($L_i\to\infty$), the Kuhn length approaches that of
     bare DNA (Supplemental Fig.~S5).
 However, this approach is power-law slow, since the kink density decreases as $1/L_i$, and is largely imperceptible for experimentally relevant linker lengths.
-%% conclusion on sensitivity of Kuhn length to NRL for homo case,
-% ``Processivity'' of the zero-temperature structure provides a simple, geometric
-%     intuition for the effects of kinks on the Kuhn length, and the \SI{10.5}{\basepair} helicity of DNA explains its sensitivity to the choice of linker length.
-% %% transition to heterogeneous chains
-% %TODO go straight to the point here. just say "we can show that processivity determines the kuhn length in the case of random linkers"
-% In what follows, we show that this geometric intuition can be extended to the case of heterogeneous linker lengths.
 
 \begin{figure}
     \centering
@@ -383,7 +374,7 @@ However, this approach is power-law slow, since the kink density decreases as $1
     %TODO maybe put the actual uniform phi in this plot instead for dotted line
     \caption{Kuhn length of a heterogeneous chromatin chain with uniformly
     distributed linker lengths chosen from the range $\mu \pm \sigma$, where
-    $\mu = \SI{41}{\basepair}$. Example ``geometrical'' chains composed of rigid
+    $\mu = \SI{41}{\basepair}$. Example zero-temperature chains composed of rigid
     rod linkers are shown for $\sigma = 0, 2, \SI{6}{\basepair}$. Kuhn length
     rapidly approaches that of a chain drawn from the maximum entropy
     distribution, in which linker lengths are exponentially distributed about
@@ -392,7 +383,7 @@ However, this approach is power-law slow, since the kink density decreases as $1
 \end{figure}
 
 %% what determines zero temperature picture for het chains
-We apply our fluctuating theory to study heterogeneous chains such as those
+We next apply our fluctuating theory to study heterogeneous chains such as those
     in~\cite{woodcock1993}, where the linker lengths are drawn uniformly from a
     range $\mu \pm \sigma$.
 In Fig.~\ref{fig:hetero-geom}, we see that as we increase $\sigma$, the
@@ -400,27 +391,24 @@ In Fig.~\ref{fig:hetero-geom}, we see that as we increase $\sigma$, the
     $\sigma = 0$ and a random walk at larger $\sigma$.
 As $\sigma$ increases, the distribution of $\phi \in [0, 2\pi]$ connecting
     adjacent linkers quickly becomes approximately uniform.
-%TODO alt: Resulting in a processivity that decreases with sigma. "Just say you're defining processivity this way.
-As a result, the zero-temperature structure itself has a Kuhn length, which we define as ``processivity'' for the case of heterogeneous chains.
-As in the homogeneous case, processivity of the zero-temperature chain qualitatively
-    predicts that of the fluctuating structure, as seen in Fig.~\ref{fig:hetero-geom}.
+As a result, the zero-temperature structure itself has a Kuhn length, which we
+    define as ``processivity'' for the case of heterogeneous chains.
+As in the homogeneous case, processivity of the zero-temperature chain
+    qualitatively predicts that of the fluctuating structure, as seen in
+    Fig.~\ref{fig:hetero-geom}.
 
-%% universality and it's approached quickly
-Uniformly distributed linkers is just one possible example of linker length heterogeneity.
-As the entropy of any linker length distribution
-increases, $\phi$ quickly become approximately uniform.
-%This convergence can be surprisingly fast.
-%TODO better way to refer to the randomness of the non-zero sigma case
-%DEEPTI: I think we can cut the following discussion. Even for 47bp, the convergence rate to the maximum entropy limit is comparable to 41bp. The only surprising facet is that the T=0 and fluctuating structures align with just sigma = 1
-%BRUNO: agreed
-%In Fig.~\ref{fig:hetero-geom}, $\meanli$ was chosen to highlight the transition between the helical and the random-walk geometries.
-%However, for many values of $\meanli$, the processivity of the zero-temperature and fluctuating structures agree with only $\sigma=\SI{1}{\basepair}$ of variability (see Supplemental Fig.~S6).
-%% introduce maximum entropy limit, justify exponential
+
 In the cell, the simplest model of nucleosome binding is the maximum-entropy
     distribution, where nucleosomes bind uniformly randomly along the DNA\@.
-For a sufficiently large lattice, the distances separating the nucleosomes in this
-    model are well-approximated by an exponential distribution, as implied by
-    state-of-the-art models of nucleosome positioning~\cite{beshnova2014}.
+For a sufficiently large lattice, the distances separating the nucleosomes in
+    this model are well-approximated by an exponential distribution, as implied
+    by state-of-the-art models of nucleosome positioning~\cite{beshnova2014}.
+
+In addition, as shown in Fig.~\ref{fig:hetero-geom}, with increasing
+    heterogeneity, the Kuhn length converges to that of the freely rotating
+    chain (uniform $\phi$, constant bond length) whose bond length matches the
+    average.
+Because this suggests
 
 In what follows, we use exponentially distributed linker lengths to predict
     behavior of realistic chromatin structures.
@@ -445,7 +433,7 @@ However, the distribution-independent convergence of our model as $\phi$ becomes
 Note that the ``exponential chain'' corresponds to a modified freely rotating
     chain.
 As has been proven in~\cite{kilanowski2017}, this chain averages to an effective
-    TWLC with the same Kuhn length (see Supplemental Figure~SX).
+    TWLC with the same Kuhn length (see Supplemental Figure~S7).
 This means that coarse-graining chromatin's structure only requires computing
     the Kuhn length of the exponential chain for the desired $\meanli$, which
     varies based on the cell type.
@@ -558,4 +546,3 @@ Financial support for this work is provided by the National Science Foundation
 \bibliography{chromatin}
 
 \end{document}
-
