@@ -56,7 +56,7 @@ Mdict = ncd.Mdict_from_unwraps
 # R^2 and Kuhn length calculations
 
 def build_B_matrices_for_R2(link, alpha, beta, gamma, lt=default_lt, lp=default_lp, tau_d=ncg.dna_params['tau_d'], lmax=2):
-    """Helper function to construct propogator B matrices for a single linker length link with kink
+    r"""Helper function to construct propogator B matrices for a single linker length link with kink
     rotation given by alpha, beta, gamma. Returns the following three matrices:
 
     .. math::
@@ -505,8 +505,8 @@ def harmonic_avg_exponential_kuhn_lengths(kuhns, links, mu):
     return (1/kuhn_avg_inverse)
 
 def tabulate_r2_heterogenous_fluctuating_chains_by_variance(num_chains, chain_length, sigmas, mu=35, pool_size=None, **kwargs):
-    """Tabulate R^2 for fluctuating heterogenous chains with increasing variance. Pass unwrapping parameters
-    through kwargs."""
+    """Tabulate R^2 for fluctuating heterogenous chains with increasing
+    variance. "Box" variance model. Pass unwrapping parameters through kwargs."""
     n_sig = len(sigmas)
     links = np.zeros((n_sig, num_chains, chain_length-1))
     #For now, assume the same unwrapping amounts for all chains
@@ -691,6 +691,7 @@ def aggregate_existing_kuhns():
             df = pd.read_csv(path)
         except:
             continue
+        match_npy = re.search('kuhns-(fluctuations|geometrical)-mu([0-9]+)-sigma_([0-9]+)_([0-9]+)_([0-9]+)unwraps.npy', str(path))
         match_box = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_0_10_([0-9]+)unwraps(?:-[0-9]+)?.csv', str(path))
         match_new = re.search('r2-(fluctuations|geometrical)-(exponential|homogenous)-link-mu_([0-9]+)-([0-9]+)unwraps(?:-[0-9]+)?.csv', str(path))
         if match_box is not None:
@@ -701,6 +702,9 @@ def aggregate_existing_kuhns():
         elif match_new is not None:
             sim, variance_type, mu, unwraps = match_new.groups()
             groups = ['mu']
+        elif match_npy:
+            variance_type = 'box'
+            sim, mu, sigma_min, sigma_max, unwraps = match_npy.groups()
         else:
             print('Unknown simulation type: ' + str(path))
             continue

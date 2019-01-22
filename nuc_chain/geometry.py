@@ -1186,7 +1186,7 @@ def minimum_energy_no_sterics(links, *, w_ins=default_w_in,
 def visualize_chain(entry_rots, entry_pos, links, w_ins=default_w_in,
         w_outs=default_w_out, lpb=dna_params['lpb'], r_dna=dna_params['r_dna'],
         helix_params=helix_params_best, mfig=None, palette="husl",
-        unwraps=None, plot_entry=False, plot_exit=False, plot_nucleosomes=False, 
+        unwraps=None, plot_entry=False, plot_exit=False, plot_nucleosomes=False,
         plot_spheres=True, nucleosome_color=None, **kwargs):
     """Visualize output of :py:func:`minimum_energy_no_sterics`.
 
