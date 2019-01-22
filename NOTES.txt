@@ -1,0 +1,94 @@
+Meeting with Andy about paper
+
+
+0)
+suggested overall paper outline:
+dna mechanics + nucleosome geometry/heterogeneity are points that are definitely
+part of chromatin's structure, and everyone can accept that.
+However, we will show in this paper that the latter two bits are in fact
+*necessary*, for any reasonable model of chromatin.
+
+OR
+
+geometry dominates
+when there'e heterogeneity in spacing, it "averages out"
+the averaged out, geometry-dominated chains HUGELY change the properties
+
+I.E.
+
+geometry dominates
+averaging out heterogeneity in geometry allows us to compute the properties of
+these polymers, and they are soooo different from what you would think
+
+1)
+why even talk about the zig-zag model to begin with
+because we see that kind of thing in vivo!
+
+probably we should include an image of in vivo dna being disordered!
+add Ou image to Figure 1. (don't worry about fair use stuff for now, let journal
+legal team handle it.)
+
+maybe reduce current figure 1 by 30%, and add and excerpt from Ou to make the
+figure three panels across
+
+
+2)
+more in general, maybe we should motivate more why we chose such a simple model.
+
+why is the dna physics and the nucleosome geometry enough to make statements
+that are relevant to stuff that's happening in vivo?
+
+it's because we can match the picture of what we see in vivo qualitatively
+
+put this language in the intro
+
+
+2.5)
+Andy still feels like we didn't emphasize the linker length heterogeneity
+enough. when adding the language in "2)", make sure to also use that as a tool
+to emphasize linker length heterogeneity also being necessary.
+
+
+3)
+we should make the "folk theorem" argument (freely rotating chain becomes WLC
+on average for heterogenous chains) just in words. put current 4a in the
+supplement, the # of biophysics that would care about that fact is
+probably...not that big. the ones that do have seen it before
+
+
+4)
+when interpreting the local organization of the local organization and physical
+manipulation of dna in variety of biological processes. the prevailing viewpoint
+that dna mechanics is adequate for predicting the processes
+is...inconsistenct....with the data that you're showing.
+
+basically: you can move nucleosomes around to affect the polymer structure much
+more than you ever could by bending it.
+
+you can much more easily affect DNA's structure by moving the nucleosomes around
+than by trying to just bend the DNA
+
+use strong words! "existing characterization is too idealized. future ... MUST
+acknowledge the contribution of the geometry."
+
+
+5)
+put block co-polymer stuff in the intro instead. because if we want to make a
+statement about general physics, it needs to be in the intro so that people
+reading the paper for that purpose can interpret it correctly.
+
+more broadly, make the statement that quenched heterogeneity can outweigh
+thermal fluctuations...in other types of models.
+
+but either way it should all go in the intro
+
+
+6)
+need to add words to some figure labels
+figure 3, call sigma the "range", use that same word in the text when we
+define sigma
+
+in figure 2, ylabel call it "end to end distance"
+
+7)
+remake the looping times figure with exponential times
