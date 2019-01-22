@@ -3,8 +3,8 @@ Deepti Kannan
 11-20-18
 
 Tabulated green's functions for heterogenous chains which sample from exponentially
-distributed linkers with mu=56bp. So far, have calculated 19 chains of 100 nucs and 
-57 chains of 50 nucs for a total of 76 chains.
+distributed linkers with mu=56bp. So far, have calculated 22 chains of 100 nucs, 
+61 chains of 50 nucs, 40 chains of 25 nucs, and 80 chains of 10 nucs for a total of 203 chains.
 
 This script loads in the greens functions from all the above chains, calculates looping
 probabilities as a function of genomic distance, saves this data in a csv, computes rolling
@@ -52,7 +52,8 @@ def compute_looping_statistics_heterogenous_chains(nucmin=2):
 	list_dfs = []
 
 	#first load in chains of length 100 nucs
-	chainIDs_100nucs = np.concatenate(([1, 2], np.arange(101, 118)))
+	#chainIDs_100nucs = np.concatenate(([1, 2], np.arange(101, 118)))
+	chainIDs_100nucs = np.concatenate(([1, 2], np.arange(101, 121)))
 	for j in chainIDs_100nucs:
 		df = pd.DataFrame(columns=['num_nucs', 'chain_id', 'ldna', 'rmax', 'ploops'])
 		chaindir = f'100nucs_chain{j}'
@@ -68,8 +69,11 @@ def compute_looping_statistics_heterogenous_chains(nucmin=2):
 		list_dfs.append(df)
 
 	#next load in chains of length 50 nucs
+	#chainIDs_50nucs = np.concatenate((np.arange(11, 15), np.arange(21, 23), np.arange(41, 44), [57, 65],
+	#								  np.arange(101, 130), np.arange(131, 139), np.arange(141, 150)))
 	chainIDs_50nucs = np.concatenate((np.arange(11, 15), np.arange(21, 23), np.arange(41, 44), [57, 65],
-									  np.arange(101, 130), np.arange(131, 139), np.arange(141, 150)))
+									  np.arange(101, 151)))
+
 	for j in chainIDs_50nucs:
 		df = pd.DataFrame(columns=['num_nucs', 'chain_id', 'ldna', 'rmax', 'ploops'])
 		chaindir = f'50nucs_chain{j}'
@@ -84,9 +88,41 @@ def compute_looping_statistics_heterogenous_chains(nucmin=2):
 		df['chaindir'] = chaindir
 		list_dfs.append(df)
 	
+	#next load in chains of length 25 nucs
+	chainIDs_25nucs = np.arange(1, 41)
+	for j in chainIDs_25nucs:
+		df = pd.DataFrame(columns=['num_nucs', 'chain_id', 'ldna', 'rmax', 'ploops'])
+		chaindir = f'25nucs_chain{j}'
+		links = np.load(dirpath/chaindir/f'linker_lengths_{chaindir}_25nucs.npy')
+		greens = np.load(dirpath/chaindir/f'kinkedWLC_greens_{chaindir}_25nucs.npy')
+		#only including looping statistics for 2 nucleosomes onwards when plotting though
+		df['ldna'] = convert.genomic_length_from_links_unwraps(links, unwraps=0)[indmin:]
+		df['rmax'] = convert.Rmax_from_links_unwraps(links, unwraps=0)[indmin:]
+		df['ploops'] = greens[0, indmin:]
+		df['num_nucs'] = 25
+		df['chain_id'] = j
+		df['chaindir'] = chaindir
+		list_dfs.append(df)
+
+	#next load in chains of length 10 nucs
+	chainIDs_10nucs = np.arange(1, 81)
+	for j in chainIDs_10nucs:
+		df = pd.DataFrame(columns=['num_nucs', 'chain_id', 'ldna', 'rmax', 'ploops'])
+		chaindir = f'10nucs_chain{j}'
+		links = np.load(dirpath/chaindir/f'linker_lengths_{chaindir}_10nucs.npy')
+		greens = np.load(dirpath/chaindir/f'kinkedWLC_greens_{chaindir}_10nucs.npy')
+		#only including looping statistics for 2 nucleosomes onwards when plotting though
+		df['ldna'] = convert.genomic_length_from_links_unwraps(links, unwraps=0)[indmin:]
+		df['rmax'] = convert.Rmax_from_links_unwraps(links, unwraps=0)[indmin:]
+		df['ploops'] = greens[0, indmin:]
+		df['num_nucs'] = 10
+		df['chain_id'] = j
+		df['chaindir'] = chaindir
+		list_dfs.append(df)		
+	
 	#Concatenate list into one data frame
 	df = pd.concat(list_dfs, ignore_index=True, sort=False)
-	df.to_csv(dirpath/'looping_probs_heterochains_exp_mu56_0unwraps.csv')
+	#df.to_csv(dirpath/'looping_probs_heterochains_exp_mu56_0unwraps.csv')
 	return df
 
 def plot_looping_probs_hetero_avg(df, **kwargs):
@@ -148,7 +184,7 @@ def plot_looping_probs_hetero_avg(df, **kwargs):
 	plt.tick_params(left=True, right=False, bottom=True)
 	plt.subplots_adjust(left=0.15, bottom=0.16, top=0.91, right=0.95)
 	#return df4
-	plt.savefig('plots/loops/looping_exp_mu56_vs_bareWLC_76chains.png')
+	plt.savefig('plots/loops/looping_exp_mu56_vs_bareWLC_203chains.png')
 
 def fit_persistance_length_to_gaussian_looping_prob(df4, ldna_min=4675):
 	"""Fit effective persistance length to log-log looping probability vs. chain length (Rmax).
