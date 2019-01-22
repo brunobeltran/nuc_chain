@@ -26,7 +26,7 @@ from PIL import Image
 cm_in_inch = 2.54
 # column size is 8.6 cm
 col_size = 8.6 / cm_in_inch
-default_width = 0.95*col_size
+default_width = 1.0*col_size
 aspect_ratio = 5/7
 default_height = aspect_ratio*default_width
 plot_params = {
@@ -41,13 +41,13 @@ plot_params = {
 
     'xtick.labelsize': 6,
     'ytick.labelsize': 6,
-    'text.usetex': False,
+    'text.usetex': True,
     'figure.figsize': [col_size, col_size*(5/7)],
 
-    'font.family': 'sans-serif',
-    'font.sans-serif': 'Arial',
+    # 'font.family': 'sans-serif',
+    # 'font.sans-serif': 'Arial',
 
-    'mathtext.fontset': 'stixsans',
+    # 'mathtext.fontset': 'stixsans',
     'savefig.format': 'pdf',
     'xtick.bottom':True,
     'xtick.major.pad': 2,
@@ -67,29 +67,33 @@ teal_flucts = '#387780'
 red_geom = '#E83151'
 dull_purple = '#755F80'
 
-def plot_fig2a():
+def plot_fig2a(lis=[36, 41]):
     """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
     fig, ax = plt.subplots(figsize=(default_width, default_height))
-    hdf = pd.read_csv('./csvs/r2/r2-fluctuations-mu_36-sigma_0_10_0unwraps.csv')
-    try:
-        del hdf['Unnamed: 0']
-    except:
-        pass
-    hdf = hdf.set_index(['variance', 'chain_id']).loc[0.0, 0.0]
-    hdf.iloc[0,0] = 1
-    hdf.iloc[0,1] = 1
-    plt.plot(hdf['rmax'], hdf['r2'], color=dull_purple)
     x = np.logspace(0, 7, 100)
-    y = wlc.r2wlc(x, hdf['kuhn'].mean()/2)
-    plt.plot(x, y, '-.', color=teal_flucts, markersize=1)
+    hdfs = {}
+    for li in lis:
+        hdfs[li] = pd.read_csv(f'./csvs/r2/r2-fluctuations-mu_{li}-sigma_0_10_0unwraps.csv')
+        try:
+            del hdfs[li]['Unnamed: 0']
+        except:
+            pass
+        hdfs[li] = hdfs[li].set_index(['variance', 'chain_id']).loc[0.0, 0.0]
+        hdfs[li].iloc[0,0:2] = 1 # rmax,r2 == (0,0) ==> (1,1)
+        plt.plot(hdfs[li]['rmax'], hdfs[li]['r2'], color=red_geom)
+    for li in lis:
+        y = wlc.r2wlc(x, hdfs[li]['kuhn'].mean()/2)
+        plt.plot(x, y, '-.', color=teal_flucts, markersize=1)
+    y = wlc.r2wlc(x, 100)
+    plt.plot(x, y, '.', color=teal_flucts, markersize=1)
     plt.xscale('log')
     plt.yscale('log')
     plt.xlim([0.5, 2000])
     plt.ylim([0.5, 20000])
     plt.xlabel('Total Linker Length (nm)')
     plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
-    plt.legend([r'$L_i = 36bp$', r'$WLC, l_p \approx 3 nm$'],
+    plt.legend([r'$L_i = 36bp$', r'$WLC, b = 100 nm$'],
                bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
     plt.savefig('./plots/PRL/fig2a_r2_homogenous_vs_wlc.pdf', bbox_inches='tight')
 
