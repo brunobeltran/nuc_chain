@@ -27,7 +27,7 @@ cm_in_inch = 2.54
 # column size is 8.6 cm
 col_size = 8.6 / cm_in_inch
 default_width = 1.0*col_size
-aspect_ratio = 3.5/7
+aspect_ratio = 4/7
 default_height = aspect_ratio*default_width
 plot_params = {
     'backend': 'pdf',
@@ -43,10 +43,10 @@ plot_params = {
     'axes.facecolor': 'white',
 
     'axes.titlesize': 8.0,
-    'axes.labelsize': 7,
-    'legend.fontsize': 6,
-    'xtick.labelsize': 6,
-    'ytick.labelsize': 6,
+    'axes.labelsize': 8,
+    'legend.fontsize': 6.5,
+    'xtick.labelsize': 6.5,
+    'ytick.labelsize': 6.5,
     'axes.linewidth': 0.75,
 
     'xtick.top': False,
@@ -121,12 +121,14 @@ def draw_power_law_triangle(alpha, x0, width, orientation, base=10,
         raise ValueError(r"Need $\alpha\in\mathbb{R} and orientation\in{'up', 'down'}")
     return corner
 
-def plot_fig2a(lis=[36, 41], colors=None):
+default_lis = [36, 38]
+default_colors = [red_geom, rich_purple]
+def plot_fig2a(lis=default_lis, colors=None):
     """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
     if colors is None:
         if len(lis) == 2:
-            colors = [red_geom, rich_purple]
+            colors = default_colors
         else:
             colors = len(lis) * [red_geom]
     assert(len(colors) == len(lis))
@@ -167,27 +169,38 @@ def plot_fig2a(lis=[36, 41], colors=None):
     plt.ylim([ymin, ymax])
     plt.xscale('log')
     plt.yscale('log')
-    plt.xlabel('Total Linker Length (nm)')
-    plt.ylabel(r'End-to-end distance, $\sqrt{\langle R^2 \rangle}$ (nm)')
-    legend = [r'WLC, $b = 100$ nm'] \
+    plt.xlabel('Total linker length (nm)')
+    plt.ylabel(r'End-to-end distance (nm)')
+    legend = [r'Bare DNA'] \
            + [r'$L_i = ' + str(li) + r'$ bp' for li in lis] \
            + [r'WLC, best fit']
     plt.legend(legend)
-               # bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
+    plt.tight_layout()
     plt.savefig('./plots/PRL/fig2a_r2_homogenous_vs_wlc.pdf', bbox_inches='tight')
 
 def plot_fig2b():
     kuhns = np.load('csvs/kuhns_1to250links_0to146unwraps.npy')
     fig, ax = plt.subplots(figsize=(default_width, default_height))
-    plt.xlabel('Fixed linker length (bp)')
-    plt.ylabel('Kuhn length (nm)')
     links = np.arange(31, 52)
     ax.plot(links, kuhns[links-1, 0], '--o', markersize=4, lw=1.5, color=teal_flucts)
-    plt.xticks(np.arange(31, 52, 2))
-    plt.xlim([30, 48])
-    plt.subplots_adjust(left=0.12, bottom=0.25, top=0.98, right=0.99)
-    plt.tick_params(left=True, right=False, bottom=True, length=4)
+    for i, li in enumerate(default_lis):
+        ax.plot(li, kuhns[li-1, 0], '--o', markersize=4, color=default_colors[i])
+    plt.xticks(np.arange(31, 50, 2))
+    plt.xlim([31, 49])
+    plt.xlabel('Fixed linker length (bp)')
+    plt.ylabel('Kuhn length (nm)')
+    plt.tight_layout()
     plt.savefig('plots/PRL/fig2b_kuhn_length_in_nm_31to51links_0unwraps.pdf')
+
+def render_fig2b_chains():
+    for li in [36, 38, 41, 47]:
+        entry_rots, entry_pos = ncg.minimum_energy_no_sterics_linker_only(14*[li], unwraps=0)
+        # on linux, hit ctrl-d in the ipython terminal but don't accept the
+        # "exit" prompt to get the mayavi interactive mode to work. make sure
+        # to use "off-screen rendering" and fullscreen your window before
+        # saving (this is actually required if you're using a tiling window
+        # manager like e.g. i3 or xmonad).
+        ncg.visualize_chain(entry_rots, entry_pos, 14*[li], unwraps=0, plot_spheres=True)
 
 def plot_fig3(sigmas=np.arange(0, 41)):
     fig, ax = plt.subplots(figsize=(default_width, default_height))
@@ -245,7 +258,7 @@ def plot_fig4a(ax=None):
     plt.yscale('log')
     plt.xlim([0.5, 100000])
     plt.ylim([0.5, 10000000])
-    plt.xlabel('Total Linker Length (nm)')
+    plt.xlabel('Total linker length (nm)')
     plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
     plt.savefig('plots/PRL/fig4a_r2_exp_vs_wlc.pdf', bbox_inches='tight')
 
