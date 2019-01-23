@@ -210,11 +210,11 @@ from multiprocessing import Pool
 import numpy as np
 import scipy
 from scipy import stats
-#import matplotlib as mpl
-#import matplotlib.pyplot as plt
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import pandas as pd
-#import seaborn as sns
-#from mayavi import mlab
+import seaborn as sns
+from mayavi import mlab
 
 from . import *
 from . import data as ncd
