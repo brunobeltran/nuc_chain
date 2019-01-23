@@ -27,53 +27,115 @@ cm_in_inch = 2.54
 # column size is 8.6 cm
 col_size = 8.6 / cm_in_inch
 default_width = 1.0*col_size
-aspect_ratio = 5/7
+aspect_ratio = 3.5/7
 default_height = aspect_ratio*default_width
 plot_params = {
-    'axes.edgecolor': 'black',
-    'axes.grid': False,
-    'axes.titlesize': 8.0,
-
-    'axes.linewidth': 0.75,
     'backend': 'pdf',
+    'savefig.format': 'pdf',
+    'text.usetex': True,
+    'font.size': 7,
+
+    'figure.figsize': [default_width, default_height],
+    'figure.facecolor': 'white',
+
+    'axes.grid': False,
+    'axes.edgecolor': 'black',
+    'axes.facecolor': 'white',
+
+    'axes.titlesize': 8.0,
     'axes.labelsize': 7,
     'legend.fontsize': 6,
-
     'xtick.labelsize': 6,
     'ytick.labelsize': 6,
-    'text.usetex': True,
-    'figure.figsize': [col_size, col_size*(5/7)],
+    'axes.linewidth': 0.75,
 
-    # 'font.family': 'sans-serif',
-    # 'font.sans-serif': 'Arial',
-
-    # 'mathtext.fontset': 'stixsans',
-    'savefig.format': 'pdf',
-    'xtick.bottom':True,
+    'xtick.top': False,
+    'xtick.bottom': True,
+    'xtick.direction': 'out',
+    'xtick.minor.size': 3,
+    'xtick.minor.width': 0.5,
     'xtick.major.pad': 2,
-    'xtick.major.size': 4,
-    'xtick.major.width': 0.5,
+    'xtick.major.size': 5,
+    'xtick.major.width': 1,
 
-    'ytick.left':True,
-    'ytick.right':False,
+    'ytick.left': True,
+    'ytick.right': False,
+    'ytick.direction': 'out',
+    'ytick.minor.size': 3,
+    'ytick.minor.width': 0.5,
     'ytick.major.pad': 2,
-    'ytick.major.size': 4,
-    'ytick.major.width': 0.5,
-    'ytick.minor.right':False,
-    'lines.linewidth':1
+    'ytick.major.size': 5,
+    'ytick.major.width': 1,
+
+    'lines.linewidth': 1
 }
 plt.rcParams.update(plot_params)
+
 teal_flucts = '#387780'
 red_geom = '#E83151'
 dull_purple = '#755F80'
+rich_purple = '#e830e8'
 
-def plot_fig2a(lis=[36, 41]):
+def draw_power_law_triangle(alpha, x0, width, orientation, base=10,
+                            **kwargs):
+    """Draw a triangle showing the best-fit power-law on a log-log scale.
+
+    Parameters
+    ----------
+    alpha : float
+        the power-law slope being demonstrated
+    x0 : (2,) array_like
+        the "left tip" of the power law triangle, where the hypotenuse starts
+    width : float
+        horizontal size in number of major log ticks (default base-10)
+    orientation : string
+        'up' or 'down', control which way the triangle's right angle "points"
+    base : float
+        scale "width" for non-base 10
+
+    Returns
+    -------
+    corner : (2,) np.array
+        coordinates of the right-angled corner of the triangle
+    """
+    x0, y0 = x0
+    x1 = x0*base**width
+    y1 = y0*(x1/x0)**alpha
+    plt.plot([x0, x1], [y0, y1], 'k')
+    if (alpha >= 0 and orientation == 'up') \
+    or (alpha < 0 and orientation == 'down'):
+        plt.plot([x0, x1], [y1, y1], 'k')
+        plt.plot([x0, x0], [y0, y1], 'k')
+        # plt.plot lines have nice rounded caps
+        # plt.hlines(y1, x0, x1, **kwargs)
+        # plt.vlines(x0, y0, y1, **kwargs)
+        corner = [x0, y1]
+    elif (alpha >= 0 and orientation == 'down') \
+    or (alpha < 0 and orientation == 'up'):
+        plt.plot([x0, x1], [y0, y0], 'k')
+        plt.plot([x1, x1], [y0, y1], 'k')
+        # plt.hlines(y0, x0, x1, **kwargs)
+        # plt.vlines(x1, y0, y1, **kwargs)
+        corner = [x1, y0]
+    else:
+        raise ValueError(r"Need $\alpha\in\mathbb{R} and orientation\in{'up', 'down'}")
+    return corner
+
+def plot_fig2a(lis=[36, 41], colors=None):
     """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
+    if colors is None:
+        if len(lis) == 2:
+            colors = [red_geom, rich_purple]
+        else:
+            colors = len(lis) * [red_geom]
+    assert(len(colors) == len(lis))
     fig, ax = plt.subplots(figsize=(default_width, default_height))
     x = np.logspace(0, 7, 100)
+    y = np.sqrt(wlc.r2wlc(x, 100))
+    plt.plot(x, y, '.', color=teal_flucts, markersize=1)
     hdfs = {}
-    for li in lis:
+    for i, li in enumerate(lis):
         hdfs[li] = pd.read_csv(f'./csvs/r2/r2-fluctuations-mu_{li}-sigma_0_10_0unwraps.csv')
         try:
             del hdfs[li]['Unnamed: 0']
@@ -81,37 +143,38 @@ def plot_fig2a(lis=[36, 41]):
             pass
         hdfs[li] = hdfs[li].set_index(['variance', 'chain_id']).loc[0.0, 0.0]
         hdfs[li].iloc[0,0:2] = 1 # rmax,r2 == (0,0) ==> (1,1)
-        plt.plot(hdfs[li]['rmax'], hdfs[li]['r2'], color=red_geom)
+        plt.plot(hdfs[li]['rmax'], np.sqrt(hdfs[li]['r2']), color=colors[i])
     for li in lis:
-        y = wlc.r2wlc(x, hdfs[li]['kuhn'].mean()/2)
+        y = np.sqrt(wlc.r2wlc(x, hdfs[li]['kuhn'].mean()/2))
         plt.plot(x, y, '-.', color=teal_flucts, markersize=1)
-    y = wlc.r2wlc(x, 100)
-    plt.plot(x, y, '.', color=teal_flucts, markersize=1)
+
+    xmin = 1
+    ymin = xmin
+    ymax = 700
+    xmax = 3_000
+    # bands representing different regimes of the R^2
+    plt.fill_between(x, ymin, ymax, where=x<12, color=[0.96, 0.95, 0.95])
+    plt.fill_between(x, ymin, ymax, where=((x>=12)&(x<250)), color=[0.99, 0.99, 0.99])
+    plt.fill_between(x, ymin, ymax, where=x>=250, color=[0.9, 0.9, 0.91])
+
+    # power law triangle for the two extremal regimes
+    corner = draw_power_law_triangle(1, [2, 3], 0.5, 'up')
+    plt.text(3, 11, '$L^1$')
+    corner = draw_power_law_triangle(1/2, [350, 30], 0.8, 'down')
+    plt.text(700, 16, '$L^{1/2}$')
+
+    plt.xlim([xmin, xmax])
+    plt.ylim([ymin, ymax])
     plt.xscale('log')
     plt.yscale('log')
-    plt.xlim([0.5, 2000])
-    plt.ylim([0.5, 20000])
     plt.xlabel('Total Linker Length (nm)')
-    plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
-    plt.legend([r'$L_i = 36bp$', r'$WLC, b = 100 nm$'],
-               bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
+    plt.ylabel(r'End-to-end distance, $\sqrt{\langle R^2 \rangle}$ (nm)')
+    legend = [r'WLC, $b = 100$ nm'] \
+           + [r'$L_i = ' + str(li) + r'$ bp' for li in lis] \
+           + [r'WLC, best fit']
+    plt.legend(legend)
+               # bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
     plt.savefig('./plots/PRL/fig2a_r2_homogenous_vs_wlc.pdf', bbox_inches='tight')
-
-# this ended up being supplemental after all
-# def plot_fig2b():
-#     plt.rcParams.update(medium_params)
-#     links = np.load('csvs/linker_lengths_homogenous_so_far.npy')
-#     kuhns = np.load('csvs/kuhns_homogenous_so_far.npy')
-#     fig, ax = plt.subplots(figsize=(0.7*col_size, 0.42*col_size))
-#     ax.plot(links, kuhns, '-o', markersize=1, lw=0.75, color=teal_flucts, label='Chromatin')
-#     ax.plot(np.linspace(min(links), max(links), 1000), np.tile(100, 1000), '--', lw=0.75, label='Bare DNA', color=dull_purple)
-#     plt.xlabel('Fixed linker length (bp)')
-#     plt.ylabel('Kuhn length (nm)')
-#     plt.xscale('log')
-#     plt.legend(loc=4) #lower right
-#     plt.subplots_adjust(left=0.19, bottom=0.28, top=0.98, right=0.99)
-#     plt.tick_params(left=True, right=False, bottom=True, length=4)
-#     plt.savefig('plots/PRL/fig2b_kuhn_length_homogenous_1to1000links_0unwraps.pdf')
 
 def plot_fig2b():
     kuhns = np.load('csvs/kuhns_1to250links_0to146unwraps.npy')
@@ -125,31 +188,6 @@ def plot_fig2b():
     plt.subplots_adjust(left=0.12, bottom=0.25, top=0.98, right=0.99)
     plt.tick_params(left=True, right=False, bottom=True, length=4)
     plt.savefig('plots/PRL/fig2b_kuhn_length_in_nm_31to51links_0unwraps.pdf')
-
-#def plot_fig3_kuhn_length_vs_variance(sigmas=np.arange(0, 11), ax=None):
-#    kuhnsf41 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_0_10_0unwraps.npy')
-#    #kuhnsf47 = np.load(f'csvs/r2/kuhns-fluctuations-mu47-sigma_0_10_0unwraps.npy')
-#    kuhnsg41 = np.load(f'csvs/r2/kuhns-geometrical-mu41-sigma_0_10_0unwraps.npy')
-#    #kuhnsg47 = np.load(f'csvs/r2/kuhns-geometrical-mu47-sigma_0_10_0unwraps.npy')
-#    if ax is None:
-#        fig, ax = plt.subplots(figsize=(0.95*col_size, 0.95*(5/7)*col_size))
-#    #entire figure
-#    ax.plot(sigmas, kuhnsg41, '--^', markersize=3, lw=1, label='Geometrical', color='#E83151')
-#    ax.plot(sigmas, kuhnsf41, '-o', markersize=3, lw=1, label='Fluctuations', color='#387780')
-#    #ax1.set_title('Mean linker length: 41bp')
-#    #ax1.set_ylabel('Kuhn length (nm)')
-#    #ax1.set_ylim([0, 200])
-#    #ax1.tick_params(labelsize=18)
-#    #plt.tick_params(labelsize=18)
-#    # ax.plot(sigmas, kuhnsg47, '--^', markersize=2, lw=0.75, label='Geometrical', color=red_geom)
-#    # ax.plot(sigmas, kuhnsf47, '-o', markersize=2, lw=0.75, label='Fluctuations', color=teal_flucts)
-#    #ax.set_title('Mean linker length: 47bp')
-#    plt.ylim([0, 200])
-#    plt.legend()
-#    plt.ylabel('Kuhn length (nm)')
-#    plt.xlabel(r'Variance in linker length $\pm [x] bp$')
-#    plt.subplots_adjust(left=0.14, bottom=0.15, top=0.98, right=0.99)
-#    #plt.savefig('plots/PRL/fig4_kuhn_length_vs_window_size_mu47bp.pdf')
 
 def plot_fig3(sigmas=np.arange(0, 41)):
     fig, ax = plt.subplots(figsize=(default_width, default_height))
