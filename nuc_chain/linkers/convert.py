@@ -1,7 +1,63 @@
 from .. import * # default parameters
-from .. import geometry as ncg
 import numpy as np
 import pandas as pd
+
+def resolve_unwrap(unwrap, w_in, w_out):
+    """For scripting convenience when the only parameter that matters is
+    unwrap = b - w_in - w_out - 1. Converts total unwrapping to amount wrapped on either
+    side of the dyad axis. If unwrap is odd, assumes the extra base pair is wrapped on
+    the entry side.
+
+    All functions take w_in, w_out directly now."""
+    if (w_in is None) != (w_out is None):
+        raise ValueError("Either none or both of w_in and w_out must be specified.")
+    if w_in:
+        return w_in, w_out
+    elif unwrap % 2 == 1:
+        w_in = (bp_in_nuc - unwrap)/2
+        return w_in, w_in-1
+    else:
+        w = (bp_in_nuc - unwrap - 1)/2
+        return w, w
+
+def resolve_wrapping_params(unwraps, w_ins, w_outs, N):
+    """Resolves wrapping-related params into (N,) arrays of w_ins and w_outs. N
+    could be number of nucleosome / number of chains, depending on use case.
+
+    Parameters
+    ----------
+    unwrap : float or (N,) array_like
+        total amount of unwrapped DNA on both sides
+    w_in : float or (N,) array_like
+        wrapped DNA on entry side of dyad axis
+    w_out : float or (N,) array_like
+        wrapped DNA on exit side of dyad axis
+
+    Returns
+    -------
+    w_in : (N,) np.ndarray
+        N output wrapping lengths on entry side of dyad axis
+    w_out : (N,) np.ndarray
+        N output wrapping lengths on exit side of dyad axis
+
+    All functions take w_in, w_out directly now."""
+    if (w_ins is None) != (w_outs is None):
+        raise ValueError("Either none or both of w_in and w_out must be specified.")
+
+    if unwraps is not None:
+        unwraps = np.atleast_1d(unwraps)
+        w_ins = np.array([resolve_unwrap(u, None, None)[0] for u in unwraps])
+        w_outs = np.array([resolve_unwrap(u, None, None)[1] for u in unwraps])
+    w_ins = np.atleast_1d(w_ins)
+    w_outs = np.atleast_1d(w_outs)
+    if len(w_ins) == 1:
+        w_ins = np.tile(w_ins, (N,))
+    if len(w_outs) == 1:
+        w_outs = np.tile(w_outs, (N,))
+    assert(len(w_ins) == N)
+    assert(len(w_outs) == N)
+    return w_ins, w_outs
+
 
 def links_from_dyad_locations(filename, w_ins=default_w_in, w_outs=default_w_out,
                                         helix_params=helix_params_best, unwraps=None):
@@ -28,7 +84,7 @@ def links_from_dyad_locations(filename, w_ins=default_w_in, w_outs=default_w_out
     df = pd.read_csv(filename, header=0, names=['nuc', 'dyad_location'])
     b = helix_params['b']
     num_linkers = df.shape[0] #rows give dyad positions
-    w_ins, w_outs = ncg.resolve_wrapping_params(unwraps, w_ins, w_outs, num_linkers+1)
+    w_ins, w_outs = resolve_wrapping_params(unwraps, w_ins, w_outs, num_linkers+1)
     # calculate unwrapping amounts based on w_ins and w_outs
     mu_ins = (b - 1)/2 - w_ins
     mu_outs = (b - 1)/2 - w_outs
@@ -68,7 +124,7 @@ def genomic_length_from_links_unwraps(links, w_ins=default_w_in, w_outs=default_
     """
     b = helix_params['b']
     num_linkers = len(links)
-    w_ins, w_outs = ncg.resolve_wrapping_params(unwraps, w_ins, w_outs, num_linkers+1)
+    w_ins, w_outs = resolve_wrapping_params(unwraps, w_ins, w_outs, num_linkers+1)
     # calculate unwrapping amounts based on w_ins and w_outs
     mu_ins = (b - 1)/2 - w_ins
     mu_outs = (b - 1)/2 - w_outs
@@ -101,7 +157,7 @@ def Rmax_from_links_unwraps(links, w_ins=default_w_in, w_outs=default_w_out,
     """
     b = helix_params['b']
     num_linkers = len(links)
-    w_ins, w_outs = ncg.resolve_wrapping_params(unwraps, w_ins, w_outs, num_linkers+1)
+    w_ins, w_outs = resolve_wrapping_params(unwraps, w_ins, w_outs, num_linkers+1)
     # calculate unwrapping amounts based on w_ins and w_outs
     mu_ins = (b - 1)/2 - w_ins
     mu_outs = (b - 1)/2 - w_outs
