@@ -147,6 +147,39 @@ def plot_kuhns_long_linkers_figb():
     plt.tick_params(left=True, right=False, bottom=True, length=4)
     #plt.savefig('plots/PRL/kuhn_length_homogenous_1to1000links_0unwraps_power_law.pdf')
 
+def plot_kuhns_multiple_unwraps():
+    kuhns = np.load('csvs/kuhns_1to250links_0to146unwraps.npy')
+    links = np.arange(1, 251)
+    fig, ax = plt.subplots(figsize=(col_size, 0.6*col_size))
+    ax.plot(links, kuhns[:, 0], '-o', markersize=1, lw=0.75, color=teal_flucts, label='0 unwraps')
+    ax.plot(links, kuhns[:, 21], '-o', markersize=1, lw=0.75, color=red_geom, label='21 unwraps')
+    ax.plot(links, kuhns[:, 42], '-o', markersize=1, lw=0.75, color=dull_purple, label='42 unwraps')
+    plt.legend()
+    plt.xlabel('Fixed linker length (bp)')
+    plt.ylabel('Kuhn length (nm)')
+    plt.subplots_adjust(left=0.12, bottom=0.25, top=0.98, right=0.98)
+    plt.savefig('plots/PRL/kuhn_length_homogenous_multiple_unwraps.pdf')
+
+def plot_kuhn_heterogenous_sigma_47bp(sigmas=np.arange(0, 11), ax=None):
+    kuhnsf47 = np.load(f'csvs/r2/kuhns-fluctuations-mu47-sigma_0_10_0unwraps.npy')
+    kuhnsg47 = np.load(f'csvs/r2/kuhns-geometrical-mu47-sigma_0_10_0unwraps.npy')
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(col_size, (5/7)*col_size))
+    #entire figure
+    ax.plot(sigmas, kuhnsg47, '--^', markersize=4, label='Geometrical', color=red_geom)
+    ax.plot(sigmas, kuhnsf47, '-o', markersize=4, label='Fluctuations', color=teal_flucts)
+    rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_47-0unwraps.csv')
+    b = rdf['kuhn'].mean()
+    xlim = plt.xlim()
+    plt.plot([-10, 50], [b, b], 'k-.', label='Maximum Entropy')
+    plt.xlim(xlim)
+    ax.set_ylim([0, 100])
+    plt.legend()
+    plt.xlabel('$\sigma$ (bp)')
+    plt.ylabel('Kuhn length (nm)')
+    plt.subplots_adjust(left=0.14, bottom=0.15, top=0.92, right=0.97)
+    plt.savefig('plots/PRL/kuhn_length_vs_sigma_mu47.png')
+
 #plot Green's function for kinked vs. bare WLC
 def plot_greens_kinkedWLC_bareWLC(integral, qintegral, links, unwrap, Nvals, rvals=None, rminN1=0.0, qrminN1=0.0):
     """Plot G(R;Rmax) for kinked WLC and bare WLC with same Rmax vs. dimensionless chain length r = R/Rmax,
