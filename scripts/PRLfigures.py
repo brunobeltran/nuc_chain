@@ -3,7 +3,10 @@
 Two figures were made by hand. Figure 1 is a pair of blender renderings. The
 relevant blend file names are simply mentioned below.
 
-Where data has to be computed, this is mentioned."""
+Where data has to be pre-computed, the procedure is mentioned."""
+import re
+from pathlib import Path
+
 import matplotlib.cm as cm
 import numpy as np
 import seaborn as sns
@@ -11,15 +14,15 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import scipy
 from scipy import stats
-from pathlib import Path
 from scipy.optimize import curve_fit
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+
 from nuc_chain import geometry as ncg
 from nuc_chain import linkers as ncl
 from MultiPoint import propagator
 from nuc_chain import fluctuations as wlc
 from nuc_chain.linkers import convert
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from PIL import Image
 
 # Plotting parameters
 # PRL Font preference: computer modern roman (cmr), medium weight (m), normal shape
@@ -75,6 +78,15 @@ teal_flucts = '#387780'
 red_geom = '#E83151'
 dull_purple = '#755F80'
 rich_purple = '#e830e8'
+
+def render_chain(linkers, unwraps=0, **kwargs):
+        entry_rots, entry_pos = ncg.minimum_energy_no_sterics_linker_only(linkers, unwraps=unwraps)
+        # on linux, hit ctrl-d in the ipython terminal but don't accept the
+        # "exit" prompt to get the mayavi interactive mode to work. make sure
+        # to use "off-screen rendering" and fullscreen your window before
+        # saving (this is actually required if you're using a tiling window
+        # manager like e.g. i3 or xmonad).
+        ncg.visualize_chain(entry_rots, entry_pos, linkers, unwraps=unwraps, plot_spheres=True)
 
 def draw_power_law_triangle(alpha, x0, width, orientation, base=10,
                             **kwargs):
@@ -192,15 +204,9 @@ def plot_fig2b():
     plt.tight_layout()
     plt.savefig('plots/PRL/fig2b_kuhn_length_in_nm_31to51links_0unwraps.pdf')
 
-def render_fig2b_chains():
+def render_fig2b_chains(**kwargs):
     for li in [36, 38, 41, 47]:
-        entry_rots, entry_pos = ncg.minimum_energy_no_sterics_linker_only(14*[li], unwraps=0)
-        # on linux, hit ctrl-d in the ipython terminal but don't accept the
-        # "exit" prompt to get the mayavi interactive mode to work. make sure
-        # to use "off-screen rendering" and fullscreen your window before
-        # saving (this is actually required if you're using a tiling window
-        # manager like e.g. i3 or xmonad).
-        ncg.visualize_chain(entry_rots, entry_pos, 14*[li], unwraps=0, plot_spheres=True)
+        render_chain(14*[li], **kwargs)
 
 def plot_fig3(sigmas=np.arange(0, 41)):
     fig, ax = plt.subplots(figsize=(default_width, default_height))
@@ -229,6 +235,11 @@ def plot_fig3(sigmas=np.arange(0, 41)):
     fig.text(1.9, 0, r'$\pm 6 bp$', size=9)
     plt.subplots_adjust(left=0.07, bottom=0.15, top=0.92, right=0.97)
     plt.savefig('./plots/PRL/fig-3-kuhn_length_vs_window_size_41_sigma0to40.pdf')
+
+def render_fig3_chains(mu=41, sigmas=[0, 2, 6]):
+    for sigma in sigmas:
+        sign_bit = 2*np.round(np.random.rand(N)) - 1
+        render_chain(mu + sign_bit*np.random.randint(sigma+1), size=(N,))
 
 def plot_fig4a(ax=None):
     """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
@@ -304,35 +315,148 @@ def plot_fig4b(ax=None):
     plt.ylabel(r'Kuhn length (nm)')
     plt.savefig('plots/PRL/fig4b_kuhn_exponential.pdf', bbox_inches='tight')
 
+def plot_fig5(df=None):
+    if df is None:
+        df = compute_looping_statistics_heterogenous_chains()
+    # if the first step is super short, we are numerically unstable
+    df.loc[df['rmax'] <= 5, 'ploops'] = np.nan
+    # if the output is obviously bad numerics, ignore it
+    df.loc[df['ploops'] < 10**(-13), 'ploops'] = np.nan
+    df = df.dropna()
+    df['log_ploop'] = np.log10(df['ploops'])
+    df['log_ldna'] = np.log10(df['ldna'])
+    df = df.sort_values('log_ldna')
+    # get an estimator of the variance from a rolling window
+    # window size chosen by eye
+    rolled = df.rolling(50).apply(np.nanmean)
+    rolled_std = df.rolling(50).apply(np.nanstd)
+    x = np.atleast_2d(df['log_ldna'].values.copy()).T
+    y = df['log_ploop'].values.copy().ravel()
+    sigma = np.interp(x, rolled['log_ldna'].values,
+            rolled_std['log_ploop'].values,
+            left=rolled_std['log_ploop'].values[0],
+            right=rolled_std['log_ploop'].values[-1])
+    sigma = sigma.ravel()
+    # pandas rolling std doesn't like left boundary, but we can just fill in
+    # soemthing reasonable
+    sigma[np.isnan(sigma)] = np.nanmax(sigma)
+    # now fit to a gaussian process
+    if Path('csvs/gp.pkl').exists():
+        gp = pickle.load(open('gp.pkl', 'rb'))
+    else:
+        kernel = C(1.0, (1e-3, 1e3)) * RBF(10, (1e-2, 1e2))
+        gp = GaussianProcessRegressor(kernel=kernel, alpha=dy**2, n_restarts_optimizer=10)
+        gp.fit(x, y)
+    xgrid = np.linspace(np.min(x), np.max(x), 100)
+    y_pred, sig = gp.predict(xgrid, return_std=True)
+    plt.fill(np.concatenate([x, x[::-1]]), np.concatenate([
+             y_pred - 1.9600 * sigma, (y_pred + 1.9600 * sigma)[::-1]]),
+             alpha=.5, fc='b', ec='None', label='95% confidence interval')
+    # now get the best fit gaussian chain
+    m, intercept, rvalue, pvalue, stderr = stats.linregress(Rmax_gaussian, ploop_gaussian)
+    #For Guassian chain, the intercept = (3/2)log(3/(4pi*lp)) -- see Deepti's notes
+    lp = 3 / (4*np.pi*np.exp(intercept/np.abs(m)))
+    lp = lp * ncg.dna_params['lpb']
+    # m is the power law exponent, should be -3/2
 
-#for all Mayavi images
-def plot_homogenous_chain(link, num_nucs):
-    links = np.tile(link, num_nucs)
-    chain = ncg.minimum_energy_no_sterics_linker_only(links, unwraps=0)
-    ncg.visualize_chain(*chain, links, unwraps=0, plot_nucleosomes=False, plot_spheres=True, plot_exit=False)
 
-def plot_MLC():
-    entry_pos = np.loadtxt('csvs/MLC/r110v0')
-    entry_us = np.loadtxt('csvs/MLC/u110v0')
-    entry_t3 = entry_us[:, 0:3]
-    entry_t2 = entry_us[:, 3:]
-    entry_t1 = np.cross(entry_t2, entry_t3, axis=1)
-    num_nucs = entry_pos.shape[0]
-    entry_rots = []
-    for i in range(num_nucs):
-        #t1, t2, t3 as columns
-        rot = np.eye(3)
-        rot[:, 0] = entry_t1[i, :]
-        rot[:, 1] = entry_t2[i, :]
-        rot[:, 2] = entry_t3[i, :]
-        entry_rots.append(rot)
-    entry_rots = np.array(entry_rots)
-    #skip the first nucleosome since entry_rot has NaNs
-    entry_rots = entry_rots[1:, :, :]
-    entry_pos = entry_pos[1:, :]
-    return entry_rots, entry_pos
-    #^above files saved in csvs/MLC in npy format
 
+def compute_looping_statistics_heterogenous_chains():
+    """Compute and save looping probabilities for all 'num_chains' heterogenous chains
+    saved in the links31to52 directory.
+    """
+    #directory in which all chains are saved
+    dirpath = Path('csvs/Bprops/0unwraps/heterogenous/exp_mu56')
+    #Create one data frame per chain and add to this list; concatenate at end
+    list_dfs = []
+    #first load in chains of length 100 nucs
+    file_re = re.compile("([0-9]+)nucs_chain([0-9]+)")
+    for chain_folder in dirpath.glob('*'):
+        match = file_re.match(chain_folder.name)
+        if match is None:
+            continue
+        num_nucs, chain_id = match.groups()
+        try:
+            links = np.load(chain_folder
+                    /f'linker_lengths_{num_nucs}nucs_chain{chain_id}_{num_nucs}nucs.npy')
+            greens = np.load(chain_folder
+                    /f'kinkedWLC_greens_{num_nucs}nucs_chain{chain_id}_{num_nucs}nucs.npy')
+        except FileNotFoundError:
+            continue
+        df = pd.DataFrame(columns=['num_nucs', 'chain_id', 'ldna', 'rmax', 'ploops'])
+        #only including looping statistics for 2 nucleosomes onwards when plotting though
+        df['ldna'] = convert.genomic_length_from_links_unwraps(links, unwraps=0)
+        df['rmax'] = convert.Rmax_from_links_unwraps(links, unwraps=0)
+        df['ploops'] = greens[0,:]
+        df['num_nucs'] = num_nucs
+        df['chain_id'] = chain_id
+        list_dfs.append(df)
+    #Concatenate list into one data frame
+    df = pd.concat(list_dfs, ignore_index=True, sort=False)
+    df = df.set_index(['num_nucs', 'chain_id']).sort_index()
+    df.to_csv(dirpath/'looping_probs_heterochains_exp_mu56_0unwraps.csv')
+    return df
+
+def plot_looping_probs_hetero_avg(df, **kwargs):
+    #df2 = df.sort_values('ldna')
+    fig, ax = plt.subplots(figsize=(default_width, default_height))
+    #first just plot all chains
+    palette = sns.cubehelix_palette(n_colors=len(df.groupby(['num_nucs', 'chain_id'])))
+    #palette = sns.color_palette("husl", np.unique(df['chaindir']).size)
+    sns.lineplot(data=df, x='ldna', y='ploops', hue='chaindir', palette=palette,
+        legend=None, ci=None, ax=ax, alpha=0.5, lw=1)
+
+    #Then plot running average
+    df2 = df.sort_values('ldna')
+    df3 = df2.drop(columns=['chaindir'])
+    df4 = df3.rolling(100).mean()
+    #df4.plot(x='ldna', y='ploops', legend=False, color='k', linewidth=3, ax=ax, label='Average')
+
+    #try plotting average of linear interpolations
+    # xvals = np.linspace(np.min(df.ldna), np.max(df.ldna), 1000)
+    # dflin = pd.DataFrame(columns=['chaindir', 'ldna', 'ploops'])
+    # for i, dfs in df.groupby('chaindir'):
+    #     f = interpolate.interp1d(dfs.ldna, dfs.ploops)
+    #     ax.plot(xvals, f(xvals), linewidth=1)
+        #dflin[]
+        #dfs.plot(x='ldna', y='ploops', legend=False, color=palette[i], linewidth=1, ax=ax)
+
+    #plot power law scaling
+    xvals = np.linspace(4675, 9432, 1000)
+    gaussian_prob = 10**-1.4*np.power(xvals, -1.5)
+    ax.loglog(xvals, gaussian_prob, 'k')
+    #vertical line of triangle
+    ax.vlines(9432, gaussian_prob[-1], gaussian_prob[0])
+    #print(gaussian_prob[0])
+    #print(gaussian_prob[-1])
+    ax.hlines(gaussian_prob[0], 4675, 9432)
+    #ax.text(9500, 8.4*10**(-8), "-3", fontsize=18)
+    ax.text(7053.5, 10**(-6.5), '$L^{-3/2}$', fontsize=18)
+
+    #compare to bare WLC with constant linker length 56 bp
+    indmin = 1
+    bare41 = np.load('csvs/Bprops/0unwraps/41link/bareWLC_greens_41link_0unwraps_1000rvals_50nucs.npy')
+    ldna = convert.genomic_length_from_links_unwraps(np.tile(41, 50), unwraps=0)
+    ax.loglog(ldna[indmin:], bare41[0, indmin:], '--',
+            color='#387780', label='Straight chain', **kwargs)
+
+    #plot gaussian probability from analytical kuhn length calculation
+    #Kuhn length for mu = 56, exponential (in nm)
+    # b = 40.662 / ncg.dna_params['lpb']
+    # #b =
+    # analytical_gaussian_prob = (3.0 / (2*np.pi*df2['rmax']*b))**(3/2)
+    # ax.loglog(df2['ldna'], analytical_gaussian_prob, ':', label='Gaussian chain with $b=40.66$nm')
+    plt.legend(loc=4)
+    plt.xlabel('Genomic distance (bp)')
+    plt.ylabel('$P_{loop}$ ($bp^{-3}$)')
+    plt.title(f'Exponentially distributed linkers mu=56bp')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.ylim([10**-12.5, 10**-5.5])
+    plt.tick_params(left=True, right=False, bottom=True)
+    plt.subplots_adjust(left=0.15, bottom=0.16, top=0.91, right=0.95)
+    #return df4
+    plt.savefig('plots/loops/looping_exp_mu56_vs_bareWLC_76chains.png')
 #Looping supplemental figure
 #For looping main figure, see hetero31to52_loops_090418.py
 def plot_homogenous_loops():
@@ -398,41 +522,3 @@ def plot_prob_loop_vs_fragment_length(integrals, labels, links, unwrap, Nvals=No
     #plt.title(f'Looping probability vs. Chain Length')
     plt.tick_params(left=True, right=False, bottom=True)
     return fig, ax
-
-def calculate_kuhn_length_from_r2(df, mu, chain_length, **kwargs):
-    """Calculate :math:`b=\langle{R^2}\rangle/R_{max}` in the long chain
-    limit (roughly 5000 monomers down the chain)."""
-
-    df2 = df.sort_values('rmax')
-    kuhns = []
-    for var, vals in df2.groupby(['variance']):
-        sample_links = ncl.fake_linkers_increasing_variance(mu, var, size=(chain_length-1,), type='box')
-        sample_rmax = convert.Rmax_from_links_unwraps(sample_links, **kwargs)
-        #Assume long chain limit is 5000 monomers down a random chain sampled from this distribution.
-        min_rmax_for_kuhn = sample_rmax[5000] * ncg.dna_params['lpb']
-        rmax_long = vals.rmax[vals['rmax']>=min_rmax_for_kuhn]
-        r2_long = vals.r2[vals['rmax']>=min_rmax_for_kuhn]
-        kuhns.append(stats.linregress(rmax_long, r2_long)[0])
-    return np.array(kuhns)
-
-#Save kuhn lengths as npy files so I don't have to git annex the huge csv's
-def extract_kuhn_lengths_from_r2():
-    links = [41, 47]
-    for link in links:
-        # dffsig10 = pd.read_csv(f'csvs/r2/r2-fluctuations-mu_{link}-sigma_0_10_0unwraps.csv')
-        # kuhnfsig10 = calculate_kuhn_length_from_r2(dffsig10, link, 7500, unwraps=0)
-        # np.save(f'csvs/r2/kuhns-fluctuations-mu{link}-sigma_0_10_0unwraps.npy', kuhnfsig10)
-        # dfgsig10 = pd.read_csv(f'csvs/r2/r2-geometrical-mu_{link}-sigma_0_10_0unwraps.csv')
-        # kuhngsig10 = calculate_kuhn_length_from_r2(dfgsig10, link, 7500, unwraps=0)
-        # np.save(f'csvs/r2/kuhns-geometrical-mu{link}-sigma_0_10_0unwraps.npy', kuhngsig10)
-        dffsig11to20 = pd.read_csv(f'csvs/r2/r2-fluctuations-mu_{link}-sigma_11_20_0unwraps.csv')
-        kuhnfsig11to20 = calculate_kuhn_length_from_r2(dffsig11to20, link, 7500, unwraps=0)
-        dffsig20to30 = pd.read_csv(f'csvs/r2/r2-fluctuations-mu_{link}-sigma_20_30_0unwraps.csv')
-        kuhngsig11to30 = np.concatenate((kuhnfsig11to20, calculate_kuhn_length_from_r2(dffsig20to30, link, 7500, unwraps=0)))
-        dffsig31to40 = pd.read_csv(f'csvs/r2/r2-fluctuations-mu_{link}-sigma_31_40_0unwraps.csv')
-        kuhnfsig11to40 = np.concatenate((kuhngsig11to30, calculate_kuhn_length_from_r2(dffsig31to40, link, 7500, unwraps=0)))
-        np.save(f'csvs/r2/kuhns-fluctuations-mu{link}-sigma_11_40_0unwraps.npy', kuhnfsig11to40)
-        #still waiting on sigmas 11 onwards; afterwards, concatenate sigmas 0 - 40
-
-
-
