@@ -119,16 +119,16 @@ def save_greens_100nuc_chains(links, unwrap=0):
     Kvals = np.unique(np.concatenate((Klin, Klog)))
     #convert to little k -- units of inverse bp (this results in kmax = 332)
     kvals = Kvals / (2*wlc.default_lp)
-    
+
     for link in links:
         linkers = np.tile(link, 50)
         Bprop_1to50 = pickle.load(open(f'csvs/Bprops/{unwrap}unwraps/{link}link/B0_k_given_N_{link}bplinkers_{unwrap}unwraps_50nucs_30000Ks.p', 'rb'))
         Bprop_50to100 = np.load(f'csvs/Bprops/{unwrap}unwraps/{link}link/B0_k_given_N_{link}bplinkers_{unwrap}unwraps_50to100nucs_30000Ks.p')
         #the last column of Bprop_1to50 and the first column of Bprop_50to100 are identical (both for 50 nucs)
         #75 points, one for each of the first 50 nucs, and every other from nucs50-100
-        Nvals = np.concatenate(np.arange(1, 50), np.arange(50, 101, 2)) 
+        Nvals = np.concatenate(np.arange(1, 50), np.arange(50, 101, 2))
         Bprop_1to100nucs = np.concatenate((Bprop_50_1to50nucs, Bprop_50_50to100nucs[:, 1:]), axis=1) #shape = (29999, 75)
-        rvals = np.linspace(0.0, 1.0, 1000)  
+        rvals = np.linspace(0.0, 1.0, 1000)
         integral = wlc.BRN_fourier_integrand_splines(kvals, linkers, unwrap, Bprop=Bprop_1to100nucs, rvals=rvals)
 
 ##### WORKFLOW FOR ANALYZING CHAIN #########
@@ -178,7 +178,7 @@ greens42_20unwraps_bare =(
 np.load('csvs/Bprops/20unwraps/42link/bareWLC_greens_42link_20unwraps_1000rvals_50nucs.npy'))
 
 #Parameters for plotting analysis
-LINK = 
+LINK =
 UNWRAP = 0
 integral = greens37_0unwraps_kinked
 qintegral = greens37_0unwraps_bare
@@ -213,7 +213,7 @@ wlc.plot_greens_kinkedWLC_bareWLC(integral, qintegral, links, unwrap, highNvals)
 
 # #Looping probabilities
 integrals = [greens35_0unwraps_kinked, greens36_0unwraps_kinked, greens37_0unwraps_kinked, greens38_0unwraps_kinked,
-            greens42_0unwraps_kinked, greens45_0unwraps_kinked, greens46_0unwraps_kinked, 
+            greens42_0unwraps_kinked, greens45_0unwraps_kinked, greens46_0unwraps_kinked,
             greens47_0unwraps_kinked, greens50_0unwraps_kinked]
 labels = ['35bp', '36bp', '37bp', '38bp', '42bp', '45bp', '46bp', '47bp', '50bp']
 plot_prob_loop_vs_fragment_length(integrals, labels, links, unwrap)

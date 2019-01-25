@@ -315,7 +315,9 @@ def plot_fig4b(ax=None):
     plt.ylabel(r'Kuhn length (nm)')
     plt.savefig('plots/PRL/fig4b_kuhn_exponential.pdf', bbox_inches='tight')
 
-def plot_fig5(df=None):
+def plot_fig5(df=None, rmax_or_ldna='rmax'):
+    n = rmax_or_ldna
+    logn = 'log_' + n
     if df is None:
         df = compute_looping_statistics_heterogenous_chains()
     # if the first step is super short, we are numerically unstable
@@ -324,15 +326,15 @@ def plot_fig5(df=None):
     df.loc[df['ploops'] < 10**(-13), 'ploops'] = np.nan
     df = df.dropna()
     df['log_ploop'] = np.log10(df['ploops'])
-    df['log_ldna'] = np.log10(df['ldna'])
-    df = df.sort_values('log_ldna')
+    df[logn] = np.log10(df[n])
+    df = df.sort_values(logn)
     # get an estimator of the variance from a rolling window
     # window size chosen by eye
-    rolled = df.rolling(50).apply(np.nanmean)
-    rolled_std = df.rolling(50).apply(np.nanstd)
-    x = np.atleast_2d(df['log_ldna'].values.copy()).T
+    rolled = df.rolling(50).apply(np.nanmean, raw=False)
+    rolled_std = df.rolling(50).apply(np.nanstd, raw=False)
+    x = np.atleast_2d(df[logn].values.copy()).T
     y = df['log_ploop'].values.copy().ravel()
-    sigma = np.interp(x, rolled['log_ldna'].values,
+    sigma = np.interp(x, rolled[logn].values,
             rolled_std['log_ploop'].values,
             left=rolled_std['log_ploop'].values[0],
             right=rolled_std['log_ploop'].values[-1])
@@ -341,21 +343,24 @@ def plot_fig5(df=None):
     # soemthing reasonable
     sigma[np.isnan(sigma)] = np.nanmax(sigma)
     # now fit to a gaussian process
-    if Path('csvs/gp.pkl').exists():
-        gp = pickle.load(open('gp.pkl', 'rb'))
+    if Path('csvs/gp_rmax.pkl').exists():
+        gp = pickle.load(open('csvs/gp_rmax.pkl', 'rb'))
     else:
         kernel = C(1.0, (1e-3, 1e3)) * RBF(10, (1e-2, 1e2))
-        gp = GaussianProcessRegressor(kernel=kernel, alpha=dy**2, n_restarts_optimizer=10)
+        gp = GaussianProcessRegressor(kernel=kernel, alpha=sigma**2, n_restarts_optimizer=10)
         gp.fit(x, y)
-    xgrid = np.linspace(np.min(x), np.max(x), 100)
+    xgrid = np.linspace(np.min(x), np.max(x), 100).reshape(-1, 1)
     y_pred, sig = gp.predict(xgrid, return_std=True)
-    plt.fill(np.concatenate([x, x[::-1]]), np.concatenate([
-             y_pred - 1.9600 * sigma, (y_pred + 1.9600 * sigma)[::-1]]),
-             alpha=.5, fc='b', ec='None', label='95% confidence interval')
-    # now get the best fit gaussian chain
-    m, intercept, rvalue, pvalue, stderr = stats.linregress(Rmax_gaussian, ploop_gaussian)
+    # 95% confidence intervals of mean estimate
+    plt.fill(np.concatenate([xgrid, xgrid[::-1]]),
+             np.concatenate([y_pred - 1.9600 * sig, (y_pred + 1.9600 * sig)[::-1]]),
+             alpha=.5, fc='r', ec='None', label='95% confidence interval')
+    # now get the best fit gaussian chain. chain becomes approximate gaussian
+    # after about 1000rmax units, hence the 3 below
+    m, intercept, rvalue, pvalue, stderr = stats.linregress(
+            xgrid[xgrid>3].ravel(), y_pred[xgrid.ravel()>3])
     #For Guassian chain, the intercept = (3/2)log(3/(4pi*lp)) -- see Deepti's notes
-    lp = 3 / (4*np.pi*np.exp(intercept/np.abs(m)))
+    lp = 3 / (4*np.pi*10**(intercept/np.abs(m)))
     lp = lp * ncg.dna_params['lpb']
     # m is the power law exponent, should be -3/2
 

@@ -129,7 +129,7 @@ m = stats.linregress(np.log(Ns_Llinks_lp10[8:]), np.log(Prob_a_Llinks_lp10[8:]))
 ### Convert above analysis into decomposed functions that can be reused upon later analyses ###
 
 def load_variables_for_Sarah_looping():
-	"""Run this function when starting a new ipython environment. Keep the variables in the 
+	"""Run this function when starting a new ipython environment. Keep the variables in the
 	environment since all future functions will use them."""
 	Klin = np.linspace(0, 10**5, 20000)
 	Klog = np.logspace(-3, 5, 10000)

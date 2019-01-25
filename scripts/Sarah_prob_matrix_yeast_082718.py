@@ -19,9 +19,9 @@ from scipy import stats
 from multiprocessing import Pool
 from functools import partial
 
-# params = {'axes.edgecolor': 'black', 'axes.facecolor': 'white', 'axes.grid': False, 
+# params = {'axes.edgecolor': 'black', 'axes.facecolor': 'white', 'axes.grid': False,
 # 'axes.linewidth': 0.75, 'backend': 'pdf','axes.labelsize': 12,'legend.fontsize': 10,
-# 'xtick.labelsize': 10,'ytick.labelsize': 10,'text.usetex': False,'figure.figsize': [5.75, 4.5], 
+# 'xtick.labelsize': 10,'ytick.labelsize': 10,'text.usetex': False,'figure.figsize': [5.75, 4.5],
 # 'mathtext.fontset': 'stixsans', 'savefig.format': 'pdf', 'xtick.major.pad': 4, 'xtick.major.size': 5, 'xtick.major.width': 0.5,
 # 'ytick.major.pad': 4, 'ytick.major.size': 5, 'ytick.major.width': 0.5,}
 
