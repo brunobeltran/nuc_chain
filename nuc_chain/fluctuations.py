@@ -50,6 +50,14 @@ default_lp = 50 / ncg.dna_params['lpb']
 
 Mdict = ncd.Mdict_from_unwraps
 """Pickled files for Greens function calculations"""
+
+Klin = np.linspace(0, 10**5, 20000)
+Klog = np.logspace(-3, 5, 10000)
+Kvals = np.unique(np.concatenate((Klin, Klog)))
+#convert to little k -- units of inverse bp (this results in kmax = 332)
+kvals = Kvals / (2*default_lp)
+"""Good values to use for integrating our Green's functions. If the lp of the
+bare chain under consideration changes, these should change."""
 ###}}}
 
 ###{{{
@@ -1428,7 +1436,7 @@ def Bprop_k_fixed_linkers_fixed_unwrap(k, links, unwrap, Nvals=None, **kwargs):
     return Bprops
 
 
-def BRN_fourier_integrand_splines(kvals, links, unwrap, Nvals=None, rvals=None, Bprop=None):
+def BRN_fourier_integrand_splines(links, unwrap, Nvals=None, rvals=None, Bprop=None):
     """Return normalized, real space Green's function G(R;Rmax) for kinked WLC using
     spline integration.
 
@@ -1620,6 +1628,34 @@ def plot_greens_kinkedWLC_bareWLC(integral, qintegral, links, unwrap, Nvals, rva
 ###{{{
 # looping stuff
 
+def sarah_looping(N):
+    """Looping probability of a bare WLC with a capture radius of a=0.1b
+    (1/10th Kuhn lengths), tabulated by Sarah. For values beyond the N that was
+    tabulated, Gaussian chain behavior is assumed.
+
+    In [1]: m, intercept, rvalue, pvalue, stderr = scipy.stats.linregres
+        ...: s(np.log10(sarah_loops.n[sarah_loops.n > 10]), np.log10(sara
+        ...: h_loops.pLoop[sarah_loops.n > 10]))
+
+    In [2]: m
+    Out[2]: -1.47636997617001
+
+    In [3]: intercept
+    Out[3]: -2.981924639134709
+    """
+    a = 0.1 # capture radius used by Sarah
+    n_max = ncd.sarah_looping.n.max()
+    N = np.atleast_1d(N)
+    # implicitly N<0.1 ==> pLoop = 1
+    out = np.ones_like(N)
+    to_interp = (a < N) & (N < n_max)
+    out[int_i] = np.interp(N[int_i], sarah_looping.n, sarah_looping.pLoop)
+    # see doc for source of these
+    m = -1.47636997617001
+    intercept = -2.981924639134709
+    out[N >= n_max] = m * N[N>=n_max] + intercept
+    return out
+
 
 def fit_persistance_length_to_gaussian_looping_prob(integral, links, unwrap, Nvals=None, Nmin=40):
     """Fit effective persistance length to log-log looping probability vs. chain length (Rmax).
@@ -1654,9 +1690,10 @@ def tabulate_bareWLC_propagators(Ks):
         props.append(propagator.propagator(i, K, m))
     return props
 
-def bareWLC_gprop(kvals, links, unwrap, Nvals=None, props=None, **kwargs):
-    """Calculate G(K;N) for a bare WLC with the same Rmax as a kinked WLC with given linker
-    lengths and unwrapping amount at chain lengths dictated by Nvals (# of nucleosomes).
+def bareWLC_gprop(links, unwrap, Nvals=None, props=None, **kwargs):
+    """Calculate G(K;N) for a bare WLC with the same Rmax as a kinked WLC with
+    given linker lengths and unwrapping amount at chain lengths dictated by
+    Nvals (# of nucleosomes).
 
     Parameters
     ----------
@@ -1679,7 +1716,6 @@ def bareWLC_gprop(kvals, links, unwrap, Nvals=None, props=None, **kwargs):
         :math:`G_{00}^{0}(k;N)` for all N values
 
     """
-
     num_linkers = len(links)
     #here, Nvals refers to number of nucleosomes; need to convert to units of Rmax / 2lp
     if Nvals is None:
@@ -1698,7 +1734,12 @@ def bareWLC_gprop(kvals, links, unwrap, Nvals=None, props=None, **kwargs):
 
     #Calculate bare WLC propagators, one for each value of K
     if props is None:
-        props = tabulate_bareWLC_propagators(Ks)
+        props_file = Path('csvs/quinn_props_default_kvals.pkl')
+        if props_file.exists():
+            props = pickle.load(open(props_file, 'rb'))
+        else:
+            props = tabulate_bareWLC_propagators(Ks)
+            pickle.dump(props, open(props_file, 'wb'))
 
     #only care about G000 for real space green's function
     l0 = 0
@@ -1836,11 +1877,6 @@ def save_greens_fixed_links_fixed_unwraps(links, unwrap=0, num_nucs=50, Kprops_b
 def save_greens_hetero_links_plus_one(links, unwrap=0, Kprops_bareWLC=None):
     """Load in saved Bprop for a heterogenous chain with 2 random linker lengths, link and link+1,
     and calculate/save Green's function."""
-    Klin = np.linspace(0, 10**5, 20000)
-    Klog = np.logspace(-3, 5, 10000)
-    Kvals = np.unique(np.concatenate((Klin, Klog)))
-    #convert to little k -- units of inverse bp (this results in kmax = 332)
-    kvals = Kvals / (2*wlc.default_lp)
     if Kprops_bareWLC is None:
         Kprops_bareWLC = wlc.tabulate_bareWLC_propagators(Kvals)
     print('Tabulated K propagators for bare WLC!')
