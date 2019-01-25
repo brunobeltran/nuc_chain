@@ -56,7 +56,7 @@ class SarahLooping:
             self.initialize()
         return self.df.pLoop
     def initialize(self):
-        self.df = pd.read_csv(self.file), header=None, sep='\t')
+        self.df = pd.read_csv(self.file, header=None, sep='\t')
         self.df.columns = ['n', 'pLoop']
 sarah_looping = SarahLooping()
 
