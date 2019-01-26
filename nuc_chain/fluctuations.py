@@ -5,15 +5,15 @@ This module calculates statistics for a series of worm-like chains with twist (D
 by kinks imposed by nucleosomes. Calculations include R^2, Kuhn length, propogator matrices,
 full Green's function for the end-to-end distance of the polymer, and looping statistics. For a detailed
 derivation of how these calculations are carried out, refer to Deepti's notes.
+
+#TODO move anything matching "def plot" to the plotting module (or testing
+module), adjust code to reference correct members of fluctuations module.
 """
 import re
 import inspect
 
 import pickle
 import numpy as np
-#from matplotlib import pyplot as plt
-#import seaborn as sns
-#from mayavi import mlab
 import scipy
 import pandas as pd
 from pathlib import Path
@@ -310,11 +310,12 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False, lt=default
     kuhn = stats.linregress(lengthDNA[5000:], r2[5000:])[0]
     # Plot r2 vs. length of chain (in bp)
     if plotfig:
-        plt.figure()
-        plt.loglog(lengthDNA, np.abs(r2))
-        plt.xlabel('Length of chain in basepairs')
-        plt.ylabel(r'$<R^2>$')
-        plt.savefig(figname)
+        raise NotImplementedError('This module no longer plots.')
+        # plt.figure()
+        # plt.loglog(lengthDNA, np.abs(r2))
+        # plt.xlabel('Length of chain in basepairs')
+        # plt.ylabel(r'$<R^2>$')
+        # plt.savefig(figname)
 
     return r2, lengthDNA, kuhn
 
@@ -1633,6 +1634,11 @@ def sarah_looping(N):
     (1/10th Kuhn lengths), tabulated by Sarah. For values beyond the N that was
     tabulated, Gaussian chain behavior is assumed.
 
+    To compare to the probabilities that we calculate in e.g. load_WLC_looping,
+    just put into our units,
+    
+         >>> n, sarah_looping(n/b)/b**2
+
     In [1]: m, intercept, rvalue, pvalue, stderr = scipy.stats.linregres
         ...: s(np.log10(sarah_loops.n[sarah_loops.n > 10]), np.log10(sara
         ...: h_loops.pLoop[sarah_loops.n > 10]))
@@ -1648,14 +1654,52 @@ def sarah_looping(N):
     N = np.atleast_1d(N)
     # implicitly N<0.1 ==> pLoop = 1
     out = np.ones_like(N)
-    to_interp = (a < N) & (N < n_max)
-    out[int_i] = np.interp(N[int_i], sarah_looping.n, sarah_looping.pLoop)
+    int_i = (a < N) & (N < n_max)
+    out[int_i] = np.interp(N[int_i], ncd.sarah_looping.n, ncd.sarah_looping.pLoop)
     # see doc for source of these
     m = -1.47636997617001
     intercept = -2.981924639134709
-    out[N >= n_max] = m * N[N>=n_max] + intercept
+    out[N >= n_max] = 10**(m * np.log10(N[N>=n_max]) + intercept)
     return out
 
+def load_WLC_looping(ns=None):
+    """Compute or load existing values for the bare WLC looping probability,
+    in units of base pairs. Saved in files that refer to non-dimensionalized
+    units N=L/2*lp (WARNING: not calculated in non-dimensionalized units, so
+    they cannot be used unless put back into their own units).
+
+    The default N = [0.005n]*50, [0.02n]*100, [0.2n]*50, [10n]*100.
+    There is some overlap, but for values of n where the function is
+    numerically stable, they match at the overlap points nicely.
+
+    TODO: fix issue where small n are numerically unstable."""
+    default_gprops_dir = Path('csvs/gprops/straight')
+    gprops_re = re.compile('gprops_bare_([0-9]+\.?[0-9]*)n_([0-9]+)steps.pkl')
+    gprops = []
+    all_ns = []
+    if ns is not None:
+        # operates in "bases" and assumes an lp of 50nm, uses "linker" lengths
+        # instead of positions along polymer, so do appropriate conversions
+        gprops = [bareWLC_gprop(np.diff(ns)*100/ncg.dna_params['lpb'], unwrap=0)]
+        all_ns = [ns]
+    else:
+        for file in default_gprops_dir.glob('*.pkl'):
+            match = gprops_re.match(file.name)
+            if match is None:
+                continue
+            dn, nsteps = match.groups()
+            dn = float(dn)
+            nsteps = int(nsteps)
+            all_ns.append(np.cumsum(np.tile(dn, nsteps)))
+            gprops.append(pickle.load(open(file, 'rb')))
+    Ploops = []
+    for i, gprop in enumerate(gprops):
+        dns = np.insert(np.diff(all_ns[i]), 0, all_ns[i][0])
+        Ploops.append(BRN_fourier_integrand_splines(dns, unwrap=0,
+                rvals=np.array([0]), Bprop=gprop).ravel())
+    n, Ploop = np.concatenate(all_ns), np.concatenate(Ploops)
+    i = np.argsort(n)
+    return 2*default_lp*n[i], Ploop[i]
 
 def fit_persistance_length_to_gaussian_looping_prob(integral, links, unwrap, Nvals=None, Nmin=40):
     """Fit effective persistance length to log-log looping probability vs. chain length (Rmax).
