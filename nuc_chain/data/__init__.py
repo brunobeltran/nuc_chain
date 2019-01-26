@@ -47,16 +47,22 @@ class SarahLooping:
     def __init__(self, file=data_dir/Path('./sarah_loop_prob_a_p1.txt')):
         self.file = file
         self.initialized = False
+
+    @property
     def n(self):
         if not self.initialized:
             self.initialize()
         return self.df.n
+
+    @property
     def pLoop(self):
         if not self.initialized:
             self.initialize()
         return self.df.pLoop
+
     def initialize(self):
         self.df = pd.read_csv(self.file, header=None, sep='\t')
         self.df.columns = ['n', 'pLoop']
+
 sarah_looping = SarahLooping()
 
