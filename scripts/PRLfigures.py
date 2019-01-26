@@ -6,6 +6,7 @@ relevant blend file names are simply mentioned below.
 Where data has to be pre-computed, the procedure is mentioned."""
 import re
 from pathlib import Path
+import pickle
 
 import matplotlib.cm as cm
 import numpy as np
