@@ -352,6 +352,7 @@ def plot_fig5(df=None, rmax_or_ldna='rmax'):
     xgrid = np.linspace(np.min(x), np.max(x), 100).reshape(-1, 1)
     y_pred, sig = gp.predict(xgrid, return_std=True)
     # 95% confidence intervals of mean estimate
+    plt.scatter(x,y)
     plt.fill(np.concatenate([xgrid, xgrid[::-1]]),
              np.concatenate([y_pred - 1.9600 * sig, (y_pred + 1.9600 * sig)[::-1]]),
              alpha=.5, fc='r', ec='None', label='95% confidence interval')
@@ -363,6 +364,18 @@ def plot_fig5(df=None, rmax_or_ldna='rmax'):
     lp = 3 / (4*np.pi*10**(intercept/np.abs(m)))
     lp = lp * ncg.dna_params['lpb']
     # m is the power law exponent, should be -3/2
+
+    # load in the straight chain.
+    bare_n, bare_ploop = wlc.load_WLC_looping()
+    k = 40.67/100 # scaling between straight and 56bp chain
+    b = 2*wlc.default_lp
+    # double plot to get rid of blue color in cycle, since cycle not shared
+    # with "scatter"
+    plt.plot(np.log10(bare_n), np.log10(bare_ploop))
+    plt.plot(np.log10(bare_n), np.log10(bare_ploop))
+    plt.plot(np.log10(bare_n*k), np.log10(bare_ploop/k**3))
+    plt.plot(np.log10(bare_n), np.log10(wlc.sarah_looping(bare_n/2/wlc.default_lp)/(2*wlc.default_lp)**2))
+
 
 
 
