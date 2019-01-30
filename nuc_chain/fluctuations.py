@@ -250,7 +250,7 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False, lt=default
     b = helix_params['b']
     num_linkers = len(links)
     num_nucleosomes = num_linkers + 1
-    w_ins, w_outs = ncg.resolve_wrapping_params(unwraps, w_ins, w_outs, num_nucleosomes)
+    w_ins, w_outs = convert.resolve_wrapping_params(unwraps, w_ins, w_outs, num_nucleosomes)
     # calculate unwrapping amounts based on w_ins and w_outs
     mu_ins = (b - 1)/2 - w_ins
     mu_outs = (b - 1)/2 - w_outs
@@ -519,7 +519,7 @@ def tabulate_r2_heterogenous_fluctuating_chains_by_variance(num_chains, chain_le
     n_sig = len(sigmas)
     links = np.zeros((n_sig, num_chains, chain_length-1))
     #For now, assume the same unwrapping amounts for all chains
-    #w_ins, w_outs = ncg.resolve_wrapping_params(unwraps, w_ins, w_outs, chain_length)
+    #w_ins, w_outs = convert.resolve_wrapping_params(unwraps, w_ins, w_outs, chain_length)
     for i in range(n_sig):
         links[i,:,:] = ncl.fake_linkers_increasing_variance(mu, sigmas[i], size=(num_chains,chain_length-1), type='box')
     rmax = np.zeros((n_sig, num_chains, chain_length))
@@ -554,7 +554,7 @@ def tabulate_r2_heterogenous_fluctuating_chains_exponential(num_chains, chain_le
     through kwargs."""
     links = np.zeros((num_chains, chain_length-1))
     #For now, assume the same unwrapping amounts for all chains
-    #w_ins, w_outs = ncg.resolve_wrapping_params(unwraps, w_ins, w_outs, chain_length)
+    #w_ins, w_outs = convert.resolve_wrapping_params(unwraps, w_ins, w_outs, chain_length)
     links = ncl.independent_linker_lengths(mu, size=(num_chains,chain_length-1))
     rmax = np.zeros((num_chains, chain_length))
     r2 = rmax.copy()
@@ -586,7 +586,7 @@ def tabulate_r2_heterogenous_fluctuating_chains_homogenous(num_chains, chain_len
     through kwargs."""
     links = np.zeros((num_chains, chain_length-1))
     #For now, assume the same unwrapping amounts for all chains
-    #w_ins, w_outs = ncg.resolve_wrapping_params(unwraps, w_ins, w_outs, chain_length)
+    #w_ins, w_outs = convert.resolve_wrapping_params(unwraps, w_ins, w_outs, chain_length)
     links = mu*np.ones((num_chains,chain_length-1))
     rmax = np.zeros((num_chains, chain_length))
     r2 = rmax.copy()
@@ -1197,7 +1197,7 @@ def Bprop_k_given_L(k, links, filepath, w_ins=ncg.default_w_in, w_outs=ncg.defau
     b = helix_params['b']
     num_linkers = len(links)
     num_nucleosomes = num_linkers + 1
-    w_ins, w_outs = ncg.resolve_wrapping_params(unwraps, w_ins, w_outs, num_nucleosomes)
+    w_ins, w_outs = convert.resolve_wrapping_params(unwraps, w_ins, w_outs, num_nucleosomes)
     # calculate unwrapping amounts based on w_ins and w_outs
     mu_ins = (b - 1)/2 - w_ins
     mu_outs = (b - 1)/2 - w_outs
@@ -1636,7 +1636,7 @@ def sarah_looping(N):
 
     To compare to the probabilities that we calculate in e.g. load_WLC_looping,
     just put into our units,
-    
+
          >>> n, sarah_looping(n/b)/b**2
 
     In [1]: m, intercept, rvalue, pvalue, stderr = scipy.stats.linregres

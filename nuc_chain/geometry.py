@@ -205,7 +205,8 @@ import sys
 import inspect
 from pathlib import Path
 from string import Template
-from multiprocessing import Pool
+# from multiprocessing import Pool
+from pathos.multiprocessing import ProcessingPool as Pool
 
 import scipy
 from scipy import stats

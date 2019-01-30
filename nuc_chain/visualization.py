@@ -7,6 +7,7 @@ import pandas as pd
 
 from . import *
 from .geometry import helix_params_best
+from .linkers import convert
 
 
 def plot_circle(phis, rs, values, ax=None, **kwargs):
