@@ -148,7 +148,7 @@ def plot_fig2a(lis=default_lis, colors=None):
     fig, ax = plt.subplots(figsize=(default_width, default_height))
     x = np.logspace(0, 7, 100)
     y = np.sqrt(wlc.r2wlc(x, 100))
-    plt.plot(x, y, '.', color=teal_flucts, markersize=1)
+    plt.plot(x, y, '.', color=[0,0,0], markersize=1)
     hdfs = {}
     for i, li in enumerate(lis):
         hdfs[li] = pd.read_csv(f'./csvs/r2/r2-fluctuations-mu_{li}-sigma_0_10_0unwraps.csv')
@@ -242,57 +242,24 @@ def render_fig3_chains(mu=41, sigmas=[0, 2, 6]):
         sign_bit = 2*np.round(np.random.rand(N)) - 1
         render_chain(mu + sign_bit*np.random.randint(sigma+1), size=(N,))
 
-def plot_fig4a(ax=None):
-    """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
-    wormlike chain with the corresponding Kuhn length."""
+def plot_fig4b():
     fig, ax = plt.subplots(figsize=(default_width, default_height))
-    rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_36-0unwraps.csv')
-    try:
-        del rdf['Unnamed: 0']
-    except:
-        pass
-    for i, chain in rdf.groupby(['mu', 'chain_id']):
-        chain.iloc[0,0] = 1
-        chain.iloc[0,1] = 1
-        plt.plot(chain['rmax'], chain['r2'], color=dull_purple, alpha=0.4)
-        break
-    x = np.logspace(0, 7, 100)
-    y = wlc.r2wlc(x, rdf['kuhn'].mean()/2)
-    plt.plot(x, y, '-', color='k')
-    plt.legend([r'$\langle L_i \rangle= 36bp$', r'$WLC, l_p \approx 15 nm$'],
-               bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
-    for i, chain in rdf.groupby(['mu', 'chain_id']):
-        chain.iloc[0,0] = 1
-        chain.iloc[0,1] = 1
-        plt.plot(chain['rmax'], chain['r2'], color=dull_purple, alpha=0.4)
-    plt.plot(x, y, '-', color='k')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.xlim([0.5, 100000])
-    plt.ylim([0.5, 10000000])
-    plt.xlabel('Total linker length (nm)')
-    plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
-    plt.savefig('plots/PRL/fig4a_r2_exp_vs_wlc.pdf', bbox_inches='tight')
-
-def plot_fig4b(ax=None):
-    kuhnsf = np.load(f'csvs/r2/kuhns_exponential_fluctuations_mu2to180.npy')
-    kuhnsg = np.load(f'csvs/r2/kuhns_exponential_geometrical_mu2to149.npy')
-    kuhns_homo = np.load('csvs/kuhns_homogenous_so_far.npy')
-    mug = np.load('csvs/r2/mus_exponential_geometrical.npy') #2 to 149
-    mug = mug[1:99] #just plot mu from 3 to 100
-    # kuhnsg = kuhnsg[1:99]
-    kuhnsf = kuhnsf[1:99] #only plot first 149 points
-    kuhns_homo = kuhns_homo[3:101]
-    if ax is None:
-        fig, ax = plt.subplots(figsize=(default_width, default_height))
-    #geometrical vs fluctuating
-    #dashed line at 100 nm
-    ax.plot(np.linspace(0, max(mug), 1000), np.tile(100, 1000), '--', lw=0.75,
-            label='Bare WLC', color=teal_flucts)
-    # ax.plot(mug[0:94], kuhnsg[0:94], '^', markersize=1, label='Geometrical', color=red_geom)
-    ax.plot(mug, kuhnsf, label='Exponential', color=teal_flucts)
-    #homogenous kuhn lengths faded in background
-    ax.plot(mug, kuhns_homo, color=dull_purple, alpha=0.5, lw=0.75, label='Homogenous')
+    kuhns = pd.read_csv('csvs/kuhns_so_far.csv')
+    kuhns = kuhns.set_index(['variance_type', 'type', 'mu', 'variance'])
+    mu_max = 100
+    # dotted line at 100 nm
+    ax.plot(np.linspace(0, mu_max, 100), np.tile(100, 100), '.',
+            markersize=1, label='Bare WLC', color=[0,0,0])
+    def make_plottable(df):
+        df = df.groupby('mu').mean().reset_index()
+        df = df[df['mu'] < mu_max].dropna()
+        return df
+    exp_fluct = kuhns.loc['exponential', 'fluctuations']
+    exp_fluct = make_plottable(exp_fluct)
+    ax.plot(exp_fluct['mu'], exp_fluct['b'], label='Exponential', color=teal_flucts)
+    homo_fluct = kuhns.loc['homogenous', 'fluctuations']
+    homo_fluct = make_plottable(homo_fluct)
+    ax.plot(homo_fluct['mu'], homo_fluct['b'], color=dull_purple, alpha=0.5, lw=0.75, label='Homogenous')
 
 
     #lines for yeast, mice, human
@@ -303,7 +270,7 @@ def plot_fig4b(ax=None):
     # ax.text(yeast+2, 6, "A")
     # ax.text(mice+2, 6, "B")
     # ax.text(human+2, 6, "C")
-    ax.vlines(linelocs, [0, 0, 0], [kuhnsf[yeast-3], kuhnsf[mice-3], kuhnsf[human-3]])
+    ax.vlines(linelocs, [0, 0, 0], [exp_fluct.loc[exp_fluct['mu'] == loc, 'b'].values for loc in linelocs])
     #best fit line for geometrical case
     # m, b, rval, pval, stderr = stats.linregress(mug, kuhnsg)
     # best_fit = lambda x: m*x + b
