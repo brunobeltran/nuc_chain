@@ -1025,7 +1025,7 @@ def entry_to_nuc_center(w_in, helix_params=helix_params_best):
 def minimum_energy_no_sterics_linker_only(links, *, w_ins=default_w_in,
         w_outs=default_w_out, tau_n=dna_params['tau_n'],
         tau_d=dna_params['tau_d'], lpb=dna_params['lpb'],
-        helix_params=helix_params_best, unwraps=None):
+        helix_params=helix_params_best, unwraps=None, random_phi=None):
     """Calculate the theoretical conformation of a chain of nucleosomes
     connected by straight linkers (ground state) with no steric exclusion.
 
@@ -1063,6 +1063,8 @@ def minimum_energy_no_sterics_linker_only(links, *, w_ins=default_w_in,
         # w_ins[i+1] because the ith linker is between i, and i+1 nucs
         Onext = OmegaNextEntry(links[i], tau_n=tau_n, tau_d=tau_d,
                 w_in=w_ins[i+1], w_out=w_outs[i], helix_params=helix_params)
+        if random_phi is not None:
+            Onext = ncr.Rz(random_phi*np.random.rand()) @ Onext
         entry_rots[i+1] = entry_rots[i] @ Onext
         exit_u = entry_rots[i+1,:,2]
         exit_u = exit_u/np.linalg.norm(exit_u)
@@ -1294,7 +1296,7 @@ def phi_from_link(Ll, w_in, w_out):
     return ncr.phi_theta_alpha_from_R(OmegaNextExit(Ll, w_in=w_in, w_out=w_out))[0]
 phi_from_link.cache = {}
 
-def tabulate_r2_heterogenous_chains_by_variance(num_chains, chain_length, sigmas, mu=35, pool_size=None, **kwargs):
+def tabulate_r2_heterogenous_chains_by_variance(num_chains, chain_length, sigmas, mu=35, pool_size=None, random_phi=None, **kwargs):
     n_sig = len(sigmas)
     links = np.zeros((n_sig, num_chains, chain_length-1))
     for i in range(n_sig):
@@ -1306,7 +1308,7 @@ def tabulate_r2_heterogenous_chains_by_variance(num_chains, chain_length, sigmas
     chain_id = rmax.copy()
     def given_ij(ij):
         i, j = ij
-        chain = minimum_energy_no_sterics_linker_only(links[i,j,:].flatten(), **kwargs)
+        chain = minimum_energy_no_sterics_linker_only(links[i,j,:].flatten(), random_phi=random_phi, **kwargs)
         chains[i,j,:,:] = chain[1]
         r2[i,j] = nuc_math.r2(chains[i,j,:,:], axis=0)
         #Rmax in nm

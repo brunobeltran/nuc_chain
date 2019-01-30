@@ -211,8 +211,11 @@ def r2wlc(ldna, lp=default_lp):
     """Analytical formula for R^2 of WLC as a function of length of chain."""
     return 2*(lp*ldna - lp**2 + lp**2*np.exp(-ldna/lp))
 
-def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False, lt=default_lt, lp=default_lp, w_ins=ncg.default_w_in, w_outs=ncg.default_w_out,
-                            tau_d=ncg.dna_params['tau_d'], tau_n=ncg.dna_params['tau_n'], lmax=2, helix_params=ncg.helix_params_best, unwraps=None):
+def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False,
+        lt=default_lt, lp=default_lp, w_ins=ncg.default_w_in,
+        w_outs=ncg.default_w_out, tau_d=ncg.dna_params['tau_d'],
+        tau_n=ncg.dna_params['tau_n'], lmax=2, helix_params=ncg.helix_params_best,
+        unwraps=None, random_phi=False):
     """Calculate the mean squared end-to-end distance, or :math:`\langle{R^2}\rangle` of a kinked WLC with a given set of linkers and unwrapping amounts.
 
     Parameters
@@ -265,6 +268,8 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False, lt=default
     wrap = w_outs[0] + w_ins[1]
     key = (link, wrap)
     R = ncg.OmegaE2E(wrap, tau_n=tau_n)
+    if random_phi:
+        R = ncr.Rz(2*np.pi*np.random.rand()) @ R
     alpha, beta, gamma = ncr.zyz_from_matrix(R)
     bmats[key] = build_B_matrices_for_R2(link, alpha, beta, gamma, lt, lp, tau_d, lmax)
     B0curr, B1curr, B2curr = bmats[key]
@@ -285,6 +290,8 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False, lt=default
         # update dictionary for this linker and wrapping amount, if necessary
         if key not in bmats:
             R = ncg.OmegaE2E(wrap, tau_n=tau_n)
+            if random_phi:
+                R = ncr.Rz(2*np.pi*np.random.rand()) @ R
             alpha, beta, gamma = ncr.zyz_from_matrix(R)
             bmats[key] = build_B_matrices_for_R2(link, alpha, beta, gamma, lt, lp, tau_d, lmax)
         B0next, B1next, B2next = bmats[key]

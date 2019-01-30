@@ -11,10 +11,10 @@ from nuc_chain import geometry as ncg
 #already calculate r2 for 36, 38, 42bp with and without 20bp unwrapping
 # links = np.concatenate((np.arange(31, 36), [37, 39, 40, 41], np.arange(43, 52)))
 
-sigmas = np.arange(0, 41)
+sigmas = np.arange(0, 11)
 def save_r2s(sigma):
-    dfg = wlc.tabulate_r2_heterogenous_fluctuating_chains_by_variance(25, 7500, [sigma], mu=41, random_phi=True)
-    dfg.to_csv(f'csvs/r2/r2-fluctuating-mu_41-sigma_{sigma}_0unwraps_random-phi-rz-left.csv')
+    dfg = ncg.tabulate_r2_heterogenous_chains_by_variance(100, 7500, [sigma], mu=41, random_phi=2*np.pi)
+    dfg.to_csv(f'csvs/r2/r2-geometrical-mu_41-sigma_{sigma}_0unwraps_random-phi.csv')
     # dff = wlc.tabulate_r2_heterogenous_fluctuating_chains_homogenous(25, 7500, mu=link, unwraps=0)
     # dff.to_csv(f'csvs/r2/r2-fluctuations-homogenous-link-mu_{link}-0unwraps.csv')
     # kuhnsf = wlc.calculate_kuhn_length_from_fluctuating_r2(dff, link, 7500, unwraps=0)
