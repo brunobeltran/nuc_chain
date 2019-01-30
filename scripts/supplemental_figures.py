@@ -242,4 +242,36 @@ def plot_greens_kinkedWLC_bareWLC(integral, qintegral, links, unwrap, Nvals, rva
 
 
 
+def plot_old_fig4a(ax=None):
+    """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
+    wormlike chain with the corresponding Kuhn length."""
+    fig, ax = plt.subplots(figsize=(default_width, default_height))
+    rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_36-0unwraps.csv')
+    try:
+        del rdf['Unnamed: 0']
+    except:
+        pass
+    for i, chain in rdf.groupby(['mu', 'chain_id']):
+        chain.iloc[0,0] = 1
+        chain.iloc[0,1] = 1
+        plt.plot(chain['rmax'], chain['r2'], color=dull_purple, alpha=0.4)
+        break
+    x = np.logspace(0, 7, 100)
+    y = wlc.r2wlc(x, rdf['kuhn'].mean()/2)
+    plt.plot(x, y, '-', color='k')
+    plt.legend([r'$\langle L_i \rangle= 36bp$', r'$WLC, l_p \approx 15 nm$'],
+               bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
+    for i, chain in rdf.groupby(['mu', 'chain_id']):
+        chain.iloc[0,0] = 1
+        chain.iloc[0,1] = 1
+        plt.plot(chain['rmax'], chain['r2'], color=dull_purple, alpha=0.4)
+    plt.plot(x, y, '-', color='k')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlim([0.5, 100000])
+    plt.ylim([0.5, 10000000])
+    plt.xlabel('Total linker length (nm)')
+    plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
+    plt.savefig('plots/PRL/fig4a_r2_exp_vs_wlc.pdf', bbox_inches='tight')
+
 

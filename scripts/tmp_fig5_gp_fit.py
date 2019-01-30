@@ -75,5 +75,5 @@ sigma[np.isnan(sigma)] = np.nanmax(sigma)
 # now fit to a gaussian process
 kernel = C(1.0, (1e-3, 1e3)) * RBF(10, (1e-2, 1e2))
 gp = GaussianProcessRegressor(kernel=kernel, alpha=sigma, n_restarts_optimizer=10)
-gp.fit(x, y)
-pickle.dump(gp, open('gp_rmax.pkl', 'wb'))
+# gp.fit(x, y)
+# pickle.dump(gp, open('gp_rmax.pkl', 'wb'))
