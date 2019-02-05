@@ -696,31 +696,37 @@ def get_kuhns_grouped(df, thresh, groups, rmax_col='rmax', r2_col='r2'):
     ks['b'] = ks['slope']
     return ks
 
-def aggregate_existing_kuhns():
+def aggregate_existing_kuhns(glob='*.csv'):
     """WARNING: not for direct use. an example function that appends new r2
     calculations to existing repository of kuhn lengths.
 
     modify for further use"""
     kuhns = []
-    for path in Path('./csvs/r2').glob('*.csv'):
+    for path in Path('./csvs/r2').glob(glob):
         try:
             df = pd.read_csv(path)
         except:
             continue
         match_npy = re.search('kuhns-(fluctuations|geometrical)-mu([0-9]+)-sigma_([0-9]+)_([0-9]+)_([0-9]+)unwraps.npy', str(path))
-        match_box = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_0_10_([0-9]+)unwraps(?:-[0-9]+)?.csv', str(path))
+        match_box = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_([0-9]+)_?([0-9]+)?_([0-9]+)unwraps(?:-[0-9]+)?.csv', str(path))
         match_new = re.search('r2-(fluctuations|geometrical)-(exponential|homogenous)-link-mu_([0-9]+)-([0-9]+)unwraps(?:-[0-9]+)?.csv', str(path))
+        match_random_phi_exp = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_([0-9]+)_([0-9]+)unwraps_random-phi-rz-(left|right).csv', str(path))
         if match_box is not None:
             variance_type = 'box'
-            sim, mu, unwraps = match_box.groups()
+            sim, mu, sigma_min, sigma_max, unwraps = match_box.groups()
             groups = ['mu', 'variance']
             df['mu'] = mu
         elif match_new is not None:
             sim, variance_type, mu, unwraps = match_new.groups()
             groups = ['mu']
-        elif match_npy:
+        elif match_npy is not None:
             variance_type = 'box'
             sim, mu, sigma_min, sigma_max, unwraps = match_npy.groups()
+        elif match_random_phi_exp is not None:
+            variance_type='box'
+            sim1, mu, sigma, unwraps, sim2 = match_random_phi_exp.groups()
+            sim = f'{sim1}-Rz-{sim2}'
+            df['mu'] = mu
         else:
             print('Unknown simulation type: ' + str(path))
             continue
@@ -728,6 +734,7 @@ def aggregate_existing_kuhns():
         ks = ks.reset_index()
         ks['type'] = sim
         ks['variance_type'] = variance_type
+        ks['unwrap'] = unwraps
         if 'homogenous' == ks['variance_type'].iloc[0]:
             ks['variance'] = 0
         elif 'exponential' == ks['variance_type'].iloc[0]:
@@ -735,7 +742,7 @@ def aggregate_existing_kuhns():
         else:
             assert('variance' in ks)
         kuhns.append(ks)
-    all_ks = [ks.set_index(['variance_type', 'type', 'mu', 'variance']) for ks in kuhns]
+    all_ks = [ks.set_index(['variance_type', 'type', 'mu', 'variance', 'unwrap']) for ks in kuhns]
     all_ks = pd.concat(all_ks)
 
     # df = pd.read_csv('csvs/r2/kuhn_lengths_so_far.csv')
