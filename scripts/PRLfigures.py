@@ -144,6 +144,7 @@ def draw_power_law_triangle(alpha, x0, width, orientation, base=10,
         the power-law slope being demonstrated
     x0 : (2,) array_like
         the "left tip" of the power law triangle, where the hypotenuse starts
+        (in log units, to be consistent with draw_triangle)
     width : float
         horizontal size in number of major log ticks (default base-10)
     orientation : string
@@ -156,7 +157,7 @@ def draw_power_law_triangle(alpha, x0, width, orientation, base=10,
     corner : (2,) np.array
         coordinates of the right-angled corner of the triangle
     """
-    x0, y0 = x0
+    x0, y0 = [base**x for x in x0]
     x1 = x0*base**width
     y1 = y0*(x1/x0)**alpha
     plt.plot([x0, x1], [y0, y1], 'k')
@@ -331,60 +332,83 @@ def plot_fig4b():
 def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
     fig, ax = plt.subplots(figsize=(default_width, default_height))
     n = rmax_or_ldna
-    logn = 'log_' + n
     # first set sim-specific parameters, draw scaling triangles at manually
     # chosen locations
     if (named_sim, rmax_or_ldna) == ('mu56', 'ldna'):
-        draw_triangle(-3/2, x0=[3.5, -7], width=0.4, orientation='up')
-        plt.text(3.6, -6.8, '$L^{-3/2}$')
+        draw_power_law_triangle(-3/2, x0=[3.5, -7], width=0.4, orientation='up')
+        plt.text(10**(3.6), 10**(-6.8), '$L^{-3/2}$')
         # manually set thresholds to account for numerical instability at low n
-        min_logn = 2.5
+        min_n = 10**2.6
     elif (named_sim, rmax_or_ldna) == ('mu56', 'rmax'):
-        draw_triangle(-3/2, x0=[3.0, -7.5], width=0.4, orientation='up')
-        plt.text(3.1, -7.3, '$L^{-3/2}$')
-        min_logn = 2.2
+        draw_power_law_triangle(-3/2, x0=[3.0, -7.5], width=0.4, orientation='up')
+        plt.text(10**3.1, 10**(-7.3), '$L^{-3/2}$')
+        min_n = 10**2.2
     elif (named_sim, rmax_or_ldna) == ('links31-to-52', 'rmax'):
-        draw_triangle(-3/2, x0=[3.0, -7.5], width=0.4, orientation='up')
-        plt.text(3.1, -7.3, '$L^{-3/2}$')
-        min_logn = 2.0
+        draw_power_law_triangle(-3/2, x0=[3.0, -7.5], width=0.4, orientation='up')
+        plt.text(10**3.1, 10**(-7.3), '$L^{-3/2}$')
+        min_n = 10**2.0
     elif (named_sim, rmax_or_ldna) == ('links31-to-52', 'ldna'):
-        draw_triangle(-3/2, x0=[3.5, -7], width=0.4, orientation='up')
-        plt.text(3.6, -6.8, '$L^{-3/2}$')
-        min_logn = 2.5
+        draw_power_law_triangle(-3/2, x0=[3.5, -7], width=0.4, orientation='up')
+        plt.text(10**3.6, 10**(-6.8), '$L^{-3/2}$')
+        min_n = 10**2.5
     if df is None:
         df = load_looping_statistics_heterogenous_chains(named_sim=named_sim)
     # if the first step is super short, we are numerically unstable
     df.loc[df['rmax'] <= 5, 'ploops'] = np.nan
     # if the output is obviously bad numerics, ignore it
+    df.loc[df['ploops'] > 10**(-4), 'ploops'] = np.nan
     df.loc[df['ploops'] < 10**(-13), 'ploops'] = np.nan
     df = df.dropna()
-    df['log_ploop'] = np.log10(df['ploops'])
-    df[logn] = np.log10(df[n])
-    df = df.sort_values(logn)
-    # get an estimator of the variance from a rolling window
-    # window size chosen by eye
-    rolled = df.rolling(50).apply(np.nanmean, raw=False)
-    rolled_std = df.rolling(50).apply(np.nanstd, raw=False)
-    x = np.atleast_2d(df[logn].values.copy()).T
-    y = df['log_ploop'].values.copy().ravel()
-    sigma = np.interp(x, rolled[logn].values,
-            rolled_std['log_ploop'].values,
-            left=rolled_std['log_ploop'].values[0],
-            right=rolled_std['log_ploop'].values[-1])
-    sigma = sigma.ravel()
-    # pandas rolling std doesn't like left boundary, but we can just fill in
-    # soemthing reasonable
-    sigma[np.isnan(sigma)] = np.nanmax(sigma)
-    # now fit to a gaussian process
-    if Path(f'csvs/gp_{named_sim}_{rmax_or_ldna}.pkl').exists():
-        gp = pickle.load(open(f'csvs/gp_{named_sim}_{rmax_or_ldna}.pkl', 'rb'))
-    else:
-        kernel = C(1.0, (1e-3, 1e3)) * RBF(10, (1e-2, 1e2))
-        gp = GaussianProcessRegressor(kernel=kernel, alpha=sigma**2, n_restarts_optimizer=10)
-        gp.fit(x, y)
-        pickle.dump(gp, open(f'gp_{named_sim}_{rmax_or_ldna}.pkl', 'wb'))
-    xgrid = np.linspace(max(min_logn, np.min(x)), np.max(x), 100).reshape(-1, 1)
-    y_pred, sig = gp.predict(xgrid, return_std=True)
+    df = df.sort_values(n)
+    # # # rolling window doesn't seem to work
+    # # get an estimator of the variance from a rolling window
+    # # window size chosen by eye
+    # df['t'] = pd.to_datetime(np.log10(df[n])*60*10**9) # to minutes
+    # dft = df.set_index('t')
+    # rolled = dft.rolling('10s').apply(np.nanmean, raw=False)
+    # rolled_ste = dft.rolling('10s').apply(lambda df: np.nanstd(df)/np.sqrt(len(df)), raw=False)
+    # # rolled = df.rolling(200).apply(np.nanmean, raw=False)
+    # # rolled_ste = df.rolling(200).apply(lambda df: np.nanstd(df)/np.sqrt(len(df)), raw=False)
+    # xgrid = rolled[n].values
+    # y_pred = rolled['ploops'].values[xgrid > min_n]
+    # sig = rolled_ste['ploops'].values[xgrid > min_n]
+
+    # # # can't seem to get teh gaussian process fitting to work unless I take to
+    # # # log space... something likely about the parameters or the kernel I'm
+    # # # choosing?
+    # # # should we just use rolling average?
+    # # tricky! doing fitting in log space for x variable helps numerics
+    # x = np.atleast_2d(df[logn].values.copy()).T
+    # y = df['ploops'].values.copy().ravel()
+    # sigma = np.interp(x, rolled[logn].values,
+    #         rolled_std['ploops'].values,
+    #         left=rolled_std['ploops'].values[0],
+    #         right=rolled_std['ploops'].values[-1])
+    # sigma = sigma.ravel()
+    # # pandas rolling std doesn't like left boundary, but we can just fill in
+    # # soemthing reasonable
+    # sigma[np.isnan(sigma)] = np.nanmax(sigma)
+    # # sigma += 10**-7 # to prevent numerical issues
+    # # now fit to a gaussian process
+    # if Path(f'csvs/gp_{named_sim}_{rmax_or_ldna}.pkl').exists():
+    #     gp = pickle.load(open(f'csvs/gp_{named_sim}_{rmax_or_ldna}.pkl', 'rb'))
+    # else:
+    #     kernel = C(10.0, (1e-3, 1e3)) * RBF(0.5, (1e-1, 1))
+    #     gp = GaussianProcessRegressor(kernel=kernel, alpha=sigma**2, n_restarts_optimizer=10)
+    #     gp.fit(x, y)
+    #     pickle.dump(gp, open(f'gp_{named_sim}_{rmax_or_ldna}.pkl', 'wb'))
+    # # recall fit done in log space
+    # xgrid = np.linspace(max(np.log10(min_n), np.min(x)), np.max(x), 100).reshape(-1, 1)
+    # y_pred, sig = gp.predict(xgrid, return_std=True)
+    df_int = df.groupby(['num_nucs', 'chain_id']).apply(interpolated_ploop,
+            rmax_or_ldna=rmax_or_ldna, n=np.logspace(np.log10(min_n), np.log10(df[n].max()), 1000))
+    df_int_ave = df_int.groupby(n+'_interp')['ploops_interp'].agg(['mean', 'std', 'count'])
+    df_int_ave = df_int_ave.reset_index()
+    xgrid = df_int_ave[n+'_interp'].values
+    y_pred = df_int_ave['mean'].values
+    sig = df_int_ave['std'].values/np.sqrt(df_int_ave['count'].values - 1)
+    # 95% joint-confidence intervals, bonferroni corrected
+    ste_to_conf = scipy.stats.norm.ppf(1 - (0.05/1000)/2)
     # plot all the individual chains, randomly chop some down to make plot look
     # nicer
     palette = sns.cubehelix_palette(n_colors=len(df.groupby(['num_nucs', 'chain_id'])))
@@ -393,41 +417,29 @@ def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
         num_nucs = int(label[0])
         max_nuc_to_plot = num_nucs*(1 - 0.2*np.random.rand())
         chain = chain[chain['nuc_id'] <= max_nuc_to_plot]
-        chain = chain[chain[logn] >= min_logn]
-        plt.plot(chain[logn].values, chain['log_ploop'].values,
-                 c=palette[ord[i]], alpha=0.25, lw=0.5, label=None)
+        chain = chain[chain[n] >= min_n]
+        plt.plot(chain[n].values, chain['ploops'].values,
+                 c=palette[ord[i]], alpha=0.15, lw=0.5, label=None)
     # bold a couple of the chains
     bold_c = palette[int(9*len(palette)/10)]
     if named_sim == 'mu56':
-        chains_to_bold = [1, 105, 112]
+        chains_to_bold = [(100,1), (50,120), (100,112)]
     elif named_sim == 'links31-to-52':
         chains_to_bold = [1, 3, 5]
     for chain_id in chains_to_bold:
-        chain = df.loc[100, chain_id]
-        chain = chain[chain[logn] >= min_logn]
-        plt.plot(chain[logn].values, chain['log_ploop'].values, c=bold_c, alpha=0.8,
+        chain = df.loc[chain_id]
+        chain = chain[chain[n] >= min_n]
+        plt.plot(chain[n].values, chain['ploops'].values, c=bold_c, alpha=0.6,
                  label=None)
-    # 95% confidence intervals of mean estimate
-    fill = plt.fill(np.concatenate([xgrid, xgrid[::-1]]),
-             np.concatenate([y_pred - 1.9600 * sig, (y_pred + 1.9600 * sig)[::-1]]),
-             alpha=.75, fc='r', ec='None', label='Average $\pm$ 95\%')
-    # now get the best fit gaussian chain. chain becomes approximate gaussian
-    # after about 1000rmax units, hence the 3 below
-    m, intercept, rvalue, pvalue, stderr = stats.linregress(
-            xgrid[xgrid>3].ravel(), y_pred[xgrid.ravel()>3])
-    #For Guassian chain, the intercept = (3/2)log(3/(4pi*lp)) -- see Deepti's notes
-    lp = 3 / (4*np.pi*10**(intercept/np.abs(m)))
-    lp = lp * ncg.dna_params['lpb']
-    # m is the power law exponent, should be -3/2
+    fill = plt.fill_between(xgrid,
+            y_pred - ste_to_conf*sig,
+            y_pred + ste_to_conf*sig,
+            alpha=.10, color='r')
+
+    plt.plot(xgrid, y_pred, 'r-', label='Average $\pm$ 95\%')
 
     # load in the straight chain, in [bp] (b = 100nm/ncg.dna_params['lpb'])
     bare_n, bare_ploop = wlc.load_WLC_looping()
-    b = 2*wlc.default_lp
-    min_bare_logn = 2.0
-    lx = np.log10(bare_n)
-    ly = np.log10(bare_ploop)
-    l100 = plt.plot(lx[lx>=min_bare_logn], ly[lx>=min_bare_logn], '-.', c=teal_flucts,
-             label=f'Straight chain, b=100nm')
     # now rescale the straight chain to match average
     if named_sim == 'mu56':
         b = 40.67 # nm
@@ -442,22 +454,21 @@ def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
         # df['ldna'] = df['rmax'] + 146*df['nuc_id']
         # (on ave)   = df['rmax'] + 146*df['rmax']/56
         bare_n = bare_n*(1 + nn)
-    lnx = np.log10(bare_n*k)
-    lny = np.log10(bare_ploop/k**3)
-    lnormed = plt.plot(lnx, lny,
-                        # lnx[lnx>=min_logn], lny[lnx>=min_logn],
+    x, y = bare_n*k, bare_ploop/k**3,
+    lnormed = plt.plot(x[x >= min_n], y[x >= min_n],
                        'k-.', label=f'Straight chain, b={b:0.1f}nm')
-    # plt.plot(np.log10(bare_n), np.log10(wlc.sarah_looping(bare_n/2/wlc.default_lp)/(2*wlc.default_lp)**2))
+    # also plot just the bare WLC
+    b = 2*wlc.default_lp
+    l100 = plt.plot(bare_n[bare_n>=min_n], bare_ploop[bare_n>=min_n], '-.', c=teal_flucts,
+             label=f'Straight chain, b=100nm')
+    # plt.plot(bare_n, wlc.sarah_looping(bare_n/2/wlc.default_lp)/(2*wlc.default_lp)**2)
 
-    plt.xlim([min_logn*0.95, np.max(x)*1.05])
+    plt.xlim([10**(np.log10(min_n)*1), 10**(np.log10(np.max(df[n]))*0.99)])
     if rmax_or_ldna == 'rmax':
-        plt.ylim([-11, -6])
+        plt.ylim([10**(-11), 10**(-6)])
     elif rmax_or_ldna == 'ldna':
-        plt.ylim([-13, -5])
-
-    # # start at nearest
-    # ticks = np.arange(np.ceil(min_logn), np.floor(np.max(x))+1)
-    # plt.xticks
+        plt.ylim([10**(-13), 10**(-5)])
+    plt.tick_params(axis='y', which='minor', bottom=False)
 
     if rmax_or_ldna == 'rmax':
         plt.xlabel('Total linker length (bp)')
@@ -467,12 +478,21 @@ def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
 
     # plt.legend([fill, l100, lnormed], ['Average $\pm$ 95\%',
     #         'Straight chain, b=100nm', f'Straight chain, b={b:0.2f}nm'],
-    plt.legend(loc='lower center')
+    plt.legend(loc='upper right', bbox_to_anchor=[0.9, 0.35])
+    plt.yscale('log')
+    plt.xscale('log')
 
     plt.savefig(f'plots/PRL/fig5_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
 
-
-
+def interpolated_ploop(df, rmax_or_ldna='ldna', n=np.logspace(2, 5, 1000),
+                       ploop_col='ploops'):
+    """Function to apply to the looping probabilities of a given chain to
+    resample it to a fixed set of values."""
+    n_col = rmax_or_ldna
+    n = n[(n >= df[n_col].min()) & (n <= df[n_col].max())]
+    ploop = np.interp(n, df[n_col].values, df[ploop_col].values,
+            left=df[ploop_col].values[0], right=df[ploop_col].values[-1])
+    return pd.DataFrame(np.stack([n, ploop]).T, columns=[n_col+'_interp', ploop_col+'_interp'])
 
 def load_looping_statistics_heterogenous_chains(*, dir=None, file_re=None, links_fmt=None, greens_fmt=None, named_sim=None):
     """Load in looping probabilities for all example chains of a given type
@@ -535,128 +555,3 @@ def load_looping_statistics_heterogenous_chains(*, dir=None, file_re=None, links
     df.to_csv(cache_csv)
     return df
 
-def plot_looping_probs_hetero_avg(df, **kwargs):
-    #df2 = df.sort_values('ldna')
-    fig, ax = plt.subplots(figsize=(default_width, default_height))
-    #first just plot all chains
-    palette = sns.cubehelix_palette(n_colors=len(df.groupby(['num_nucs', 'chain_id'])))
-    #palette = sns.color_palette("husl", np.unique(df['chaindir']).size)
-    sns.lineplot(data=df, x='ldna', y='ploops', hue='chaindir', palette=palette,
-        legend=None, ci=None, ax=ax, alpha=0.5, lw=1)
-
-    #Then plot running average
-    df2 = df.sort_values('ldna')
-    df3 = df2.drop(columns=['chaindir'])
-    df4 = df3.rolling(100).mean()
-    #df4.plot(x='ldna', y='ploops', legend=False, color='k', linewidth=3, ax=ax, label='Average')
-
-    #try plotting average of linear interpolations
-    # xvals = np.linspace(np.min(df.ldna), np.max(df.ldna), 1000)
-    # dflin = pd.DataFrame(columns=['chaindir', 'ldna', 'ploops'])
-    # for i, dfs in df.groupby('chaindir'):
-    #     f = interpolate.interp1d(dfs.ldna, dfs.ploops)
-    #     ax.plot(xvals, f(xvals), linewidth=1)
-        #dflin[]
-        #dfs.plot(x='ldna', y='ploops', legend=False, color=palette[i], linewidth=1, ax=ax)
-
-    #plot power law scaling
-    xvals = np.linspace(4675, 9432, 1000)
-    gaussian_prob = 10**-1.4*np.power(xvals, -1.5)
-    ax.loglog(xvals, gaussian_prob, 'k')
-    #vertical line of triangle
-    ax.vlines(9432, gaussian_prob[-1], gaussian_prob[0])
-    #print(gaussian_prob[0])
-    #print(gaussian_prob[-1])
-    ax.hlines(gaussian_prob[0], 4675, 9432)
-    #ax.text(9500, 8.4*10**(-8), "-3", fontsize=18)
-    ax.text(7053.5, 10**(-6.5), '$L^{-3/2}$', fontsize=18)
-
-    #compare to bare WLC with constant linker length 56 bp
-    indmin = 1
-    bare41 = np.load('csvs/Bprops/0unwraps/41link/bareWLC_greens_41link_0unwraps_1000rvals_50nucs.npy')
-    ldna = convert.genomic_length_from_links_unwraps(np.tile(41, 50), unwraps=0)
-    ax.loglog(ldna[indmin:], bare41[0, indmin:], '--',
-            color='#387780', label='Straight chain', **kwargs)
-
-    #plot gaussian probability from analytical kuhn length calculation
-    #Kuhn length for mu = 56, exponential (in nm)
-    # b = 40.662 / ncg.dna_params['lpb']
-    # #b =
-    # analytical_gaussian_prob = (3.0 / (2*np.pi*df2['rmax']*b))**(3/2)
-    # ax.loglog(df2['ldna'], analytical_gaussian_prob, ':', label='Gaussian chain with $b=40.66$nm')
-    plt.legend(loc=4)
-    plt.xlabel('Genomic distance (bp)')
-    plt.ylabel('$P_{loop}$ ($bp^{-3}$)')
-    plt.title(f'Exponentially distributed linkers mu=56bp')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.ylim([10**-12.5, 10**-5.5])
-    plt.tick_params(left=True, right=False, bottom=True)
-    plt.subplots_adjust(left=0.15, bottom=0.16, top=0.91, right=0.95)
-    #return df4
-    plt.savefig('plots/loops/looping_exp_mu56_vs_bareWLC_76chains.png')
-#Looping supplemental figure
-#For looping main figure, see hetero31to52_loops_090418.py
-def plot_homogenous_loops():
-    kink41 = np.load(f'csvs/Bprops/0unwraps/41link/kinkedWLC_greens_41link_0unwraps_1000rvals_50nucs.npy')
-    kink47 = np.load(f'csvs/Bprops/0unwraps/47link/kinkedWLC_greens_47link_0unwraps_1000rvals_50nucs.npy')
-    bare41 = np.load(f'csvs/Bprops/0unwraps/41link/bareWLC_greens_41link_0unwraps_1000rvals_50nucs.npy')
-    integrals = [kink47, kink41, bare41]
-    labels = ['47bp', '41bp', 'Straight chain']
-    links_list = [np.tile(47, 50), np.tile(41, 50), np.tile(41, 50)]
-    plot_prob_loop_vs_fragment_length(integrals, labels, links_list, unwrap=0, nucmin=2)
-    plt.subplots_adjust(left=0.19, bottom=0.21, top=0.96, right=0.97)
-    plt.savefig('plots/loops/looping_homogenous_41_47_straight_chain.png')
-
-def plot_prob_loop_vs_fragment_length(integrals, labels, links, unwrap, Nvals=None, nucmin=2, **kwargs):
-    """Plot looping probability vs. chain length, where looping probability defined as G(0;L).
-
-    Parameters
-    ----------
-    integrals : (L,) list of (rvals.size, Nvals.size) greens function arrays
-        list of matrices G(r; N) where columns correspond to Nvals
-    labels : (L,) array-like
-        strings corresponding to label for each greens function (printed in legend)
-    links : (L,) list of (num_linkers,) arrays
-        list of full set of linkers in each chain, where num_linkers is the total number of
-        nucleosomes in each chain
-    unwrap : float
-        unwrapping amount in bp. Assumes fixed unwrapping.
-    Nvals : array-like
-        number of linkers down the chain for which each green's functions in 'integrals' was calculated.
-        Defaults to one per monomer of the chain. Assumes Nvals is the same for all chains for which
-        you are plotting looping probabilities.
-    nucmin : float
-        minimum number of nucleosomes for which looping probability should be plotted. Defaults to 2,
-        since first nucleosome is numerically not trusted. For shorter linkers (<42bp), recommended
-        to set nucmin to 3 since first two points are sketchy.
-
-    """
-
-    if Nvals is None:
-        Nvals = np.arange(1, len(links[0])+1)
-
-    fig, ax = plt.subplots(figsize=(6.08, 3.84))
-    #ignore first couple nucleosomes because of noise
-    indmin = nucmin-1
-    inds = Nvals - 1
-    inds = inds[inds >= indmin]
-    color_red = sns.color_palette("hls", 8)[0]
-    #HARD CODE COLOR TUPLE: #D9A725 corresponds to
-        #yellow = (217./255, 167./255, 37./255)
-    #HARD CODE COLOR TUPE: #387780 corresponds to
-        #teal = (56./255, 119./225, 128./255)
-    colors = [color_red, '#D9A725', '#387780']
-    print(colors)
-    for i in range(len(labels)):
-        ldna = convert.genomic_length_from_links_unwraps(links[i], unwraps=unwrap)
-        ploops = integrals[i][0, indmin:]
-        pldna = ldna[inds]
-        ax.loglog(pldna, ploops, '-o', markersize=2, linewidth=1,
-            color=colors[i], label=labels[i], **kwargs)
-    ax.legend(loc=(0.32, 0.03), frameon=False)
-    plt.xlabel('Genomic distance (bp)')
-    plt.ylabel('$P_{loop}$ ($bp^{-3}$)')
-    #plt.title(f'Looping probability vs. Chain Length')
-    plt.tick_params(left=True, right=False, bottom=True)
-    return fig, ax
