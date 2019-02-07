@@ -255,7 +255,9 @@ def render_fig2b_chains(**kwargs):
     for li in [36, 38, 41, 47]:
         render_chain(14*[li], **kwargs)
 
-def plot_fig3(sigmas=np.arange(0, 41)):
+def plot_fig3(mu=41, sigmas=np.arange(0, 41)):
+    """use scripts/r2-tabulation.py and wlc.aggregate_existing_kuhns to create
+    the kuhns_so_far.csv file."""
     fig, ax = plt.subplots(figsize=(default_width, default_height))
     kuhnsf41_sig0to10 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_0_10_0unwraps.npy')
     kuhnsf41_sig11to40 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_11_40_0unwraps.npy')
@@ -263,10 +265,9 @@ def plot_fig3(sigmas=np.arange(0, 41)):
     kuhnsg41_sig0to10 = np.load(f'csvs/r2/kuhns-geometrical-mu41-sigma_0_10_0unwraps.npy')
     kuhnsg41_sig11to40 = np.load(f'csvs/r2/kuhns-geometrical-mu41-sigma_11_40_0unwraps.npy')
     kuhnsg41 = np.concatenate((kuhnsg41_sig0to10, kuhnsg41_sig11to40))
-    ax.plot(sigmas, kuhnsf41, '-o', markersize=3, label='Fluctuations',
+    ax.plot(sigmas, kuhnsf41, '-o', markersize=3, label='Fluctuating',
             color=teal_flucts)
-
-    ax.plot(sigmas, kuhnsg41, '--^', markersize=3, label='Geometrical',
+    ax.plot(sigmas, kuhnsg41, '--^', markersize=3, label='Zero-temperature',
             color=red_geom)
     rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_41-0unwraps.csv')
     b = rdf['kuhn'].mean()
@@ -274,14 +275,15 @@ def plot_fig3(sigmas=np.arange(0, 41)):
     plt.plot([-10, 50], [b, b], 'k-.', label='Maximum Entropy')
     plt.xlim(xlim)
     ax.set_ylim([0, 100])
-    plt.xlabel('$\sigma$ (bp)')
+    plt.xlabel('Linker length variability $\pm\sigma$ (bp)')
     plt.ylabel('Kuhn length (nm)')
     plt.legend()
     fig.text(1.3, 0, r'$\pm 0 bp$', size=9)
     fig.text(1.6, 0, r'$\pm 2 bp$', size=9)
     fig.text(1.9, 0, r'$\pm 6 bp$', size=9)
     plt.subplots_adjust(left=0.07, bottom=0.15, top=0.92, right=0.97)
-    plt.savefig('./plots/PRL/fig-3-kuhn_length_vs_window_size_41_sigma0to40.pdf')
+    plt.savefig('./plots/PRL/fig-3-kuhn_length_vs_window_size_41_sigma0to40.pdf',
+               bbox_inches='tight')
 
 def render_fig3_chains(mu=41, sigmas=[0, 2, 6]):
     for sigma in sigmas:
@@ -335,8 +337,8 @@ def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
     # first set sim-specific parameters, draw scaling triangles at manually
     # chosen locations
     if (named_sim, rmax_or_ldna) == ('mu56', 'ldna'):
-        draw_power_law_triangle(-3/2, x0=[3.5, -7], width=0.4, orientation='up')
-        plt.text(10**(3.6), 10**(-6.8), '$L^{-3/2}$')
+        draw_power_law_triangle(-3/2, x0=[3.8, -7.1], width=0.4, orientation='up')
+        plt.text(10**(3.9), 10**(-6.9), '$L^{-3/2}$')
         # manually set thresholds to account for numerical instability at low n
         min_n = 10**2.6
     elif (named_sim, rmax_or_ldna) == ('mu56', 'rmax'):
@@ -468,7 +470,7 @@ def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
         plt.ylim([10**(-11), 10**(-6)])
     elif rmax_or_ldna == 'ldna':
         plt.ylim([10**(-13), 10**(-5)])
-    plt.tick_params(axis='y', which='minor', bottom=False)
+    plt.tick_params(axis='y', which='minor', left=False)
 
     if rmax_or_ldna == 'rmax':
         plt.xlabel('Total linker length (bp)')
