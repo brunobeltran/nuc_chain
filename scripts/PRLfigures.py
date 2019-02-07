@@ -281,7 +281,8 @@ def plot_fig3(mu=41, sigmas=np.arange(0, 41)):
     fig.text(1.3, 0, r'$\pm 0 bp$', size=9)
     fig.text(1.6, 0, r'$\pm 2 bp$', size=9)
     fig.text(1.9, 0, r'$\pm 6 bp$', size=9)
-    plt.subplots_adjust(left=0.07, bottom=0.15, top=0.92, right=0.97)
+    # plt.subplots_adjust(left=0.07, bottom=0.15, top=0.92, right=0.97)
+    plt.tight_layout()
     plt.savefig('./plots/PRL/fig-3-kuhn_length_vs_window_size_41_sigma0to40.pdf',
                bbox_inches='tight')
 
@@ -326,9 +327,10 @@ def plot_fig4b():
     # ax.plot(xvals, best_fit(xvals), ':', lw=0.75, color=red_geom)
     plt.ylim([0, 110])
     plt.legend(loc=(0.05, 0.6))
-    plt.subplots_adjust(left=0.14, bottom=0.15, top=0.98, right=0.99)
+    # plt.subplots_adjust(left=0.14, bottom=0.15, top=0.98, right=0.99)
     plt.xlabel(r'$\langle L_i \rangle$ (bp)')
     plt.ylabel(r'Kuhn length (nm)')
+    plt.tight_layout()
     plt.savefig('plots/PRL/fig4b_kuhn_exponential.pdf', bbox_inches='tight')
 
 def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
@@ -338,7 +340,7 @@ def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
     # chosen locations
     if (named_sim, rmax_or_ldna) == ('mu56', 'ldna'):
         draw_power_law_triangle(-3/2, x0=[3.8, -7.1], width=0.4, orientation='up')
-        plt.text(10**(3.9), 10**(-6.9), '$L^{-3/2}$')
+        plt.text(10**(3.95), 10**(-6.8), '$L^{-3/2}$')
         # manually set thresholds to account for numerical instability at low n
         min_n = 10**2.6
     elif (named_sim, rmax_or_ldna) == ('mu56', 'rmax'):
@@ -484,6 +486,7 @@ def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
     plt.yscale('log')
     plt.xscale('log')
 
+    plt.tight_layout()
     plt.savefig(f'plots/PRL/fig5_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
 
 def interpolated_ploop(df, rmax_or_ldna='ldna', n=np.logspace(2, 5, 1000),
