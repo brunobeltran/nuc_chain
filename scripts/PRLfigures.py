@@ -16,8 +16,8 @@ from matplotlib import pyplot as plt
 import scipy
 from scipy import stats
 from scipy.optimize import curve_fit
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+#from sklearn.gaussian_process import GaussianProcessRegressor
+#from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 
 from nuc_chain import geometry as ncg
 from nuc_chain import linkers as ncl
@@ -429,7 +429,8 @@ def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
     if named_sim == 'mu56':
         chains_to_bold = [(100,1), (50,120), (100,112)]
     elif named_sim == 'links31-to-52':
-        chains_to_bold = [1, 3, 5]
+        chains_to_bold = [(50, 1), (50, 3), (50, 5)]
+        min_n = 10**2.7
     for chain_id in chains_to_bold:
         chain = df.loc[chain_id]
         chain = chain[chain[n] >= min_n]

@@ -19,7 +19,9 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 cm_in_inch = 2.54
 # column size is 8.6 cm
 col_size = 8.6 / cm_in_inch
-
+default_width = 1.0*col_size
+aspect_ratio = 5/7
+default_height = aspect_ratio*default_width
 #These follow Andy's plotting preferences for
 medium_params = {
     'axes.edgecolor': 'black',
@@ -166,7 +168,7 @@ def plot_kuhn_heterogenous_sigma_47bp(sigmas=np.arange(0, 11), ax=None):
     if ax is None:
         fig, ax = plt.subplots(figsize=(col_size, (5/7)*col_size))
     #entire figure
-    ax.plot(sigmas, kuhnsg47, '--^', markersize=4, label='Geometrical', color=red_geom)
+    ax.plot(sigmas, kuhnsg47, '--^', markersize=4, label='Zero-temperature', color=red_geom)
     ax.plot(sigmas, kuhnsf47, '-o', markersize=4, label='Fluctuations', color=teal_flucts)
     rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_47-0unwraps.csv')
     b = rdf['kuhn'].mean()
@@ -238,10 +240,6 @@ def plot_greens_kinkedWLC_bareWLC(integral, qintegral, links, unwrap, Nvals, rva
     plt.title(f'{links[0]}bp linkers, {unwrap} unwraps')
     return fig, ax
 
-
-
-
-
 def plot_old_fig4a(ax=None):
     """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
@@ -273,5 +271,179 @@ def plot_old_fig4a(ax=None):
     plt.xlabel('Total linker length (nm)')
     plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
     plt.savefig('plots/PRL/fig4a_r2_exp_vs_wlc.pdf', bbox_inches='tight')
+
+def draw_power_law_triangle(alpha, x0, width, orientation, base=10,
+                            **kwargs):
+    """Draw a triangle showing the best-fit power-law on a log-log scale.
+
+    Parameters
+    ----------
+    alpha : float
+        the power-law slope being demonstrated
+    x0 : (2,) array_like
+        the "left tip" of the power law triangle, where the hypotenuse starts
+        (in log units, to be consistent with draw_triangle)
+    width : float
+        horizontal size in number of major log ticks (default base-10)
+    orientation : string
+        'up' or 'down', control which way the triangle's right angle "points"
+    base : float
+        scale "width" for non-base 10
+
+    Returns
+    -------
+    corner : (2,) np.array
+        coordinates of the right-angled corner of the triangle
+    """
+    x0, y0 = [base**x for x in x0]
+    x1 = x0*base**width
+    y1 = y0*(x1/x0)**alpha
+    plt.plot([x0, x1], [y0, y1], 'k')
+    if (alpha >= 0 and orientation == 'up') \
+    or (alpha < 0 and orientation == 'down'):
+        plt.plot([x0, x1], [y1, y1], 'k')
+        plt.plot([x0, x0], [y0, y1], 'k')
+        # plt.plot lines have nice rounded caps
+        # plt.hlines(y1, x0, x1, **kwargs)
+        # plt.vlines(x0, y0, y1, **kwargs)
+        corner = [x0, y1]
+    elif (alpha >= 0 and orientation == 'down') \
+    or (alpha < 0 and orientation == 'up'):
+        plt.plot([x0, x1], [y0, y0], 'k')
+        plt.plot([x1, x1], [y0, y1], 'k')
+        # plt.hlines(y0, x0, x1, **kwargs)
+        # plt.vlines(x1, y0, y1, **kwargs)
+        corner = [x1, y0]
+    else:
+        raise ValueError(r"Need $\alpha\in\mathbb{R} and orientation\in{'up', 'down'}")
+    return corner
+
+def plot_looping_heterogeneous(df=None, rmax_or_ldna='ldna', named_sim='links31-to-52'):
+    "Plot supplemental looping figure with uniformly distributed linkers 31-52 bp."
+    fig, ax = plt.subplots(figsize=(default_width, default_height))
+    n = rmax_or_ldna
+    # first set sim-specific parameters, draw scaling triangles at manually
+    # chosen locations
+    if (named_sim, rmax_or_ldna) == ('mu56', 'ldna'):
+        draw_power_law_triangle(-3/2, x0=[3.8, -7.1], width=0.4, orientation='up')
+        plt.text(10**(3.95), 10**(-6.8), '$L^{-3/2}$')
+        # manually set thresholds to account for numerical instability at low n
+        min_n = 10**2.6
+    elif (named_sim, rmax_or_ldna) == ('mu56', 'rmax'):
+        draw_power_law_triangle(-3/2, x0=[3.0, -7.5], width=0.4, orientation='up')
+        plt.text(10**3.1, 10**(-7.3), '$L^{-3/2}$')
+        min_n = 10**2.2
+    elif (named_sim, rmax_or_ldna) == ('links31-to-52', 'rmax'):
+        draw_power_law_triangle(-3/2, x0=[3.0, -7.5], width=0.4, orientation='up')
+        plt.text(10**3.1, 10**(-7.3), '$L^{-3/2}$')
+        min_n = 10**2.0
+    elif (named_sim, rmax_or_ldna) == ('links31-to-52', 'ldna'):
+        draw_power_law_triangle(-3/2, x0=[3.5, -7], width=0.4, orientation='up')
+        plt.text(10**3.6, 10**(-6.8), '$L^{-3/2}$')
+        min_n = 10**2.5
+    if df is None:
+        df = load_looping_statistics_heterogenous_chains(named_sim=named_sim)
+    # if the first step is super short, we are numerically unstable
+    df.loc[df['rmax'] <= 5, 'ploops'] = np.nan
+    # if the output is obviously bad numerics, ignore it
+    df.loc[df['ploops'] > 10**(-4), 'ploops'] = np.nan
+    df.loc[df['ploops'] < 10**(-13), 'ploops'] = np.nan
+    df = df.dropna()
+    df = df.sort_values(n)
+    df_int = df.groupby(['num_nucs', 'chain_id']).apply(interpolated_ploop,
+            rmax_or_ldna=rmax_or_ldna, n=np.logspace(np.log10(min_n), np.log10(df[n].max()), 1000))
+    df_int_ave = df_int.groupby(n+'_interp')['ploops_interp'].agg(['mean', 'std', 'count'])
+    df_int_ave = df_int_ave.reset_index()
+    xgrid = df_int_ave[n+'_interp'].values
+    y_pred = df_int_ave['mean'].values
+    sig = df_int_ave['std'].values/np.sqrt(df_int_ave['count'].values - 1)
+    # 95% joint-confidence intervals, bonferroni corrected
+    ste_to_conf = scipy.stats.norm.ppf(1 - (0.05/1000)/2)
+    # plot all the individual chains, randomly chop some down to make plot look
+    # nicer
+    palette = sns.cubehelix_palette(n_colors=len(df.groupby(['num_nucs', 'chain_id'])))
+    ord = np.random.permutation(len(palette))
+    for i, (label, chain) in enumerate(df.groupby(['num_nucs', 'chain_id'])):
+        num_nucs = int(label[0])
+        max_nuc_to_plot = num_nucs*(1 - 0.2*np.random.rand())
+        chain = chain[chain['nuc_id'] <= max_nuc_to_plot]
+        chain = chain[chain[n] >= min_n]
+        plt.plot(chain[n].values, chain['ploops'].values,
+                 c=palette[ord[i]], alpha=0.15, lw=0.5, label=None)
+    # bold a couple of the chains
+    bold_c = palette[int(9*len(palette)/10)]
+    if named_sim == 'mu56':
+        chains_to_bold = [(100,1), (50,120), (100,112)]
+    elif named_sim == 'links31-to-52':
+        chains_to_bold = [(50, 1), (50, 3), (50, 5)]
+    for chain_id in chains_to_bold:
+        chain = df.loc[chain_id]
+        chain = chain[chain[n] >= min_n]
+        plt.plot(chain[n].values, chain['ploops'].values, c=bold_c, alpha=0.6,
+                 label=None)
+    fill = plt.fill_between(xgrid,
+            y_pred - ste_to_conf*sig,
+            y_pred + ste_to_conf*sig,
+            alpha=.10, color='r')
+
+    plt.plot(xgrid, y_pred, 'r-', label='Average $\pm$ 95\%')
+
+    # load in the straight chain, in [bp] (b = 100nm/ncg.dna_params['lpb'])
+    bare_n, bare_ploop = wlc.load_WLC_looping()
+    # now rescale the straight chain to match average
+    if named_sim == 'mu56':
+        b = 40.67 # nm
+        k = b/100 # scaling between straight and 56bp exponential chain
+        nn = 146/56 # wrapped amount to linker length ratio
+    elif named_sim == 'links31-to-52':
+        b = 2*13.762 # nm
+        k = b/100 # scaling between straight and uniform chain
+        nn = 146/41.5
+    if rmax_or_ldna == 'ldna':
+        # we use the fact that (e.g. for exp_mu56, 0 unwraps)
+        # df['ldna'] = df['rmax'] + 146*df['nuc_id']
+        # (on ave)   = df['rmax'] + 146*df['rmax']/56
+        bare_n = bare_n*(1 + nn)
+    x, y = bare_n*k, bare_ploop/k**3,
+    lnormed = plt.plot(x[x >= min_n], y[x >= min_n],
+                       'k-.', label=f'Straight chain, b={b:0.1f}nm')
+    # also plot just the bare WLC
+    b = 2*wlc.default_lp
+    min_n_b100 = 10**2.7
+    l100 = plt.plot(bare_n[bare_n>=min_n_b100], bare_ploop[bare_n>=min_n_b100], '-.', c=teal_flucts,
+             label=f'Straight chain, b=100nm')
+    # plt.plot(bare_n, wlc.sarah_looping(bare_n/2/wlc.default_lp)/(2*wlc.default_lp)**2)
+
+    plt.xlim([10**(np.log10(min_n)*1), 10**(np.log10(np.max(df[n]))*0.99)])
+    if rmax_or_ldna == 'rmax':
+        plt.ylim([10**(-11), 10**(-6)])
+    elif rmax_or_ldna == 'ldna':
+        plt.ylim([10**(-13), 10**(-5)])
+    plt.tick_params(axis='y', which='minor', left=False)
+
+    if rmax_or_ldna == 'rmax':
+        plt.xlabel('Total linker length (bp)')
+    elif rmax_or_ldna == 'ldna':
+        plt.xlabel('Genomic distance (bp)')
+    plt.ylabel(r'$P_\mathrm{loop}\;\;\;(\mathrm{nm}^{-3})$')
+
+    # plt.legend([fill, l100, lnormed], ['Average $\pm$ 95\%',
+    #         'Straight chain, b=100nm', f'Straight chain, b={b:0.2f}nm'],
+    plt.legend(loc='upper right', bbox_to_anchor=[0.9, 0.35])
+    plt.yscale('log')
+    plt.xscale('log')
+
+    plt.tight_layout()
+    plt.savefig(f'plots/PRL/figS8_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
+
+def interpolated_ploop(df, rmax_or_ldna='ldna', n=np.logspace(2, 5, 1000),
+                       ploop_col='ploops'):
+    """Function to apply to the looping probabilities of a given chain to
+    resample it to a fixed set of values."""
+    n_col = rmax_or_ldna
+    n = n[(n >= df[n_col].min()) & (n <= df[n_col].max())]
+    ploop = np.interp(n, df[n_col].values, df[ploop_col].values,
+            left=df[ploop_col].values[0], right=df[ploop_col].values[-1])
+    return pd.DataFrame(np.stack([n, ploop]).T, columns=[n_col+'_interp', ploop_col+'_interp'])
 
 
