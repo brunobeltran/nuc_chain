@@ -764,8 +764,7 @@ def OmegaNextAssoc(Ll, *, w_in=default_w_in, w_out=default_w_out,
 def OmegaNextExit(Ll, *, w_in=default_w_in, w_out=default_w_out,
         tau_n=dna_params['tau_n'], tau_d=dna_params['tau_d'],
         helix_params=helix_params_best):
-    r"""Nucleosome entry to exit (including unwrapped DNA on exit side and
-    unwrapped entry DNA to next nucleosome) and a linker on one side."""
+    r"""Nucleosome exit to exit."""
     b = helix_params['b']
     mu_in = (b - 1)/2 - w_in
     mu_out = (b - 1)/2 - w_out
@@ -775,8 +774,7 @@ def OmegaNextExit(Ll, *, w_in=default_w_in, w_out=default_w_out,
 def OmegaNextEntry(Ll, *, w_in=default_w_in, w_out=default_w_out,
         tau_n=dna_params['tau_n'], tau_d=dna_params['tau_d'],
         helix_params=helix_params_best):
-    r"""Nucleosome entry to exit (including unwrapped DNA on exit side and
-    unwrapped entry DNA to next nucleosome) and a linker on one side."""
+    r"""Nucleosome entry to entry."""
     b = helix_params['b']
     mu_in = (b - 1)/2 - w_in
     mu_out = (b - 1)/2 - w_out

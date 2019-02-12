@@ -268,6 +268,13 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False,
     wrap = w_outs[0] + w_ins[1]
     key = (link, wrap)
     R = ncg.OmegaE2E(wrap, tau_n=tau_n)
+    # recall that our OmegaE2E matrix is designed to be applied from the right
+    # so in order to add an arbitrary twist *before* the action of the
+    # nucleosome (as if from changing the linker length) then we should apply
+    # Rz to the left of R so that when the combined R is applied on the *right*
+    # then the extra Rz is applied "first".
+    # in this code, we use "(-gamma, -beta, -alpha)" from the left as a proxy
+    # from right multiplication in build_B_matrices_for_R2
     if random_phi:
         R = ncr.Rz(2*np.pi*np.random.rand()) @ R
     alpha, beta, gamma = ncr.zyz_from_matrix(R)
