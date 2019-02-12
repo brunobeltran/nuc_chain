@@ -255,19 +255,18 @@ def render_fig2b_chains(**kwargs):
     for li in [36, 38, 41, 47]:
         render_chain(14*[li], **kwargs)
 
-def plot_fig3(mu=41, sigmas=np.arange(0, 41)):
+def plot_fig3(mu=41):
     """use scripts/r2-tabulation.py and wlc.aggregate_existing_kuhns to create
     the kuhns_so_far.csv file."""
     fig, ax = plt.subplots(figsize=(default_width, default_height))
-    kuhnsf41_sig0to10 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_0_10_0unwraps.npy')
-    kuhnsf41_sig11to40 = np.load(f'csvs/r2/kuhns-fluctuations-mu41-sigma_11_40_0unwraps.npy')
-    kuhnsf41 = np.concatenate((kuhnsf41_sig0to10, kuhnsf41_sig11to40))
-    kuhnsg41_sig0to10 = np.load(f'csvs/r2/kuhns-geometrical-mu41-sigma_0_10_0unwraps.npy')
-    kuhnsg41_sig11to40 = np.load(f'csvs/r2/kuhns-geometrical-mu41-sigma_11_40_0unwraps.npy')
-    kuhnsg41 = np.concatenate((kuhnsg41_sig0to10, kuhnsg41_sig11to40))
-    ax.plot(sigmas, kuhnsf41, '-o', markersize=3, label='Fluctuating',
+    # index: variance_type, type, mu, variance, unwrap
+    # columns: slope, intercept, rvalue, pvalue, stderr, b
+    all_kuhns = pd.read_csv('./csvs/kuhns_so_far.csv', index_col=np.arange(5))
+    kf = all_kuhns.loc['box', 'fluctuations', mu].reset_index()
+    ax.plot(kf['variance'].values, kf['b'].values, '-o', markersize=3, label='Fluctuating',
             color=teal_flucts)
-    ax.plot(sigmas, kuhnsg41, '--^', markersize=3, label='Zero-temperature',
+    kg = all_kuhns.loc['box', 'geometrical', mu].reset_index()
+    ax.plot(kg['variance'].values, kg['b'].values, '--^', markersize=3, label='Zero-temperature',
             color=red_geom)
     rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_41-0unwraps.csv')
     b = rdf['kuhn'].mean()

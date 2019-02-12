@@ -704,10 +704,12 @@ def get_kuhns_grouped(df, thresh, groups, rmax_col='rmax', r2_col='r2'):
     return ks
 
 def aggregate_existing_kuhns(glob='*.csv'):
-    """WARNING: not for direct use. an example function that appends new r2
-    calculations to existing repository of kuhn lengths.
+    """WARNING: not really for direct use. an example function that appends new
+    r2 calculations to existing repository of kuhn lengths.
 
-    modify for further use"""
+    you should be able to modify for further use by just adding match_*
+    variables that correspond to your format string in the r2-tabulation.py
+    script"""
     kuhns = []
     for path in Path('./csvs/r2').glob(glob):
         try:
@@ -715,28 +717,36 @@ def aggregate_existing_kuhns(glob='*.csv'):
         except:
             continue
         match_npy = re.search('kuhns-(fluctuations|geometrical)-mu([0-9]+)-sigma_([0-9]+)_([0-9]+)_([0-9]+)unwraps.npy', str(path))
-        match_box = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_([0-9]+)_?([0-9]+)?_([0-9]+)unwraps(?:-[0-9]+)?.csv', str(path))
-        match_new = re.search('r2-(fluctuations|geometrical)-(exponential|homogenous)-link-mu_([0-9]+)-([0-9]+)unwraps(?:-[0-9]+)?.csv', str(path))
+        match_box = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_([0-9]+)_?([0-9]+)?_([0-9]+)unwraps(?:-[0-9]+)?(-random_phi)?.csv', str(path))
+        match_new = re.search('r2-(fluctuations|geometrical)-(box|exponential|homogenous)-link-mu_([0-9]+)-(?:sigma_[0-9]+_)?([0-9]+)unwraps(?:-[0-9]+)?(-random_phi)?.csv', str(path))
         match_random_phi_exp = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_([0-9]+)_([0-9]+)unwraps_random-phi-rz-(left|right).csv', str(path))
         if match_box is not None:
             variance_type = 'box'
-            sim, mu, sigma_min, sigma_max, unwraps = match_box.groups()
+            sim, mu, sigma_min, sigma_max, unwraps, is_random = match_box.groups()
+            if is_random:
+                sim = sim + '-random_phi'
             groups = ['mu', 'variance']
-            df['mu'] = mu
         elif match_new is not None:
-            sim, variance_type, mu, unwraps = match_new.groups()
+            sim, variance_type, mu, unwraps, is_random = match_new.groups()
+            if variance_type == 'homogenous':
+                variance_type = 'box'
+            if is_random:
+                sim = sim + '-random_phi'
             groups = ['mu']
         elif match_npy is not None:
             variance_type = 'box'
             sim, mu, sigma_min, sigma_max, unwraps = match_npy.groups()
         elif match_random_phi_exp is not None:
-            variance_type='box'
+            variance_type = 'box'
             sim1, mu, sigma, unwraps, sim2 = match_random_phi_exp.groups()
-            sim = f'{sim1}-Rz-{sim2}'
-            df['mu'] = mu
+            # it was later discovered that left application is the correct one
+            if sim2 == 'right':
+                continue
+            sim = f'{sim1}-random_phi'
         else:
             print('Unknown simulation type: ' + str(path))
             continue
+        df['mu'] = mu
         ks = get_kuhns_grouped(df, thresh=5000, groups=groups)
         ks = ks.reset_index()
         ks['type'] = sim
