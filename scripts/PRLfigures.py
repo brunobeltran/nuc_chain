@@ -262,12 +262,14 @@ def plot_fig3(mu=41):
     # index: variance_type, type, mu, variance, unwrap
     # columns: slope, intercept, rvalue, pvalue, stderr, b
     all_kuhns = pd.read_csv('./csvs/kuhns_so_far.csv', index_col=np.arange(5))
-    kf = all_kuhns.loc['box', 'fluctuations', mu].reset_index()
-    ax.plot(kf['variance'].values, kf['b'].values, '-o', markersize=3, label='Fluctuating',
-            color=teal_flucts)
     kg = all_kuhns.loc['box', 'geometrical', mu].reset_index()
+    kg = kg.sort_values('variance')
     ax.plot(kg['variance'].values, kg['b'].values, '--^', markersize=3, label='Zero-temperature',
             color=red_geom)
+    kf = all_kuhns.loc['box', 'fluctuations', mu].reset_index()
+    kf = kf.sort_values('variance')
+    ax.plot(kf['variance'].values, kf['b'].values, '-o', markersize=3, label='Fluctuating',
+            color=teal_flucts)
     rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_41-0unwraps.csv')
     b = rdf['kuhn'].mean()
     xlim = plt.xlim()
