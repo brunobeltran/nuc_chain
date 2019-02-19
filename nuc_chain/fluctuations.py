@@ -718,7 +718,7 @@ def aggregate_existing_kuhns(glob='*.csv'):
             continue
         match_npy = re.search('kuhns-(fluctuations|geometrical)-mu([0-9]+)-sigma_([0-9]+)_([0-9]+)_([0-9]+)unwraps.npy', str(path))
         match_box = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_([0-9]+)_?([0-9]+)?_([0-9]+)unwraps(?:-[0-9]+)?(-random_phi)?.csv', str(path))
-        match_new = re.search('r2-(fluctuations|geometrical)-(box|exponential|homogenous)-link-mu_([0-9]+)-(?:sigma_[0-9]+_)?([0-9]+)unwraps(?:-[0-9]+)?(-random_phi)?.csv', str(path))
+        match_new = re.search('r2-(fluctuations|geometrical)-(box|exponential|homogenous)-link-mu_([0-9]+)-(?:sigma_([0-9]+))?_?([0-9]+)unwraps(?:-[0-9]+)?(-random_phi)?.csv', str(path))
         match_random_phi_exp = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_([0-9]+)_([0-9]+)unwraps_random-phi-rz-(left|right).csv', str(path))
         if match_box is not None:
             variance_type = 'box'
@@ -727,8 +727,8 @@ def aggregate_existing_kuhns(glob='*.csv'):
                 sim = sim + '-random_phi'
             groups = ['mu', 'variance']
         elif match_new is not None:
-            sim, variance_type, mu, unwraps, is_random = match_new.groups()
-            if variance_type == 'homogenous':
+            sim, variance_type, mu, sigma, unwraps, is_random = match_new.groups()
+            if variance_type == 'homogenous' and sigma is not None:
                 variance_type = 'box'
             if is_random:
                 sim = sim + '-random_phi'
@@ -756,6 +756,8 @@ def aggregate_existing_kuhns(glob='*.csv'):
             ks['variance'] = 0
         elif 'exponential' == ks['variance_type'].iloc[0]:
             ks['variance'] = ks['mu']
+        elif match_new and sigma is not None:
+            ks['variance'] = sigma
         else:
             assert('variance' in ks)
         kuhns.append(ks)
