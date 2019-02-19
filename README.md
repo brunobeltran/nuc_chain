@@ -1,7 +1,6 @@
 # nuc\_chain
 
-[![Documentation
-Status](https://readthedocs.org/projects/ansicolortags/badge/?version=latest)](http://ansicolortags.readthedocs.io/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/nuc-chain/badge/?version=latest)](https://nuc-chain.readthedocs.io/en/latest/?badge=latest)
 
 Model chromatin as a chain of nucleosomes.
 
