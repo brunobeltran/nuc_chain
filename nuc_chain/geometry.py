@@ -819,7 +819,7 @@ def OmegaE2E(Lw=default_Lw, *, tau_n=dna_params['tau_n'], helix_params=helix_par
     return Oc @ Rz(theta)
 
 def OmegaC(Lw, helix_params=helix_params_best):
-    """inv(H_rot(0)) @ H_rot(Lw) @ R_z(-Lw*Htau)
+    """inv(H_rot(0)) @ H_rot(Lw)
 
     The non-twist-corrected rotation matrix that takes the n, b, and u vectors
     of the helix from the start of the helix to the exit.
