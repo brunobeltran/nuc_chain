@@ -27,5 +27,4 @@ This package can be pip installed
 pip install nuc_chain
 ```
 
-For detailed usage instructions, simply build the documentation using
-sphinx by cloning the repository and using `make` in the `doc` directory.
+For detailed usage instructions, please see the [docs](https://nuc-chain.readthedocs.io).
