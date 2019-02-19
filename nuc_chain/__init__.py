@@ -34,31 +34,24 @@ is itself a helix, regardless of the specific linker length used.
 Goals
 -----
 
-heterogeneity is important
+Incorporate relevant sources of nucleosome heterogeneity.
 
 - unwrapping heterogeneity
 - sliding heterogeneity
 - initial binding site heterogeneity
 - heterogeneity of "extra unwrapping" due to linker histone fixing the exit
 angles, or including (or not) linker globule domains
-- how easy is it to undergo "spontaneous nucleosome flipping" where the
-nucleosome superhelix flips between left-and-right-handed
 
 We care a lot about
 
-- local accessibility (to get "real" answers, would require explicit nucleosome
-sliding though, so it would get hairy to try to include chromatin remodelers
-for sliding, or like explict nucleosome-bound-dna dynamics to incorporate
-"breathing"). but to get an idea of the global search process, since teh time
-scales of e.g. transcription factor search are so long, we can probably just
-ignore these local details.
+- local accessibility to transcription factors
 
-long term
+Long term
 
 - diffusion vs binding/unbinding histone
 
 """
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 import numpy as np
 
