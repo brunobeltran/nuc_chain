@@ -48,9 +48,6 @@ default_lt = 100 / ncg.dna_params['lpb']
 default_lp = 50 / ncg.dna_params['lpb']
 """bend persistance length of DNA in bp: 50 nm, or ~150 bp"""
 
-Mdict = ncd.Mdict_from_unwraps
-"""Pickled files for Greens function calculations"""
-
 Klin = np.linspace(0, 10**5, 20000)
 Klog = np.logspace(-3, 5, 10000)
 Kvals = np.unique(np.concatenate((Klin, Klog)))
@@ -832,7 +829,7 @@ def visualize_kuhn_lengths(links, unwraps, kuhns, mfig=None, **kwargs):
 ###{{{
 # """Propogators and Greens Functions"""
 
-def tabulate_M_kinks(unwraps=None, l0max=20, **kwargs):
+def tabulate_M_kinks(unwraps=None, l0max=None, **kwargs):
     """Return a lookup table of M matrices for a given (alpha, beta, gamma).
     One matrix for each possible level of unwrapping.
 
@@ -848,6 +845,13 @@ def tabulate_M_kinks(unwraps=None, l0max=20, **kwargs):
     Mdict_from_unwraps.p : pickle dumped dictionary
         to load, Mdict = pickle.load(open('Mdict_from_unwraps.p', 'rb'))
     """
+    #retrieve dictionary of 441 by 441 M kink matrices if it exists
+    mdicts_file = ncd.data_dir / Path('Mdict_from_unwraps.p')
+    if l0max is None and unwraps is None and mdicts_file.exists():
+        return pickle.load(mdicts_file, 'rb')
+
+    if l0max is None:
+        l0max = 20
     if unwraps is None:
         unwraps = np.arange(0, 147)
 
@@ -861,7 +865,7 @@ def tabulate_M_kinks(unwraps=None, l0max=20, **kwargs):
     mywd = wd.wigner_d_vals()
 
     for i, u in enumerate(unwraps):
-        w_in, w_out = ncg.resolve_unwrap(u, None, None)
+        w_in, w_out = convert.resolve_unwrap(u)
         R = ncg.OmegaE2E(w_in+w_out, tau_n=tau_n)
         alpha, beta, gamma = ncr.zyz_from_matrix(R)
 
@@ -880,8 +884,12 @@ def tabulate_M_kinks(unwraps=None, l0max=20, **kwargs):
     # Mdf = pd.concat(Mdict.values(), keys=Mdict.keys())
     # Mdf.index.names = ['unwrap', 'If']
     # Mdf.to_csv('csvs/Mkink_matrices.csv')
-    pickle.dump(Mdict, open(f'csvs/Mdict_from_unwraps.p', 'wb'))
+    pickle.dump(Mdict, open(mdicts_file, 'wb'))
     return Mdict
+
+Mdict = tabulate_M_kinks()
+"""Pickled files for Greens function calculations"""
+
 
 ###{{{
 # """Linker propogator g calculations"""
