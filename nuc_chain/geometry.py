@@ -874,7 +874,7 @@ def dp_omega(Ll, *, w_in=default_w_in, w_out=default_w_out,
         Rotation matrix from entry site to entry site.
     """
     if unwrap is not None:
-        w_in, w_out = convert.resolve_unwrap(unwrap, None, None)
+        w_in, w_out = convert.resolve_unwrap(unwrap)
     b = helix_params['b']
     Lw = w_in + w_out
     unwrap = b - Lw - 1
@@ -909,7 +909,7 @@ def dp_omega_linker_only(Ll, *, w_in=default_w_in, w_out=default_w_out,
         Rotation matrix from entry site to entry site.
     """
     if unwrap is not None:
-        w_in, w_out = convert.resolve_unwrap(unwrap, None, None)
+        w_in, w_out = convert.resolve_unwrap(unwrap)
     b = helix_params['b']
     Lw = w_in + w_out
     unwrap = b - Lw - 1
@@ -944,7 +944,7 @@ def dp_omega_exit(Ll, *, w_in=default_w_in, w_out=default_w_out,
         Rotation matrix from exit site to exit site.
     """
     if unwrap is not None:
-        w_in, w_out = convert.resolve_unwrap(unwrap, None, None)
+        w_in, w_out = convert.resolve_unwrap(unwrap)
     b = helix_params['b']
     Lw = w_in + w_out
     unwrap = b - Lw - 1
@@ -977,7 +977,7 @@ def dp_omega_nuc(Ll, *, w_in=default_w_in, w_out=default_w_out,
         Rotation matrix from entry site to entry site.
     """
     if unwrap is not None:
-        w_in, w_out = convert.resolve_unwrap(unwrap, None, None)
+        w_in, w_out = convert.resolve_unwrap(unwrap)
     N_rot, N_pos = entry_to_nuc_center(w_in, helix_params=helix_params)
     b = helix_params['b']
     Lw = w_in + w_out
@@ -1239,7 +1239,7 @@ def tabulate_exit_angles(*, tau_n=dna_params['tau_n'], unwrap=None):
     beta = np.zeros_like(unwrap).astype(float)
     gamma = np.zeros_like(unwrap).astype(float)
     for i,u in enumerate(unwrap):
-        w_in, w_out = convert.resolve_unwrap(u, None, None)
+        w_in, w_out = convert.resolve_unwrap(u)
         R = OmegaE2E(w_in+w_out, tau_n=tau_n)
         alpha[i], beta[i], gamma[i] = ncr.zyz_from_matrix(R)
         R_reconstruct = Rz(alpha[i])@Ry(beta[i])@Rz(gamma[i])

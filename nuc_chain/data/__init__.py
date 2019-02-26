@@ -33,8 +33,6 @@ The columns of the DataFrame are
     z-coordinate of the terminal carbon of that base
 """
 spokes_manual_deepti_2018_05_31.set_index(['deepti id'], inplace=True)
-#retrieve dictionary of 441 by 441 M kink matrices
-Mdict_from_unwraps = pickle.load(open(data_dir / Path('Mdict_from_unwraps.p'), 'rb'))
 
 class SarahLooping:
     """Delayed loading for the looping probability of a bare WLC with a capture

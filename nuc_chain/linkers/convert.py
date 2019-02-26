@@ -2,36 +2,48 @@ from .. import * # default parameters
 import numpy as np
 import pandas as pd
 
-def resolve_unwrap(unwrap, w_in, w_out):
-    """For scripting convenience when the only parameter that matters is
-    unwrap = b - w_in - w_out - 1. Converts total unwrapping to amount wrapped on either
-    side of the dyad axis. If unwrap is odd, assumes the extra base pair is wrapped on
-    the entry side.
+def resolve_unwrap(unwrap):
+    """Allows the user to specify number of base pairs unwrapped compared to
+    the crystal structure (146bp of DNA length wrap, 147bp bound), and converts
+    this to the number of base pairs bound on each side of the dyad axis.
 
-    All functions take w_in, w_out directly now."""
-    if (w_in is None) != (w_out is None):
-        raise ValueError("Either none or both of w_in and w_out must be specified.")
-    if w_in:
-        return w_in, w_out
-    elif unwrap % 2 == 1:
+    Parameters
+    ----------
+    unwrap : int
+        total amount of unwrapped DNA on both sides
+
+    Returns
+    -------
+    w_in : int
+        amount wrapped entry side of dyad axis
+    w_out : int
+        amount wrapped exit side of dyad axis
+    """
+    if unwrap % 2 == 1:
         w_in = (bp_in_nuc - unwrap)/2
         return w_in, w_in-1
     else:
         w = (bp_in_nuc - unwrap - 1)/2
         return w, w
 
-def resolve_wrapping_params(unwraps, w_ins, w_outs, N):
-    """Resolves wrapping-related params into (N,) arrays of w_ins and w_outs. N
-    could be number of nucleosome / number of chains, depending on use case.
+def resolve_wrapping_params(unwraps, w_ins=None, w_outs=None, N=None):
+    """Allow the user to specify either one value (and tile appropriately) or
+    an array of values for the number of base pairs bound to the nucleosome.
+    Also allow either the number of base pairs bound on each side of the dyad to be
+    specified or the number of base pairs unwrapped relative to the crystal
+    structure (in which case the unwrapping is split evenly on either side of
+    the dyad for simplicity.
 
     Parameters
     ----------
     unwrap : float or (N,) array_like
         total amount of unwrapped DNA on both sides
-    w_in : float or (N,) array_like
+    w_in (optional): float or (N,) array_like
         wrapped DNA on entry side of dyad axis
-    w_out : float or (N,) array_like
+    w_out (optional): float or (N,) array_like
         wrapped DNA on exit side of dyad axis
+    N (optional): int
+        output size, if other params are not array_like
 
     Returns
     -------
@@ -46,16 +58,12 @@ def resolve_wrapping_params(unwraps, w_ins, w_outs, N):
 
     if unwraps is not None:
         unwraps = np.atleast_1d(unwraps)
-        w_ins = np.array([resolve_unwrap(u, None, None)[0] for u in unwraps])
-        w_outs = np.array([resolve_unwrap(u, None, None)[1] for u in unwraps])
+        w_ins, w_outs = zip(*map(resolve_unwrap, unwraps))
     w_ins = np.atleast_1d(w_ins)
     w_outs = np.atleast_1d(w_outs)
-    if len(w_ins) == 1:
+    if len(w_ins) == 1 and N is not None:
         w_ins = np.tile(w_ins, (N,))
-    if len(w_outs) == 1:
         w_outs = np.tile(w_outs, (N,))
-    assert(len(w_ins) == N)
-    assert(len(w_outs) == N)
     return w_ins, w_outs
 
 
