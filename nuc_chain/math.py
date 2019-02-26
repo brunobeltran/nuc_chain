@@ -28,6 +28,7 @@ def links_rmax(links):
     rmax[1:] = np.cumsum(links)
     return rmax
 
-def rolling(df):
+
+def rolling_mean(df):
     return df.rolling(window_size).mean()
 

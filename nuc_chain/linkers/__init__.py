@@ -101,6 +101,49 @@ def independent_linker_lengths(mu, size, chrom_size=default_chrom_size,
         i = i + num_nuc - 1
     return np.reshape(linkers, size)
 
+def random_positions_in_lattice(count, lattice_size):
+    """Insert n steric objects (of width 1) into a discrete lattice of
+    lattice_size (uniform potential of insertion).
+
+    Equivalent to np.sort(np.random.shuffle(np.arange(lattice_size)))[:n]
+
+    Notes
+    -----
+    Translated from the following code on stack overflow
+    (https://stackoverflow.com/questions/16000196/java-generating-non-repeating-random-numbers)
+    from the book "programming pearls" pg 127.
+    public static int[] sampleRandomNumbersWithoutRepetition(int start, int end, int count) {
+        Random rng = new Random();
+
+        int[] result = new int[count];
+        int cur = 0;
+        int remaining = end - start;
+        for (int i = start; i < end && count > 0; i++) {
+            double probability = rng.nextDouble();
+            if (probability < ((double) count) / (double) remaining) {
+                count--;
+                result[cur++] = i;
+            }
+            remaining--;
+        }
+        return result;
+    }
+    """
+    result = np.zeros((count,))
+    cur = 0
+    remaining = lattice_size
+    i = 0
+    while True:
+        if np.random.rand() < float(count)/float(remaining):
+            count -= 1
+            result[cur] = i
+            cur += 1
+        remaining -= 1
+        if not (i < lattice_size and count > 0):
+            break
+        i += 1
+    return result
+
 def fake_linkers_increasing_variance(mu, sigma, size, type='lognorm'):
     """Generate "linkers" that are only designed to be used to test the
     properties of heterogenous nucleosome chains, and not necessarily to

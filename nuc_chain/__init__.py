@@ -1,10 +1,10 @@
 """Model chromatin as a chain of nucleosomes.
 
-The nuc_chain package contains routines to calculate various configurational
-and dynamic properties of a model of chromatin that consists of wormlike-chains
-(linker DNA) connecting nucleosomes (approximately cylinders or spheres) at
-angles determined by the geometry of the entry/exit angles of DNA into the
-nucleosome crystal structure.
+The :py:mod:`nuc_chain` package contains routines to calculate various
+configurational and dynamic properties of a model of chromatin that consists of
+wormlike-chains (linker DNA) connecting nucleosomes (approximately cylinders or
+spheres) at angles determined by the geometry of the entry/exit angles of DNA
+into the nucleosome crystal structure.
 
 This package was developed to investigate the contributions of fluctuations in
 the linkers, heterogeneity in the linker length, and "breathing" (partial
@@ -20,16 +20,20 @@ Notes
 -----
 In this model of chromatin, the double-helical DNA is modeled as a
 wormlike-chain with twist (tWLC). It is understood to be bound to nucleosomes
-at fixed locations (as might be determined via the lattice_nucleosomes.py
-module). The configuration of DNA bound to the nucleosome is approximated to
-itself be a helix. The number of wraps of DNA around the histone octamer
+at fixed locations (as might be generated the :py:mod:`nuc_chain.linkers`
+module). The configuration of DNA bound to the nucleosome is approximated as
+itself being a helix. The amount of DNA wrapped around the histone octamer
 determines the entry and exit angles of the DNA. The number of wraps is itself
 determined by the relative energy benefit of the DNA sequence of interest being
 bound at each nucleosome contact point.
 
 A consequence of Chasles's theorem is that if the amount of DNA between
 nucleosomes is constant, the higher order structure of the chain of nucleosomes
-is itself a helix, regardless of the specific linker length used.
+is itself a helix, regardless of the specific linker length used. The main
+finding of (Beltran and Kannan et. al. *in review*) is that when the amount of
+linker DNA is heterogeneous between nucleosomes, the elasticity of the fiber as
+a whole increases to a value that mostly depends only on the mean linker
+length.
 
 Goals
 -----
@@ -49,6 +53,27 @@ We care a lot about
 Long term
 
 - diffusion vs binding/unbinding histone
+
+Usage
+-----
+
+In order to instantiate realistic linker lengths, convert between bp and nm
+units along the chain, or implicitly account for base pairs "buried inside" the
+nucleosome, use the :py:mod:`nuc_chain.linkers` module.
+
+In order to calculate or access geometrical data about nucleosomes' structure
+and quickly generate zero-temperature chain realizations, use
+:py:mod:`nuc_chain.geometry`.
+
+In order to include WLC-linker-based fluctuations in computations about the
+chain (including R2, Kuhn length, looping probabilities, and more), use the
+:py:mod:`nuc_chain.fluctuations` module.
+
+.. warning::
+    The first time that the :py:mod:`nuc_chain.fluctuations` module is loaded,
+    it will tabulate the "Mkinks" matrices. This can take many hours! But it is
+    required for fast calculation of most fluctuating chain statistics.
+
 
 """
 __version__ = "0.1.0"
