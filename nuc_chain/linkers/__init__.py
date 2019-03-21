@@ -12,7 +12,6 @@ import scipy.stats
 import numpy as np
 
 from .. import bp_in_nuc
-from ..utils import random_positions_in_lattice
 
 default_chrom_size = 20000000
 

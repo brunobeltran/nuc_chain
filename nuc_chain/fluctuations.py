@@ -848,7 +848,7 @@ def tabulate_M_kinks(unwraps=None, l0max=None, **kwargs):
     #retrieve dictionary of 441 by 441 M kink matrices if it exists
     mdicts_file = ncd.data_dir / Path('Mdict_from_unwraps.p')
     if l0max is None and unwraps is None and mdicts_file.exists():
-        return pickle.load(mdicts_file, 'rb')
+        return pickle.load(open(mdicts_file, 'rb'))
 
     if l0max is None:
         l0max = 20
