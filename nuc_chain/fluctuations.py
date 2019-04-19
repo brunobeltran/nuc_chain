@@ -689,7 +689,8 @@ def get_kuhn(df, thresh, rmax_col='rmax', r2_col='r2'):
     """Take a df with r2/rmax columns and a threshold (burn in length) in
     number of monomers after which to fit adn do a linear fit to extract teh
     kuhn length."""
-    ks = scipy.stats.linregress(df[rmax_col].iloc[thresh:], df[r2_col].iloc[thresh:])
+    ks = scipy.stats.linregress(df.loc[df[rmax_col] > thresh, rmax_col],
+                                df.loc[df[rmax_col] > thresh, r2_col])
     return ks
 
 def get_kuhns_grouped(df, thresh, groups, rmax_col='rmax', r2_col='r2'):
