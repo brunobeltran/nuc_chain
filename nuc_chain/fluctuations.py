@@ -700,76 +700,31 @@ def get_kuhns_grouped(df, thresh, groups, rmax_col='rmax', r2_col='r2'):
     ks['b'] = ks['slope']
     return ks
 
-def aggregate_existing_kuhns(glob='*.csv'):
-    """WARNING: not really for direct use. an example function that appends new
-    r2 calculations to existing repository of kuhn lengths.
-
-    you should be able to modify for further use by just adding match_*
-    variables that correspond to your format string in the r2-tabulation.py
-    script"""
+def aggregate_existing_kuhns(glob='*.csv', thresh=5000):
+    """Aggregates all Kuhn lengths that can be calculated from the
+    r2-tabulation script."""
     kuhns = []
+    r2_format_re = re.compile('r2-(fluct|geom)-(box|exp)-mu_([0-9]+)-sigma_([0-9]+)-([0-9]+)unwraps(-.*)?.csv')
     for path in Path('./csvs/r2').glob(glob):
         try:
             df = pd.read_csv(path)
         except:
             continue
-        match_npy = re.search('kuhns-(fluctuations|geometrical)-mu([0-9]+)-sigma_([0-9]+)_([0-9]+)_([0-9]+)unwraps.npy', str(path))
-        match_box = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_([0-9]+)_?([0-9]+)?_([0-9]+)unwraps(?:-[0-9]+)?(-random_phi)?.csv', str(path))
-        match_new = re.search('r2-(fluctuations|geometrical)-(box|exponential|homogenous)-link-mu_([0-9]+)-(?:sigma_([0-9]+))?_?([0-9]+)unwraps(?:-[0-9]+)?(-random_phi)?.csv', str(path))
-        match_random_phi_exp = re.search('r2-(fluctuations|geometrical)-mu_([0-9]+)-sigma_([0-9]+)_([0-9]+)unwraps_random-phi-rz-(left|right).csv', str(path))
-        if match_box is not None:
-            variance_type = 'box'
-            sim, mu, sigma_min, sigma_max, unwraps, is_random = match_box.groups()
-            if is_random:
-                sim = sim + '-random_phi'
-            groups = ['mu', 'variance']
-        elif match_new is not None:
-            sim, variance_type, mu, sigma, unwraps, is_random = match_new.groups()
-            if variance_type == 'homogenous' and sigma is not None:
-                variance_type = 'box'
-            if is_random:
-                sim = sim + '-random_phi'
-            groups = ['mu']
-        elif match_npy is not None:
-            variance_type = 'box'
-            sim, mu, sigma_min, sigma_max, unwraps = match_npy.groups()
-        elif match_random_phi_exp is not None:
-            variance_type = 'box'
-            sim1, mu, sigma, unwraps, sim2 = match_random_phi_exp.groups()
-            # it was later discovered that left application is the correct one
-            if sim2 == 'right':
-                continue
-            sim = f'{sim1}-random_phi'
-        else:
-            print('Unknown simulation type: ' + str(path))
+        match = r2_format_re.search(path.name)
+        if match is None:
+            print("File name cannot be parsed: " + str(path))
             continue
+        sim_type, variance_type, mu, sigma, unwrap, desc = match.groups()
         df['mu'] = mu
-        ks = get_kuhns_grouped(df, thresh=5000, groups=groups)
+        df['sigma'] = sigma
+        df['unwrap'] = unwrap
+        ks = get_kuhns_grouped(df, thresh=thresh, groups=['mu', 'sigma', 'unwrap'])
         ks = ks.reset_index()
-        ks['type'] = sim
+        ks['sim_type'] = sim_type
         ks['variance_type'] = variance_type
-        ks['unwrap'] = unwraps
-        if 'homogenous' == ks['variance_type'].iloc[0]:
-            ks['variance'] = 0
-        elif 'exponential' == ks['variance_type'].iloc[0]:
-            ks['variance'] = ks['mu']
-        elif match_new and sigma is not None:
-            ks['variance'] = sigma
-        else:
-            assert('variance' in ks)
         kuhns.append(ks)
-    all_ks = [ks.set_index(['variance_type', 'type', 'mu', 'variance', 'unwrap']) for ks in kuhns]
+    all_ks = [ks.set_index(['variance_type', 'sim_type', 'mu', 'sigma', 'unwrap']) for ks in kuhns]
     all_ks = pd.concat(all_ks)
-
-    # df = pd.read_csv('csvs/r2/kuhn_lengths_so_far.csv')
-    # df['variance_type'] = 'box'
-    # all_ks['variance'] = all_ks['mu']
-    # all_ks['variance_type'] = 'exponential'
-    # df.set_index(['variance_type', 'type', 'mu', 'variance'], inplace=True)
-    # all_ks.set_index(['variance_type', 'type', 'mu', 'variance'], inplace=True)
-    # all_ks.sort_index(inplace=True)
-    # all_ks = pd.concat([ak, df])
-    # all_ks.to_csv('./csvs/r2/kuhn_lengths_so_far.csv')
 
     return all_ks
 

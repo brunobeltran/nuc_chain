@@ -9,14 +9,17 @@ import pandas as pd
 from nuc_chain import fluctuations as wlc
 from nuc_chain import geometry as ncg
 
-mus = np.arange(31, 60)
+mus = np.arange(31, 150)
 sigmas = [0]
 unwraps = [0]
 
 r2_format_string = 'csvs/r2/r2-{fluct}-{mode}-mu_{mu}-sigma_{sigma}-{unwrap}unwraps.csv'
-def save_r2s(param, num_chains=None, num_linkers=None, fluct=True, mode='box',
-             force_override=False, **kwargs):
+def save_r2s(param, num_chains=None, num_linkers=None, fluct=True, mode='exp',
+             force_override=False, desc=None, **kwargs):
     f"""Tabulates r2 for a bunch of chains with fixed parameters.
+
+    extra kwargs are passed to the relevant r2 generation function from wlc or
+    ncg for each chain.
 
     Parameters
     ----------
@@ -36,6 +39,8 @@ def save_r2s(param, num_chains=None, num_linkers=None, fluct=True, mode='box',
     force_override : bool
         whether or not to recompute file if it already exists. this is mostly
         useful if you're increasing num_chains or num_nucleosomes.
+    desc : string
+        extra information to append to filename, like values of kwargs used
 
     Notes
     -----
@@ -47,8 +52,10 @@ def save_r2s(param, num_chains=None, num_linkers=None, fluct=True, mode='box',
     where fluct is 'fluct' or 'geom'.
     """
     mu, sigma, unwrap = param
-    fluct = 'fluct' if fluct else 'geom'
-    file_name = r2_format_string.format(fluct=fluct, mode=mode, mu=mu, sigma=sigma, unwrap=unwrap)
+    fluct_str = 'fluct' if fluct else 'geom'
+    file_name = r2_format_string.format(fluct=fluct_str, mode=mode, mu=mu, sigma=sigma, unwrap=unwrap)
+    if desc is not None:
+        file_name = file_name[:-4] + '-' + desc + '.csv'
 
     if Path(file_name).exists() and not force_override:
         return
@@ -56,7 +63,7 @@ def save_r2s(param, num_chains=None, num_linkers=None, fluct=True, mode='box',
 
     if mode == 'box':
         if not fluct:
-            num_chains = num_chains if num_chains else 400
+            num_chains = num_chains if num_chains else 1000
             num_linkers = num_linkers if num_linkers else 7500
             df = ncg.tabulate_r2_heterogenous_chains_by_variance(num_chains, num_linkers, [sigma], mu=mu, unwraps=unwrap, **kwargs)
         elif fluct:
@@ -65,16 +72,16 @@ def save_r2s(param, num_chains=None, num_linkers=None, fluct=True, mode='box',
             df = wlc.tabulate_r2_heterogenous_fluctuating_chains_by_variance(num_chains, num_linkers, [sigma], mu=mu, unwraps=unwrap, **kwargs)
     elif mode == 'exp':
         sigma = mu # by definition
-        raise NotImplementedError("this is implemented, just need to go dig up what function to call.")
         if not fluct:
-            pass
+            raise NotImplementedError("this is implemented, just need to go dig up what function to call.")
         elif fluct:
-            pass
+            num_chains = num_chains if num_chains else 100
+            num_linkers = num_linkers if num_linkers else 7500
+            df = wlc.tabulate_r2_heterogenous_fluctuating_chains_exponential(num_chains, num_linkers, mu=mu, unwraps=unwrap, **kwargs)
     else:
         raise NotImplementedError("Invalid mode (linker variance type)")
 
-    df['variance'] = sigma
-    df.to_csv(file_name)
+    df.to_csv(file_name, index=False)
 
 pool_size = multiprocessing.cpu_count() - 1
 with Pool(processes=pool_size) as p:
