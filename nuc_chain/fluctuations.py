@@ -209,7 +209,7 @@ def r2wlc(ldna, lp=default_lp):
     return 2*(lp*ldna - lp**2 + lp**2*np.exp(-ldna/lp))
 
 def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False,
-        lt=default_lt, lp=default_lp, w_ins=ncg.default_w_in,
+        lt=default_lt, lp=default_lp, kd_unwrap=0.0, w_ins=ncg.default_w_in,
         w_outs=ncg.default_w_out, tau_d=ncg.dna_params['tau_d'],
         tau_n=ncg.dna_params['tau_n'], lmax=2, helix_params=ncg.helix_params_best,
         unwraps=None, random_phi=False):
@@ -250,7 +250,14 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False,
     b = helix_params['b']
     num_linkers = len(links)
     num_nucleosomes = num_linkers + 1
-    w_ins, w_outs = convert.resolve_wrapping_params(unwraps, w_ins, w_outs, num_nucleosomes)
+    if kd_unwrap > 0.0:
+        sites_unbound_left = scipy.stats.binom(7, kd_unwrap).rvs(len(w_ins))
+        sites_unbound_right = scipy.stats.binom(7, kd_unwrap).rvs(len(w_outs))
+        w_ins, w_outs = convert.resolve_wrapping_params(sites_unbound_left + sites_unbound_right,
+                w_ins, w_outs, num_nucleosomes, unwraps_is='sites')
+    else:
+        w_ins, w_outs = convert.resolve_wrapping_params(unwraps, w_ins, w_outs, num_nucleosomes)
+
     # calculate unwrapping amounts based on w_ins and w_outs
     mu_ins = (b - 1)/2 - w_ins
     mu_outs = (b - 1)/2 - w_outs
@@ -596,8 +603,6 @@ def tabulate_r2_heterogenous_fluctuating_chains_homogenous(num_chains, chain_len
     """Tabulate R^2 for fluctuating heterogenous chains with increasing variance. Pass unwrapping parameters
     through kwargs."""
     links = np.zeros((num_chains, chain_length-1))
-    #For now, assume the same unwrapping amounts for all chains
-    #w_ins, w_outs = convert.resolve_wrapping_params(unwraps, w_ins, w_outs, chain_length)
     links = mu*np.ones((num_chains,chain_length-1))
     rmax = np.zeros((num_chains, chain_length))
     r2 = rmax.copy()

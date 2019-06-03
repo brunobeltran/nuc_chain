@@ -2,15 +2,32 @@ from .. import * # default parameters
 import numpy as np
 import pandas as pd
 
-def resolve_unwrap(unwrap):
+def resolve_unwrap(unwrap, unwraps_is='bp'):
     """Allows the user to specify number of base pairs unwrapped compared to
-    the crystal structure (146bp of DNA length wrap, 147bp bound), and converts
-    this to the number of base pairs bound on each side of the dyad axis.
+    the crystal structure (146bp of DNA length wrapped, 147bp bound since one
+    base pair is exactly on the dyad axis), and converts this to the number of
+    base pairs bound on each side of the dyad axis.
+
+    Optionally, the user can specify an alternate model "sites" for DNA
+    unwrapping, where the 7 nucleosome-DNA contact "sites" on each side of the
+    dyad axis are treated explicitly. These contact locations are known to
+    occur every 10.5bp, and the dyad is centered between two of them. this
+    means that the 14 contact points have 13 lengths of DNA (of length 10.5bp)
+    between them, leading to a total wrapped amount (with both sites bound) of
+    about 13*10.5 = 136.5bp.
+
+    This means 0 sites unwrapped corresponds to 10.5bp unwrapped.
+
+    The w_in+w_out value will be rounded, due to our codebase only
+    precomputing the linker propagator for integer unwrapping amounts by
+    default.
 
     Parameters
     ----------
     unwrap : int
         total amount of unwrapped DNA on both sides
+    unwraps_is : string
+        'bp' or 'sites', specifies the DNA-nucleosome binding model used
 
     Returns
     -------
@@ -19,14 +36,18 @@ def resolve_unwrap(unwrap):
     w_out : int
         amount wrapped exit side of dyad axis
     """
+    if unwraps_is == 'sites':
+        unwrap = 10.5 + 10.5*unwrap
+    unwrap = np.round(unwrap).astype(int)
     if unwrap % 2 == 1:
         w_in = (bp_in_nuc - unwrap)/2
         return w_in, w_in-1
     else:
         w = (bp_in_nuc - unwrap - 1)/2
         return w, w
+    return
 
-def resolve_wrapping_params(unwraps, w_ins=None, w_outs=None, N=None):
+def resolve_wrapping_params(unwraps, w_ins=None, w_outs=None, N=None, unwraps_is='bp'):
     """Allow the user to specify either one value (and tile appropriately) or
     an array of values for the number of base pairs bound to the nucleosome.
     Also allow either the number of base pairs bound on each side of the dyad to be
@@ -36,14 +57,17 @@ def resolve_wrapping_params(unwraps, w_ins=None, w_outs=None, N=None):
 
     Parameters
     ----------
-    unwrap : float or (N,) array_like
+    unwraps : float or (N,) array_like
         total amount of unwrapped DNA on both sides
-    w_in (optional): float or (N,) array_like
+    w_ins (optional): float or (N,) array_like
         wrapped DNA on entry side of dyad axis
-    w_out (optional): float or (N,) array_like
+    w_outs (optional): float or (N,) array_like
         wrapped DNA on exit side of dyad axis
     N (optional): int
         output size, if other params are not array_like
+    unwraps_is : string
+        'bp' or 'sites', to specify whether we're counting the number of bp
+        bound or the number of nucleosome-to-dna contacts (respectively)
 
     Returns
     -------
