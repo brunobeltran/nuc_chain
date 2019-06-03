@@ -4,7 +4,7 @@ import numpy as np
 def r2(r, axis=None):
     """Calculate the instantaneous r^2 along a given axis.
 
-    r.shape == (N,3) ==> r2(r, axis=0) would give the r^2"""
+    r.shape == (N,3) ==> r2(r, axis=0) would give the r^2 of shape (N,)"""
     zero = [slice(None)]*len(r.shape) # [:,:,...,:]
     zero[axis] = slice(0, 1) # [:,:,..,0,..,:]
     return np.sum(np.power(r - r[zero], 2), axis=1-axis)
