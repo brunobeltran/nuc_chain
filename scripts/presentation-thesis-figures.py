@@ -9,6 +9,8 @@ from pathlib import Path
 import pickle
 
 import matplotlib.cm as cm
+import matplotlib.ticker as tck
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import numpy as np
 import seaborn as sns
 import pandas as pd
@@ -21,45 +23,45 @@ from scipy.optimize import curve_fit
 
 from nuc_chain import geometry as ncg
 from nuc_chain import linkers as ncl
+from nuc_chain import rotations as ncr
 from MultiPoint import propagator
 from nuc_chain import fluctuations as wlc
-from nuc_chain.linkers import convert
 from nuc_chain import visualization as vis
+from nuc_chain.linkers import convert
 
 # Plotting parameters
-# PRL Font preference: computer modern roman (cmr), medium weight (m), normal shape
-cm_in_inch = 2.54
-# column size is 8.6 cm
-col_size = 8.6 / cm_in_inch
-default_width = 1.0*col_size
-aspect_ratio = 4/7
-default_height = aspect_ratio*default_width
+#width of one column on ppt slide in inch
+col_width = 5.67
+full_width = 8.63
+aspect_ratio = 2/3
+col_height = aspect_ratio*col_width
+full_height = aspect_ratio*full_width
 plot_params = {
     'backend': 'pdf',
     'savefig.format': 'pdf',
     'text.usetex': True,
-    'font.size': 7,
+    'font.size': 18,
 
-    'figure.figsize': [default_width, default_height],
+    'figure.figsize': [full_width, full_height],
     'figure.facecolor': 'white',
 
     'axes.grid': False,
     'axes.edgecolor': 'black',
     'axes.facecolor': 'white',
 
-    'axes.titlesize': 8.0,
-    'axes.labelsize': 8,
-    'legend.fontsize': 6.5,
-    'xtick.labelsize': 6.5,
-    'ytick.labelsize': 6.5,
-    'axes.linewidth': 0.75,
+    'axes.titlesize': 20,
+    'axes.labelsize': 20,
+    'legend.fontsize': 18,
+    'xtick.labelsize': 16,
+    'ytick.labelsize': 16,
+    'axes.linewidth': 1,
 
     'xtick.top': False,
     'xtick.bottom': True,
     'xtick.direction': 'out',
     'xtick.minor.size': 3,
     'xtick.minor.width': 0.5,
-    'xtick.major.pad': 2,
+    'xtick.major.pad': 5,
     'xtick.major.size': 5,
     'xtick.major.width': 1,
 
@@ -68,11 +70,11 @@ plot_params = {
     'ytick.direction': 'out',
     'ytick.minor.size': 3,
     'ytick.minor.width': 0.5,
-    'ytick.major.pad': 2,
+    'ytick.major.pad': 5,
     'ytick.major.size': 5,
     'ytick.major.width': 1,
 
-    'lines.linewidth': 1
+    'lines.linewidth': 2
 }
 plt.rcParams.update(plot_params)
 
@@ -88,7 +90,7 @@ def render_chain(linkers, unwraps=0, **kwargs):
         # to use "off-screen rendering" and fullscreen your window before
         # saving (this is actually required if you're using a tiling window
         # manager like e.g. i3 or xmonad).
-        vis.visualize_chain(entry_rots, entry_pos, linkers, unwraps=unwraps, plot_spheres=True)
+        vis.visualize_chain(entry_rots, entry_pos, linkers, unwraps=unwraps, plot_spheres=True, **kwargs)
 
 def draw_triangle(alpha, x0, width, orientation, base=10,
                             **kwargs):
@@ -181,21 +183,54 @@ def draw_power_law_triangle(alpha, x0, width, orientation, base=10,
         raise ValueError(r"Need $\alpha\in\mathbb{R} and orientation\in{'up', 'down'}")
     return corner
 
-default_lis = [36, 38]
-default_colors = [red_geom, rich_purple]
-def plot_fig2a(lis=default_lis, colors=None):
+#link_ix, unwrap_ix, rise, angle, radius = ncg.tabulate_rise(dp_f=ncg.dp_omega_exit)
+
+def plot_fig31_rise_vs_linker_length():
+    fig, ax = plt.subplots(figsize=(1.2*default_width, default_height))
+    links = np.arange(10, 101)
+    #kuhns1to250 = np.load('csvs/kuhns_1to250links_0to146unwraps.npy')
+    #calculate the 'phi' angle corresponding to twist due to linker
+    phis_dp_omega_exit = np.zeros(links.size)
+    for i, link in enumerate(links):
+        dP, Onext = ncg.dp_omega_exit(link, unwrap=0)
+        phi, theta, alpha = ncr.phi_theta_alpha_from_R(Onext)
+        #record angles in units of pi
+        phis_dp_omega_exit[i] = phi/np.pi + 1
+    
+    plt.plot(links, rise[0:91,0], linewidth=0.5)
+    plt.scatter(links, rise[0:91,0], c=phis_dp_omega_exit, cmap='Spectral', s=3);
+    plt.xlabel('Linker length (bp)')
+    plt.ylabel(r'Rise (nm)')
+    plt.subplots_adjust(left=0.1, bottom=0.19, top=0.95, right=0.97)
+    cb = plt.colorbar(ticks=[0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2])
+    cb.set_label(r'$\phi$')
+    cb.ax.yaxis.set_major_formatter(tck.FormatStrFormatter('%g $\pi$'))
+    #cb.ax.yaxis.set_yticks([0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2], 
+    #                    [r'$0$', r'$\frac{\pi}{4}$', r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$',
+    #                     r'$\frac{5\pi}{4}$', r'$\frac{3\pi}{2}$', r'$\frac{7\pi}{4}$', r'$2\pi$'])
+    fig.text(0.13, 0.47, r'38 bp', size=10)
+    fig.text(0.12, 0.57, r'36 bp', size=10)
+    plt.savefig('plots/thesis/fig3.1_rise-vs-linker-length.pdf')
+
+
+default_lis = [36]
+default_colors = [teal_flucts]
+def plot_r2_homo(lis=default_lis, colors=None):
     """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
     if colors is None:
         if len(lis) == 2:
             colors = default_colors
         else:
-            colors = len(lis) * [red_geom]
+            colors = len(lis) * [teal_flucts]
     assert(len(colors) == len(lis))
-    fig, ax = plt.subplots(figsize=(default_width, default_height))
+    
+    fig, ax = plt.subplots(figsize=(7.79, 4.43))
     x = np.logspace(0, 7, 100)
-    y = np.sqrt(wlc.r2wlc(x, 100))
-    plt.plot(x, y, '.', color=[0,0,0], markersize=1)
+
+    #plot rigid rod line
+    plt.plot(x, x, '^', markersize=3, color=red_geom)
+    
     hdfs = {}
     for i, li in enumerate(lis):
         hdfs[li] = pd.read_csv(f'./csvs/r2/r2-fluctuations-mu_{li}-sigma_0_10_0unwraps.csv')
@@ -208,7 +243,7 @@ def plot_fig2a(lis=default_lis, colors=None):
         plt.plot(hdfs[li]['rmax'], np.sqrt(hdfs[li]['r2']), color=colors[i])
     for li in lis:
         y = np.sqrt(wlc.r2wlc(x, hdfs[li]['kuhn'].mean()/2))
-        plt.plot(x, y, '-.', color=teal_flucts, markersize=1)
+        plt.plot(x, y, '-.', color=[0,0,0], markersize=1)
 
     xmin = 1
     ymin = xmin
@@ -231,76 +266,169 @@ def plot_fig2a(lis=default_lis, colors=None):
     plt.yscale('log')
     plt.xlabel('Total linker length (nm)')
     plt.ylabel(r'End-to-end distance (nm)')
-    legend = [r'Bare DNA'] \
-           + [r'$L_i = ' + str(li) + r'$ bp' for li in lis] \
+    legend = ['Rigid rod (0T)'] \
+           + ['Fluctuations, ' + r'$L_i = ' + str(li) + r'$ bp' for li in lis] \
            + [r'WLC, best fit']
-    plt.legend(legend)
+    plt.legend(legend, loc='upper left')
     plt.tight_layout()
-    plt.savefig('./plots/PRL/fig2a_r2_homogenous_vs_wlc.pdf', bbox_inches='tight')
+    plt.savefig('./plots/thesis-pres/r2_homogenous_vs_wlc.pdf', bbox_inches='tight')
 
-def plot_fig2b():
+def plot_kuhns_homo():
     kuhns = np.load('csvs/kuhns_1to250links_0to146unwraps.npy')
-    fig, ax = plt.subplots(figsize=(default_width, default_height))
+    fig, ax = plt.subplots(figsize=(9, 4.43))
     links = np.arange(31, 52)
-    ax.plot(links, kuhns[links-1, 0], '--o', markersize=4, lw=1.5, color=teal_flucts)
-    for i, li in enumerate(default_lis):
-        ax.plot(li, kuhns[li-1, 0], '--o', markersize=4, color=default_colors[i])
-    plt.xticks(np.arange(31, 50, 2))
-    plt.xlim([31, 49])
+    ax.plot(links, kuhns[links-1, 0], '--o', markersize=8, lw=3.5, color=teal_flucts)
+    plt.xticks(np.arange(31, 52, 2))
+    plt.xlim([31, 51])
     plt.xlabel('Fixed linker length (bp)')
     plt.ylabel('Kuhn length (nm)')
     plt.tight_layout()
-    plt.savefig('plots/PRL/fig2b_kuhn_length_in_nm_31to51links_0unwraps.pdf')
+    plt.savefig('plots/thesis-pres/kuhn_length_in_nm_31to51links_0unwraps.pdf')
 
-def render_fig2b_chains(**kwargs):
+def render_fig32b_chains(**kwargs):
     for li in [36, 38, 41, 47]:
         render_chain(14*[li], **kwargs)
 
-def plot_fig3(mu=41):
+def render_fig34_chains(**kwargs):
+    links = np.tile(38, 20)
+    colors = [teal_flucts, red_geom, dull_purple]
+    for i, unwrap in enumerate([0, 21, 42]):
+        col = colors[i].lstrip('#') #string of the form #hex
+        #convert hex color to RGB tuple of the form (0.0 <= floating point number <= 1.0, "", "")
+        col = tuple(int(col[i:i+2], 16)/256 for i in (0, 2, 4))
+        render_chain(links, unwraps=unwrap, nucleosome_color=col, **kwargs)
+
+def plot_kuhn_hetero(mu=41):
     """use scripts/r2-tabulation.py and wlc.aggregate_existing_kuhns to create
     the kuhns_so_far.csv file."""
-    fig, ax = plt.subplots(figsize=(default_width, default_height))
+    fig, ax = plt.subplots(figsize=(7.4, 4.31))
     # index: variance_type, type, mu, variance, unwrap
     # columns: slope, intercept, rvalue, pvalue, stderr, b
     all_kuhns = pd.read_csv('./csvs/kuhns_so_far.csv', index_col=np.arange(5))
     kg = all_kuhns.loc['box', 'geometrical', mu].reset_index()
     kg = kg.sort_values('variance')
-    ax.plot(kg['variance'].values, kg['b'].values, '--^', markersize=3, label='0T, uniform',
+    ax.plot(kg['variance'].values, kg['b'].values, '--^', markersize=6, label='Zero-temperature',
             color=red_geom)
     kf = all_kuhns.loc['box', 'fluctuations', mu].reset_index()
     kf = kf.sort_values('variance')
-    ax.plot(kf['variance'].values, kf['b'].values, '-o', markersize=3, label='Fluctuating, uniform',
+    ax.plot(kf['variance'].values, kf['b'].values, '-o', markersize=6, label='Fluctuating',
             color=teal_flucts)
     rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_41-0unwraps.csv')
     b = rdf['kuhn'].mean()
     xlim = plt.xlim()
-    plt.plot([-10, 50], [b, b], 'k-.', label='Fluctuating, exponential')
+    plt.plot([-10, 50], [b, b], 'k-.', label='Exponential chain')
     plt.xlim(xlim)
     ax.set_ylim([0, 100])
     plt.xlabel('Linker length variability $\pm\sigma$ (bp)')
     plt.ylabel('Kuhn length (nm)')
     plt.legend()
-    #fig.text(0, 1.3, r'$\pm 0 bp$', size=9)
-    #fig.text(0.1, 1.1, r'$\pm 2 bp$', size=9)
-    #fig.text(0.7, 1.2, r'$\pm 6 bp$', size=9)
-    #plt.subplots_adjust(left=0.07, bottom=0.15, top=0.92, right=0.97)
+    #fig.text(1.3, 0, r'$\pm 0 bp$', size=9)
+    #fig.text(1.6, 0, r'$\pm 2 bp$', size=9)
+    #fig.text(1.9, 0, r'$\pm 6 bp$', size=9)
+    # plt.subplots_adjust(left=0.07, bottom=0.15, top=0.92, right=0.97)
     plt.tight_layout()
-    plt.savefig('./plots/PRL/fig-3-kuhn_length_vs_window_size_41_sigma0to40.pdf',
+    plt.savefig('./plots/thesis-pres/kuhn_length_vs_variability_41_sigma0to40.pdf',
                bbox_inches='tight')
 
-def render_fig3_chains(mu=41, sigmas=[0, 2, 6], N=50):
+def render_fig36_chains(mu=41, sigmas=[0, 2, 6]):
     for sigma in sigmas:
         sign_bit = 2*np.round(np.random.rand(N)) - 1
         render_chain(mu + sign_bit*np.random.randint(sigma+1), size=(N,))
 
-def plot_fig4b():
+def plot_r2_exponential(mu=36, colors=None):
+    """The r2 of the 36bp exponential chain (0 unwrapping) compared to the
+    wormlike chain with the corresponding Kuhn length."""
+    fig, ax = plt.subplots(figsize=(4.45, 4.29))
+    x = np.logspace(0, 7, 100)
+
+    #plot exponential chains
+    rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_36-0unwraps.csv')
+    try:
+        del rdf['Unnamed: 0']
+    except:
+        pass
+    for i, chain in rdf.groupby(['mu', 'chain_id']):
+        chain.iloc[0,0] = 1
+        chain.iloc[0,1] = 1
+        plt.plot(chain['rmax'], np.sqrt(chain['r2']), color=dull_purple, alpha=0.3, lw=0.5)
+        break
+
+    lp_bestfit = rdf['kuhn'].mean()/2
+    y = np.sqrt(wlc.r2wlc(x, lp_bestfit))
+    plt.plot(x, y, '-', color=teal_flucts)
+    legend = [r'Exponential, $\langle L_i \rangle= 36bp$'] \
+           + [r'WLC, $b \approx 30nm$']
+    plt.legend(legend, bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
+
+    for i, chain in rdf.groupby(['mu', 'chain_id']):
+        chain.iloc[0,0] = 1
+        chain.iloc[0,1] = 1
+        plt.plot(chain['rmax'], np.sqrt(chain['r2']), color=dull_purple, alpha=0.3, lw=0.5)
+    plt.plot(x, y, '-', color=teal_flucts)
+
+    plt.xlabel('Total linker length (nm)')
+    plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
+
+    xmin = 0.5
+    ymin = xmin
+    xmax = 100000
+    ymax = 10000
+
+    # power law triangle for the two extremal regimes
+    corner = draw_power_law_triangle(1, [np.log10(1.3), np.log10(3)], 0.8, 'up')
+    plt.text(2, 26, '$L^1$')
+    corner = draw_power_law_triangle(1/2, [np.log10(2800), np.log10(125)], 1, 'down')
+    plt.text(5500, 35, '$L^{1/2}$')
+
+    plt.xlim([xmin, xmax])
+    plt.ylim([ymin, ymax])
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel('Total linker length (nm)')
+    plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$ (nm)')
+    plt.subplots_adjust(left=0.19, bottom=0.17, top=0.76, right=0.97)
+    plt.savefig('plots/thesis-pres/r2-exponential.pdf', bbox_inches='tight')
+
+def plot_old_fig4a(ax=None):
+    """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
+    wormlike chain with the corresponding Kuhn length."""
     fig, ax = plt.subplots(figsize=(default_width, default_height))
-    kuhns = pd.read_csv('csvs/kuhns_so_far.csv') #note this is the old version (not in new repo)
+    rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_36-0unwraps.csv')
+    try:
+        del rdf['Unnamed: 0']
+    except:
+        pass
+    for i, chain in rdf.groupby(['mu', 'chain_id']):
+        chain.iloc[0,0] = 1
+        chain.iloc[0,1] = 1
+        plt.plot(chain['rmax'], chain['r2'], color=dull_purple, alpha=0.4)
+        break
+    x = np.logspace(0, 7, 100)
+    y = wlc.r2wlc(x, rdf['kuhn'].mean()/2)
+    plt.plot(x, y, '-', color='k')
+    plt.legend([r'$\langle L_i \rangle= 36bp$', r'$WLC, l_p \approx 15 nm$'],
+               bbox_to_anchor=(0, 1.02, 1, .102), loc=3, borderaxespad=0)
+    for i, chain in rdf.groupby(['mu', 'chain_id']):
+        chain.iloc[0,0] = 1
+        chain.iloc[0,1] = 1
+        plt.plot(chain['rmax'], chain['r2'], color=dull_purple, alpha=0.4)
+    plt.plot(x, y, '-', color='k')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlim([0.5, 100000])
+    plt.ylim([0.5, 10000000])
+    plt.xlabel('Total linker length (nm)')
+    plt.ylabel(r'$\sqrt{\langle R^2 \rangle}$')
+    plt.savefig('plots/PRL/fig4a_r2_exp_vs_wlc.pdf', bbox_inches='tight')
+
+def plot_exponential_kuhns():
+    fig, ax = plt.subplots(figsize=(7.4, 4.31))
+    kuhns = pd.read_csv('csvs/kuhns_so_far.csv')
     kuhns = kuhns.set_index(['variance_type', 'type', 'mu', 'variance'])
     mu_max = 100
     # dotted line at 100 nm
     ax.plot(np.linspace(0, mu_max, 100), np.tile(100, 100), '.',
-            markersize=1, label='Bare WLC', color=[0,0,0])
+            markersize=5, label='Bare DNA', color=[0,0,0])
     def make_plottable(df):
         df = df.groupby('mu').mean().reset_index()
         df = df[df['mu'] < mu_max].dropna()
@@ -333,11 +461,80 @@ def plot_fig4b():
     plt.xlabel(r'$\langle L_i \rangle$ (bp)')
     plt.ylabel(r'Kuhn length (nm)')
     plt.tight_layout()
-    plt.savefig('plots/PRL/fig4b_kuhn_exponential.pdf', bbox_inches='tight')
+    plt.savefig('plots/thesis-pres/kuhn_exponential.pdf', bbox_inches='tight')
 
-def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
-    #TODO: change units to be in inverse nanometers cubed
-    fig, ax = plt.subplots(figsize=(default_width, default_height))
+def plot_fig39_homo_loop():
+    kink41 = np.load(f'csvs/Bprops/0unwraps/41link/kinkedWLC_greens_41link_0unwraps_1000rvals_50nucs.npy')
+    kink47 = np.load(f'csvs/Bprops/0unwraps/47link/kinkedWLC_greens_47link_0unwraps_1000rvals_50nucs.npy')
+    bare41 = np.load(f'csvs/Bprops/0unwraps/41link/bareWLC_greens_41link_0unwraps_1000rvals_50nucs.npy')
+    integrals = [kink47, kink41, bare41]
+    labels = ['47bp', '41bp', 'Straight chain']
+    links_list = [np.tile(47, 50), np.tile(41, 50), np.tile(41, 50)]
+    plot_prob_loop_vs_fragment_length(integrals, labels, links_list, unwrap=0, nucmin=2)
+    plt.subplots_adjust(left=0.17, bottom=0.20, top=0.96, right=0.97)
+    plt.savefig('plots/thesis/fig39_looping-homo.pdf')
+
+def plot_prob_loop_vs_fragment_length(integrals, labels, links, unwrap, Nvals=None, nucmin=2, **kwargs):
+    """Plot looping probability vs. chain length, where looping probability defined as G(0;L).
+
+    Parameters
+    ----------
+    integrals : (L,) list of (rvals.size, Nvals.size) greens function arrays
+        list of matrices G(r; N) where columns correspond to Nvals
+    labels : (L,) array-like
+        strings corresponding to label for each greens function (printed in legend)
+    links : (L,) list of (num_linkers,) arrays
+        list of full set of linkers in each chain, where num_linkers is the total number of
+        nucleosomes in each chain
+    unwrap : float
+        unwrapping amount in bp. Assumes fixed unwrapping.
+    Nvals : array-like
+        number of linkers down the chain for which each green's functions in 'integrals' was calculated.
+        Defaults to one per monomer of the chain. Assumes Nvals is the same for all chains for which
+        you are plotting looping probabilities.
+    nucmin : float
+        minimum number of nucleosomes for which looping probability should be plotted. Defaults to 2,
+        since first nucleosome is numerically not trusted. For shorter linkers (<42bp), recommended
+        to set nucmin to 3 since first two points are sketchy.
+
+    """
+
+    if Nvals is None:
+        Nvals = np.arange(1, len(links[0])+1)
+
+    fig, ax = plt.subplots(figsize=(default_width, 1.1*default_height))
+    #ignore first couple nucleosomes because of noise
+    indmin = nucmin-1
+    inds = Nvals - 1
+    inds = inds[inds >= indmin]
+    color_red = sns.color_palette("hls", 8)[0]
+    #HARD CODE COLOR TUPLE: #D9A725 corresponds to
+        #yellow = (217./255, 167./255, 37./255)
+    #HARD CODE COLOR TUPE: #387780 corresponds to
+        #teal = (56./255, 119./225, 128./255)
+    colors = [color_red, '#D9A725', '#387780']
+    for i in range(len(labels)):
+        ldna = convert.genomic_length_from_links_unwraps(links[i], unwraps=unwrap)
+        ploops = integrals[i][0, indmin:]
+        pldna = ldna[inds]
+        ax.loglog(pldna, ploops, '-o', markersize=2, linewidth=1,
+            color=colors[i], label=labels[i], **kwargs)
+    ax.legend(loc=(0.32, 0.03), frameon=False, fontsize=10)
+    plt.xlabel('Genomic distance (bp)')
+    plt.ylabel(r'$P_\mathrm{loop}\;\;\;(\mathrm{bp}^{-3})$')
+
+def render_fig39_chains(**kwargs):
+    color_red = sns.color_palette("hls", 8)[0]
+    colors = [color_red, '#D9A725', '#387780']
+    for i, link in enumerate([47, 41, 41]):
+        col = colors[i].lstrip('#') #string of the form #hex
+        #convert hex color to RGB tuple of the form (0.0 <= floating point number <= 1.0, "", "")
+        col = tuple(int(col[i:i+2], 16)/256 for i in (0, 2, 4))
+        links = np.tile(link, 10)
+        render_chain(links, unwraps=0, nucleosome_color=col, **kwargs)
+
+def plot_hetero_looping(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
+    fig, ax = plt.subplots(figsize=(6.17, 4.13))
     n = rmax_or_ldna
     # first set sim-specific parameters, draw scaling triangles at manually
     # chosen locations
@@ -367,46 +564,6 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
     df.loc[df['ploops'] < 10**(-13), 'ploops'] = np.nan
     df = df.dropna()
     df = df.sort_values(n)
-    # # # rolling window doesn't seem to work
-    # # get an estimator of the variance from a rolling window
-    # # window size chosen by eye
-    # df['t'] = pd.to_datetime(np.log10(df[n])*60*10**9) # to minutes
-    # dft = df.set_index('t')
-    # rolled = dft.rolling('10s').apply(np.nanmean, raw=False)
-    # rolled_ste = dft.rolling('10s').apply(lambda df: np.nanstd(df)/np.sqrt(len(df)), raw=False)
-    # # rolled = df.rolling(200).apply(np.nanmean, raw=False)
-    # # rolled_ste = df.rolling(200).apply(lambda df: np.nanstd(df)/np.sqrt(len(df)), raw=False)
-    # xgrid = rolled[n].values
-    # y_pred = rolled['ploops'].values[xgrid > min_n]
-    # sig = rolled_ste['ploops'].values[xgrid > min_n]
-
-    # # # can't seem to get teh gaussian process fitting to work unless I take to
-    # # # log space... something likely about the parameters or the kernel I'm
-    # # # choosing?
-    # # # should we just use rolling average?
-    # # tricky! doing fitting in log space for x variable helps numerics
-    # x = np.atleast_2d(df[logn].values.copy()).T
-    # y = df['ploops'].values.copy().ravel()
-    # sigma = np.interp(x, rolled[logn].values,
-    #         rolled_std['ploops'].values,
-    #         left=rolled_std['ploops'].values[0],
-    #         right=rolled_std['ploops'].values[-1])
-    # sigma = sigma.ravel()
-    # # pandas rolling std doesn't like left boundary, but we can just fill in
-    # # soemthing reasonable
-    # sigma[np.isnan(sigma)] = np.nanmax(sigma)
-    # # sigma += 10**-7 # to prevent numerical issues
-    # # now fit to a gaussian process
-    # if Path(f'csvs/gp_{named_sim}_{rmax_or_ldna}.pkl').exists():
-    #     gp = pickle.load(open(f'csvs/gp_{named_sim}_{rmax_or_ldna}.pkl', 'rb'))
-    # else:
-    #     kernel = C(10.0, (1e-3, 1e3)) * RBF(0.5, (1e-1, 1))
-    #     gp = GaussianProcessRegressor(kernel=kernel, alpha=sigma**2, n_restarts_optimizer=10)
-    #     gp.fit(x, y)
-    #     pickle.dump(gp, open(f'gp_{named_sim}_{rmax_or_ldna}.pkl', 'wb'))
-    # # recall fit done in log space
-    # xgrid = np.linspace(max(np.log10(min_n), np.min(x)), np.max(x), 100).reshape(-1, 1)
-    # y_pred, sig = gp.predict(xgrid, return_std=True)
     df_int = df.groupby(['num_nucs', 'chain_id']).apply(interpolated_ploop,
             rmax_or_ldna=rmax_or_ldna, n=np.logspace(np.log10(min_n), np.log10(df[n].max()), 1000))
     df_int_ave = df_int.groupby(n+'_interp')['ploops_interp'].agg(['mean', 'std', 'count'])
@@ -437,8 +594,8 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
     for chain_id in chains_to_bold:
         chain = df.loc[chain_id]
         chain = chain[chain[n] >= min_n]
-        plt.plot(chain[n].values, chain['ploops'].values, c=bold_c, alpha=0.6,
-                 label=None)
+        #plt.plot(chain[n].values, chain['ploops'].values, c=bold_c, alpha=0.6,
+        #         label=None)
     fill = plt.fill_between(xgrid,
             y_pred - ste_to_conf*sig,
             y_pred + ste_to_conf*sig,
@@ -486,12 +643,13 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
 
     # plt.legend([fill, l100, lnormed], ['Average $\pm$ 95\%',
     #         'Straight chain, b=100nm', f'Straight chain, b={b:0.2f}nm'],
-    plt.legend(loc='upper right', bbox_to_anchor=[0.9, 0.35])
+    plt.legend(loc='lower right')
     plt.yscale('log')
     plt.xscale('log')
-
+    plt.subplots_adjust(left=0.17, bottom=0.17, top=0.96, right=0.97)
+    #plt.subplots_adjust(left=0.12, bottom=0.13, top=0.96, right=0.99)
     plt.tight_layout()
-    plt.savefig(f'plots/PRL/fig5_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
+    #plt.savefig(f'plots/thesis-pres/looping_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
 
 def interpolated_ploop(df, rmax_or_ldna='ldna', n=np.logspace(2, 5, 1000),
                        ploop_col='ploops'):
@@ -563,4 +721,7 @@ def load_looping_statistics_heterogenous_chains(*, dir=None, file_re=None, links
     df = df.set_index(['num_nucs', 'chain_id']).sort_index()
     df.to_csv(cache_csv)
     return df
+
+
+
 

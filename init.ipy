@@ -31,5 +31,6 @@ from nuc_chain import rotations as ncr
 from nuc_chain import wignerD as wd
 from nuc_chain import fluctuations as wlc
 from nuc_chain import linkers as ncl
+from nuc_chain import visualization as vis
 from nuc_chain import math as ncm
 from MultiPoint import propagator

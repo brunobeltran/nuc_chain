@@ -114,10 +114,12 @@ def visualize_chain(entry_rots, entry_pos, links, w_ins=default_w_in,
                 color=colors[i], **kwargs)
     return mfig
 
-def visualize_MLC_chain(entry_pos, r_dna=dna_params['r_dna'],
-        mfig=None, palette="husl", nucleosome_color=None,
-        unwraps=None, plot_entry=False, plot_exit=False, plot_spheres=True, entry_rots=None, **kwargs):
-    """Visualize output of :py:func:`minimum_energy_no_sterics`.
+def visualize_MC_chain(entry_rots, entry_pos, w_ins=default_w_in,
+        w_outs=default_w_out, lpb=dna_params['lpb'], r_dna=dna_params['r_dna'],
+        helix_params=helix_params_best,
+        mfig=None, palette="husl", nucleosome_color=None, translation=False,
+        unwraps=None, plot_entry=False, plot_exit=False, **kwargs):
+    """Visualize output of MC simulation structure with a list of positions for each nucleosome.
 
     Parameters
     ----------
@@ -147,22 +149,32 @@ def visualize_MLC_chain(entry_pos, r_dna=dna_params['r_dna'],
     if mfig is None:
         mfig = mlab.figure()
     num_nucleosomes = len(entry_pos)
-    #assert(np.all(entry_rots.shape[:2] == entry_pos.shape))
+    w_ins, w_outs = convert.resolve_wrapping_params(unwraps, w_ins, w_outs, num_nucleosomes)
     colors = sns.color_palette(palette, num_nucleosomes)
     if nucleosome_color is not None:
         colors = [nucleosome_color]*num_nucleosomes
-    if plot_spheres:
+    if translation:
+        #plot nucleosome
+        nuc, mfig = plot_nucleosome(entry_rot=entry_rots[0], entry_pos=entry_pos[0],
+            Lw=w_ins[0]+w_outs[0], helix_params=helix_params,
+            mfig=mfig, color=colors[0], **kwargs)
+    else:
+        #plot sphere
         mlab.points3d(entry_pos[0, 0], entry_pos[0, 1], entry_pos[0, 2], scale_factor=5, figure=mfig,
                 color=colors[0], **kwargs)
-    # if plot_entry:
-    #     mlab.quiver3d(*entry_pos[0], *entry_rots[0][:,0], mode='arrow',
-    #                   scale_factor=5, color=(1,0,0))
-    #     mlab.quiver3d(*entry_pos[0], *entry_rots[0][:,1], mode='arrow',
-    #                   scale_factor=5, color=(0,1,0))
-    #     mlab.quiver3d(*entry_pos[0], *entry_rots[0][:,2], mode='arrow',
-    #                   scale_factor=5, color=(0,0,1))
+        
+    if plot_entry:
+        mlab.quiver3d(*entry_pos[0], *entry_rots[0][:,0], mode='arrow',
+                      scale_factor=5, color=(1,0,0))
+        mlab.quiver3d(*entry_pos[0], *entry_rots[0][:,1], mode='arrow',
+                      scale_factor=5, color=(0,1,0))
+        mlab.quiver3d(*entry_pos[0], *entry_rots[0][:,2], mode='arrow',
+                      scale_factor=5, color=(0,0,1))
     for i in range(1,num_nucleosomes):
-        prev_exit_pos = entry_pos[i-1]
+        if translation:
+            prev_exit_pos = nuc[:, -1]
+        else:
+            prev_exit_pos = entry_pos[i-1]
         mlab.plot3d([prev_exit_pos[0], entry_pos[i][0]],
                     [prev_exit_pos[1], entry_pos[i][1]],
                     [prev_exit_pos[2], entry_pos[i][2]],
@@ -175,7 +187,11 @@ def visualize_MLC_chain(entry_pos, r_dna=dna_params['r_dna'],
                           scale_factor=5, color=(0,1,0))
             mlab.quiver3d(*entry_pos[i], *entry_rots[i][:,2], mode='arrow',
                           scale_factor=5, color=(0,0,1))
-        if plot_spheres:
+        if translation:
+            nuc, mfig = plot_nucleosome(entry_rot=entry_rots[i], entry_pos=entry_pos[i],
+                Lw=w_ins[i]+w_outs[i], helix_params=helix_params,
+                mfig=mfig, color=colors[i], **kwargs)
+        else:
             mlab.points3d(entry_pos[i, 0], entry_pos[i, 1], entry_pos[i, 2], scale_factor=5, figure=mfig,
                 color=colors[i], **kwargs)
     return mfig
