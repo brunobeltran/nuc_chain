@@ -24,6 +24,7 @@ import bruno_util
 from bruno_util import pandas_util
 from bruno_util import pickle_variables
 
+import nuc_chain
 from nuc_chain import geometry as ncg
 from nuc_chain import data as ncd
 from nuc_chain import rotations as ncr

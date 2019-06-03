@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from . import *
-from .geometry import helix_params_best
+from .geometry import helix_params_best, H_oriented
 from .linkers import convert
 
 
