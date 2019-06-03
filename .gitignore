@@ -55,7 +55,9 @@ dist
 
 # Data files not tracked #
 ##########################
-csvs/gprops
+csvs
+nuc_chain/data/Mdict_from_unwraps.p
+plots
 
 
 # LateX Files #

@@ -836,10 +836,6 @@ def tabulate_M_kinks(unwraps=None, l0max=None, **kwargs):
         # Mdict[u] = pd.DataFrame(M)
         Mdict[u] = M
 
-    #CODE USED TO SAVE CSV FILE -- module uses pickled file for calculations
-    # Mdf = pd.concat(Mdict.values(), keys=Mdict.keys())
-    # Mdf.index.names = ['unwrap', 'If']
-    # Mdf.to_csv('csvs/Mkink_matrices.csv')
     pickle.dump(Mdict, open(mdicts_file, 'wb'))
     return Mdict
 
