@@ -251,8 +251,8 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False,
     num_linkers = len(links)
     num_nucleosomes = num_linkers + 1
     if kd_unwrap > 0.0:
-        sites_unbound_left = scipy.stats.binom(7, kd_unwrap).rvs(len(w_ins))
-        sites_unbound_right = scipy.stats.binom(7, kd_unwrap).rvs(len(w_outs))
+        sites_unbound_left = scipy.stats.binom(7, kd_unwrap).rvs(num_nucleosomes)
+        sites_unbound_right = scipy.stats.binom(7, kd_unwrap).rvs(num_nucleosomes)
         w_ins, w_outs = convert.resolve_wrapping_params(sites_unbound_left + sites_unbound_right,
                 w_ins, w_outs, num_nucleosomes, unwraps_is='sites')
     else:
