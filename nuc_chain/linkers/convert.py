@@ -1,8 +1,11 @@
+import functools
+
 from .. import * # default parameters
 import numpy as np
 import pandas as pd
 
-def resolve_unwrap(unwrap, unwraps_is='bp'):
+
+def resolve_unwrap(unwrap, unwrap_is='bp'):
     """Allows the user to specify number of base pairs unwrapped compared to
     the crystal structure (146bp of DNA length wrapped, 147bp bound since one
     base pair is exactly on the dyad axis), and converts this to the number of
@@ -26,7 +29,7 @@ def resolve_unwrap(unwrap, unwraps_is='bp'):
     ----------
     unwrap : int
         total amount of unwrapped DNA on both sides
-    unwraps_is : string
+    unwrap_is : string
         'bp' or 'sites', specifies the DNA-nucleosome binding model used
 
     Returns
@@ -36,7 +39,7 @@ def resolve_unwrap(unwrap, unwraps_is='bp'):
     w_out : int
         amount wrapped exit side of dyad axis
     """
-    if unwraps_is == 'sites':
+    if unwrap_is == 'sites':
         unwrap = 10.5 + 10.5*unwrap
     unwrap = np.round(unwrap).astype(int)
     if unwrap % 2 == 1:
@@ -47,7 +50,7 @@ def resolve_unwrap(unwrap, unwraps_is='bp'):
         return w, w
     return
 
-def resolve_wrapping_params(unwraps, w_ins=None, w_outs=None, N=None, unwraps_is='bp'):
+def resolve_wrapping_params(unwraps, w_ins=None, w_outs=None, N=None, unwrap_is='bp'):
     """Allow the user to specify either one value (and tile appropriately) or
     an array of values for the number of base pairs bound to the nucleosome.
     Also allow either the number of base pairs bound on each side of the dyad to be
@@ -65,7 +68,7 @@ def resolve_wrapping_params(unwraps, w_ins=None, w_outs=None, N=None, unwraps_is
         wrapped DNA on exit side of dyad axis
     N (optional): int
         output size, if other params are not array_like
-    unwraps_is : string
+    unwrap_is : string
         'bp' or 'sites', to specify whether we're counting the number of bp
         bound or the number of nucleosome-to-dna contacts (respectively)
 
@@ -82,7 +85,7 @@ def resolve_wrapping_params(unwraps, w_ins=None, w_outs=None, N=None, unwraps_is
 
     if unwraps is not None:
         unwraps = np.atleast_1d(unwraps)
-        w_ins, w_outs = zip(*map(resolve_unwrap, unwraps))
+        w_ins, w_outs = zip(*map(functools.partial(resolve_unwrap, unwrap_is=unwrap_is), unwraps))
     w_ins = np.atleast_1d(w_ins)
     w_outs = np.atleast_1d(w_outs)
     if len(w_ins) == 1 and N is not None:
