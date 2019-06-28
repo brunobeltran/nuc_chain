@@ -24,7 +24,6 @@ from nuc_chain import linkers as ncl
 from MultiPoint import propagator
 from nuc_chain import fluctuations as wlc
 from nuc_chain.linkers import convert
-from nuc_chain import visualization as vis
 
 # Plotting parameters
 # PRL Font preference: computer modern roman (cmr), medium weight (m), normal shape
@@ -32,7 +31,7 @@ cm_in_inch = 2.54
 # column size is 8.6 cm
 col_size = 8.6 / cm_in_inch
 default_width = 1.0*col_size
-aspect_ratio = 4/7
+aspect_ratio = 5/7
 default_height = aspect_ratio*default_width
 plot_params = {
     'backend': 'pdf',
@@ -80,6 +79,7 @@ teal_flucts = '#387780'
 red_geom = '#E83151'
 dull_purple = '#755F80'
 rich_purple = '#e830e8'
+dull_blue = '#c4aab8' #sns.color_palette('muted')[0]
 
 def render_chain(linkers, unwraps=0, **kwargs):
         entry_rots, entry_pos = ncg.minimum_energy_no_sterics_linker_only(linkers, unwraps=unwraps)
@@ -88,7 +88,7 @@ def render_chain(linkers, unwraps=0, **kwargs):
         # to use "off-screen rendering" and fullscreen your window before
         # saving (this is actually required if you're using a tiling window
         # manager like e.g. i3 or xmonad).
-        vis.visualize_chain(entry_rots, entry_pos, linkers, unwraps=unwraps, plot_spheres=True)
+        ncg.visualize_chain(entry_rots, entry_pos, linkers, unwraps=unwraps, plot_spheres=True)
 
 def draw_triangle(alpha, x0, width, orientation, base=10,
                             **kwargs):
@@ -183,8 +183,8 @@ def draw_power_law_triangle(alpha, x0, width, orientation, base=10,
 
 default_lis = [36, 38]
 default_colors = [red_geom, rich_purple]
-def plot_fig2a(lis=default_lis, colors=None):
-    """The r2 of the 36bp homogenous chain (0 unwrapping) compared to the
+def plot_r2_homogeneous(lis=default_lis, colors=None):
+    """The r2 of the 36bp homogeneous chain (0 unwrapping) compared to the
     wormlike chain with the corresponding Kuhn length."""
     if colors is None:
         if len(lis) == 2:
@@ -198,13 +198,14 @@ def plot_fig2a(lis=default_lis, colors=None):
     plt.plot(x, y, '.', color=[0,0,0], markersize=1)
     hdfs = {}
     for i, li in enumerate(lis):
-        hdfs[li] = pd.read_csv(f'./csvs/r2/r2-fluctuations-mu_{li}-sigma_0_10_0unwraps.csv')
+        hdfs[li] = pd.read_csv(f'./csvs/r2/r2-fluct-box-mu_{li}-sigma_0-0unwraps.csv')
         try:
             del hdfs[li]['Unnamed: 0']
         except:
             pass
-        hdfs[li] = hdfs[li].set_index(['variance', 'chain_id']).loc[0.0, 0.0]
-        hdfs[li].iloc[0,0:2] = 1 # rmax,r2 == (0,0) ==> (1,1)
+        hdfs[li] = hdfs[li].set_index(['chain_id']).loc[0.0]
+        # make log pretty
+        hdfs[li].loc[hdfs[li]['rmax'] == 0.0, ['r2', 'rmax']] = 1
         plt.plot(hdfs[li]['rmax'], np.sqrt(hdfs[li]['r2']), color=colors[i])
     for li in lis:
         y = np.sqrt(wlc.r2wlc(x, hdfs[li]['kuhn'].mean()/2))
@@ -220,9 +221,9 @@ def plot_fig2a(lis=default_lis, colors=None):
     plt.fill_between(x, ymin, ymax, where=x>=250, color=[0.9, 0.9, 0.91])
 
     # power law triangle for the two extremal regimes
-    corner = draw_power_law_triangle(1, [np.log10(2), np.log10(3)], 0.5, 'up')
+    corner = draw_power_law_triangle(1, np.log10([2, 3]), 0.5, 'up')
     plt.text(3, 11, '$L^1$')
-    corner = draw_power_law_triangle(1/2, [np.log10(350), np.log10(30)], 0.8, 'down')
+    corner = draw_power_law_triangle(1/2, np.log10([350, 30]), 0.8, 'down')
     plt.text(700, 16, '$L^{1/2}$')
 
     plt.xlim([xmin, xmax])
@@ -236,27 +237,73 @@ def plot_fig2a(lis=default_lis, colors=None):
            + [r'WLC, best fit']
     plt.legend(legend)
     plt.tight_layout()
-    plt.savefig('./plots/PRL/fig2a_r2_homogenous_vs_wlc.pdf', bbox_inches='tight')
+    plt.savefig('./plots/lesHouches/r2_homogeneous_vs_wlc.pdf', bbox_inches='tight')
 
-def plot_fig2b():
-    kuhns = np.load('csvs/kuhns_1to250links_0to146unwraps.npy')
+def plot_r2_exponential(mu=37, color=dull_blue):
+    """show that ensemble of exponential chains is a WLC"""
     fig, ax = plt.subplots(figsize=(default_width, default_height))
+    x = np.logspace(0, 7, 100)
+    y = np.sqrt(wlc.r2wlc(x, 100))
+    plt.plot(x, y, '.', color=[0,0,0], markersize=1, label='Bare DNA')
+    r2s = pd.read_csv(f'./csvs/r2/r2-fluct-exp-mu_{mu}-sigma_0-0unwraps.csv')
+    # make log pretty
+    r2s.loc[r2s['rmax'] == 0.0, ['r2', 'rmax']] = 1
+    y = np.sqrt(wlc.r2wlc(x, r2s['kuhn'].mean()/2))
+    plt.plot([], [], '-.', color=teal_flucts, markersize=2,
+             linewidth=1.5, label='WLC, best fit')
+    plt.plot([], [], color=color,
+            label=(r'Exponential chain, $\mu = ' + f'{mu}' + r'$bp'))
+    plt.legend()
+
+    for chain_id, r2 in r2s.groupby(['chain_id']):
+        plt.plot(r2['rmax'], np.sqrt(r2['r2']), color=color, alpha=0.2)
+    plt.plot(x, y, '-.', color=teal_flucts, markersize=2, linewidth=1.5)
+
+    xmin = 1
+    ymin = xmin
+    ymax = 700
+    xmax = 3_000
+    # bands representing different regimes of the R^2
+    plt.fill_between(x, ymin, ymax, where=x<12, color=[0.96, 0.95, 0.95])
+    plt.fill_between(x, ymin, ymax, where=((x>=12)&(x<250)), color=[0.99, 0.99, 0.99])
+    plt.fill_between(x, ymin, ymax, where=x>=250, color=[0.9, 0.9, 0.91])
+
+    # power law triangle for the two extremal regimes
+    corner = draw_power_law_triangle(1, np.log10([2, 3]), 0.5, 'up')
+    plt.text(3, 11, '$L^1$')
+    corner = draw_power_law_triangle(1/2, np.log10([350, 30]), 0.8, 'down')
+    plt.text(700, 16, '$L^{1/2}$')
+
+    plt.xlim([xmin, xmax])
+    plt.ylim([ymin, ymax])
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel('Total linker length (nm)')
+    plt.ylabel(r'End-to-end distance (nm)')
+    plt.tight_layout()
+    plt.savefig('./plots/lesHouches/r2_exponential_vs_wlc.pdf', bbox_inches='tight')
+
+
+def kuhn_lengths_homogeneous():
+    kuhns = pd.read_csv('./csvs/all_kuhns.csv', index_col=np.arange(5))
+    homo = kuhns.loc['box', 'fluct', :, 0, 0] # all mu, sigma/unwrap=0
+    fig, ax = plt.subplots(figsize=(default_height*7/4, default_height))
     links = np.arange(31, 52)
-    ax.plot(links, kuhns[links-1, 0], '--o', markersize=4, lw=1.5, color=teal_flucts)
+    ax.plot(links, homo.loc[links, 'b'], '--o', markersize=4, lw=1.5, color=teal_flucts)
     for i, li in enumerate(default_lis):
-        ax.plot(li, kuhns[li-1, 0], '--o', markersize=4, color=default_colors[i])
+        ax.plot(li, homo.loc[li, 'b'], '--o', markersize=4, color=default_colors[i])
     plt.xticks(np.arange(31, 50, 2))
     plt.xlim([31, 49])
     plt.xlabel('Fixed linker length (bp)')
     plt.ylabel('Kuhn length (nm)')
     plt.tight_layout()
-    plt.savefig('plots/PRL/fig2b_kuhn_length_in_nm_31to51links_0unwraps.pdf')
+    plt.savefig('plots/lesHouches/kuhn_lengths_homogeneous.pdf')
 
 def render_fig2b_chains(**kwargs):
     for li in [36, 38, 41, 47]:
         render_chain(14*[li], **kwargs)
 
-def plot_fig3(mu=41):
+def increasing_sigma(mu=41):
     """use scripts/r2-tabulation.py and wlc.aggregate_existing_kuhns to create
     the kuhns_so_far.csv file."""
     fig, ax = plt.subplots(figsize=(default_width, default_height))
@@ -265,38 +312,38 @@ def plot_fig3(mu=41):
     all_kuhns = pd.read_csv('./csvs/kuhns_so_far.csv', index_col=np.arange(5))
     kg = all_kuhns.loc['box', 'geometrical', mu].reset_index()
     kg = kg.sort_values('variance')
-    ax.plot(kg['variance'].values, kg['b'].values, '--^', markersize=3, label='0T, uniform',
+    ax.plot(kg['variance'].values, kg['b'].values, '--^', markersize=3, label='Zero-temperature',
             color=red_geom)
     kf = all_kuhns.loc['box', 'fluctuations', mu].reset_index()
     kf = kf.sort_values('variance')
-    ax.plot(kf['variance'].values, kf['b'].values, '-o', markersize=3, label='Fluctuating, uniform',
+    ax.plot(kf['variance'].values, kf['b'].values, '-o', markersize=3, label='Fluctuating',
             color=teal_flucts)
     rdf = pd.read_csv('./csvs/r2/r2-fluctuations-exponential-link-mu_41-0unwraps.csv')
     b = rdf['kuhn'].mean()
     xlim = plt.xlim()
-    plt.plot([-10, 50], [b, b], 'k-.', label='Fluctuating, exponential')
+    plt.plot([-10, 50], [b, b], 'k-.', label='Maximum Entropy')
     plt.xlim(xlim)
     ax.set_ylim([0, 100])
     plt.xlabel('Linker length variability $\pm\sigma$ (bp)')
     plt.ylabel('Kuhn length (nm)')
     plt.legend()
-    #fig.text(0, 1.3, r'$\pm 0 bp$', size=9)
-    #fig.text(0.1, 1.1, r'$\pm 2 bp$', size=9)
-    #fig.text(0.7, 1.2, r'$\pm 6 bp$', size=9)
-    #plt.subplots_adjust(left=0.07, bottom=0.15, top=0.92, right=0.97)
+    fig.text(1.3, 0, r'$\pm 0 bp$', size=9)
+    fig.text(1.6, 0, r'$\pm 2 bp$', size=9)
+    fig.text(1.9, 0, r'$\pm 6 bp$', size=9)
+    # plt.subplots_adjust(left=0.07, bottom=0.15, top=0.92, right=0.97)
     plt.tight_layout()
-    plt.savefig('./plots/PRL/fig-3-kuhn_length_vs_window_size_41_sigma0to40.pdf',
+    plt.savefig('./plots/lesHouches/fig-3-kuhn_length_vs_window_size_41_sigma0to40.pdf',
                bbox_inches='tight')
 
-def render_fig3_chains(mu=41, sigmas=[0, 2, 6], N=50):
+def render_fig3_chains(mu=41, sigmas=[0, 2, 6]):
     for sigma in sigmas:
         sign_bit = 2*np.round(np.random.rand(N)) - 1
         render_chain(mu + sign_bit*np.random.randint(sigma+1), size=(N,))
 
-def plot_fig4b():
-    fig, ax = plt.subplots(figsize=(default_width, 1.06*default_height))
-    kuhns = pd.read_csv('csvs/kuhns_so_far.csv') #note this is the old version (not in new repo)
-    kuhns = kuhns.set_index(['variance_type', 'type', 'unwrap', 'mu', 'variance'])
+def kuhn_lengths_heterogeneous():
+    fig, ax = plt.subplots(figsize=(default_width, default_height))
+    kuhns = pd.read_csv('csvs/kuhns_so_far.csv')
+    kuhns = kuhns.set_index(['variance_type', 'type', 'mu', 'variance'])
     mu_max = 100
     # dotted line at 100 nm
     ax.plot(np.linspace(0, mu_max, 100), np.tile(100, 100), '.',
@@ -304,14 +351,13 @@ def plot_fig4b():
     def make_plottable(df):
         df = df.groupby('mu').mean().reset_index()
         df = df[df['mu'] < mu_max].dropna()
-        df = df.sort_values('mu')
         return df
-    exp_fluct = kuhns.loc['exponential', 'fluctuations', 0]
+    exp_fluct = kuhns.loc['exponential', 'fluctuations']
     exp_fluct = make_plottable(exp_fluct)
     ax.plot(exp_fluct['mu'], exp_fluct['b'], label='Exponential', color=teal_flucts)
-    homo_fluct = kuhns.loc['box', 'fluctuations', 0, :, 0]
+    homo_fluct = kuhns.loc['homogeneous', 'fluctuations']
     homo_fluct = make_plottable(homo_fluct)
-    ax.plot(homo_fluct['mu'], homo_fluct['b'], color=dull_purple, alpha=0.5, lw=0.75, label='Homogeneous')
+    ax.plot(homo_fluct['mu'], homo_fluct['b'], color=dull_purple, alpha=0.5, lw=0.75, label='homogeneous')
 
 
     #lines for yeast, mice, human
@@ -332,11 +378,11 @@ def plot_fig4b():
     plt.legend(loc=(0.05, 0.6))
     # plt.subplots_adjust(left=0.14, bottom=0.15, top=0.98, right=0.99)
     plt.xlabel(r'$\langle L_i \rangle$ (bp)')
-    plt.ylabel(r'Kuhn length (nm \textbf{of linker})')
+    plt.ylabel(r'Kuhn length (nm)')
     plt.tight_layout()
-    plt.savefig('plots/PRL/fig4b_kuhn_exponential.pdf', bbox_inches='tight')
+    plt.savefig('plots/lesHouches/fig4b_kuhn_exponential.pdf', bbox_inches='tight')
 
-def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
+def plot_fig5(df=None, rmax_or_ldna='rmax', named_sim='mu56'):
     fig, ax = plt.subplots(figsize=(default_width, default_height))
     n = rmax_or_ldna
     # first set sim-specific parameters, draw scaling triangles at manually
@@ -359,7 +405,7 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
         plt.text(10**3.6, 10**(-6.8), '$L^{-3/2}$')
         min_n = 10**2.5
     if df is None:
-        df = load_looping_statistics_heterogenous_chains(named_sim=named_sim)
+        df = load_looping_statistics_heterogeneous_chains(named_sim=named_sim)
     # if the first step is super short, we are numerically unstable
     df.loc[df['rmax'] <= 5, 'ploops'] = np.nan
     # if the output is obviously bad numerics, ignore it
@@ -482,7 +528,7 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
         plt.xlabel('Total linker length (bp)')
     elif rmax_or_ldna == 'ldna':
         plt.xlabel('Genomic distance (bp)')
-    plt.ylabel(r'$P_\mathrm{loop}\;\;\;(\mathrm{bp}^{-3})$')
+    plt.ylabel(r'$P_\mathrm{loop}\;\;\;(\mathrm{nm}^{-3})$')
 
     # plt.legend([fill, l100, lnormed], ['Average $\pm$ 95\%',
     #         'Straight chain, b=100nm', f'Straight chain, b={b:0.2f}nm'],
@@ -491,7 +537,7 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
     plt.xscale('log')
 
     plt.tight_layout()
-    plt.savefig(f'plots/PRL/fig5_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
+    plt.savefig(f'plots/lesHouches/fig5_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
 
 def interpolated_ploop(df, rmax_or_ldna='ldna', n=np.logspace(2, 5, 1000),
                        ploop_col='ploops'):
@@ -503,7 +549,7 @@ def interpolated_ploop(df, rmax_or_ldna='ldna', n=np.logspace(2, 5, 1000),
             left=df[ploop_col].values[0], right=df[ploop_col].values[-1])
     return pd.DataFrame(np.stack([n, ploop]).T, columns=[n_col+'_interp', ploop_col+'_interp'])
 
-def load_looping_statistics_heterogenous_chains(*, dir=None, file_re=None, links_fmt=None, greens_fmt=None, named_sim=None):
+def load_looping_statistics_heterogeneous_chains(*, dir=None, file_re=None, links_fmt=None, greens_fmt=None, named_sim=None):
     """Load in looping probabilities for all example chains of a given type
     done so far.
 
@@ -523,9 +569,9 @@ def load_looping_statistics_heterogenous_chains(*, dir=None, file_re=None, links
         greens_fmt = 'kinkedWLC_greens_{num_nucs}nucs_chain{chain_id}_{num_nucs}nucs.npy'
         if named_sim == 'mu56':
             #directory in which all chains are saved
-            loops_dir = Path('csvs/Bprops/0unwraps/heterogenous/exp_mu56')
+            loops_dir = Path('csvs/Bprops/0unwraps/heterogeneous/exp_mu56')
         elif named_sim == 'links31-to-52':
-            loops_dir = Path('csvs/Bprops/0unwraps/heterogenous/links31to52')
+            loops_dir = Path('csvs/Bprops/0unwraps/heterogeneous/links31to52')
         else:
             raise ValueError('Unknown sim type!')
         cache_csv = Path(loops_dir/f'looping_probs_heterochains_{named_sim}_0unwraps.csv')

@@ -1,4 +1,6 @@
 #plotting parameters
+from pathlib import Path
+
 import matplotlib.cm as cm
 import numpy as np
 import seaborn as sns
@@ -446,4 +448,63 @@ def interpolated_ploop(df, rmax_or_ldna='ldna', n=np.logspace(2, 5, 1000),
             left=df[ploop_col].values[0], right=df[ploop_col].values[-1])
     return pd.DataFrame(np.stack([n, ploop]).T, columns=[n_col+'_interp', ploop_col+'_interp'])
 
+
+def figs11a_unwrapping_kuhn():
+    """ to generate the data needed to make this plot, run r2-tabulation.py
+    with kd_unwrap equal to the values below, and mu=np.arange(100) """
+    fig, ax = plt.subplots(figsize=(1.1*default_width, default_height))
+
+    kuhns_file = Path('csvs/kuhns-kd_unwrap.csv')
+    if kuhns_file.exists():
+        kuhns = pd.read_csv(kuhns_file) \
+                .set_index(['variance_type', 'sim_type']) \
+                .apply(pd.to_numeric)
+    else:
+        prefix = 'r2-fluct-exp-mu_*-sigma_0-kd_unwraps_'
+        # globs = [prefix + name for name in ['1e-10-small.csv', '0.1-small.csv',
+        #                                     '0.01-small.csv', '0.001-small.csv']]
+        globs = [prefix + name for name in ['0-fake_kd.csv', '0.1-small.csv',
+                                            '0.01-small.csv', '0.001-small.csv']]
+        kuhns = pd.concat([wlc.aggregate_existing_kuhns(glob) for glob in globs]) \
+                .reset_index() \
+                .set_index(['variance_type', 'sim_type']) \
+                .apply(pd.to_numeric) \
+                .sort_values('mu')
+    kd = 0
+    ks = kuhns[kuhns['kd_unwrap'] == 0]
+    plt.scatter(ks['mu'], ks['b'], s=2, c='k', label=f'$K_d = {kd}$')
+    kds = [0.1, 0.01, 0.001]
+    for i, kd in enumerate(kds):
+        ks = kuhns[kuhns['kd_unwrap'] == kd]
+        plt.scatter(ks['mu'], ks['b'], c=sns.color_palette()[i],
+                 label=f'$K_d = {kd}$', alpha=0.7)
+    plt.legend()
+    kd = 0
+    ks = kuhns[kuhns['kd_unwrap'] == 0]
+    plt.scatter(ks['mu'], ks['b'], s=2, c='k')
+    plt.plot(ks['mu'], ks['b'], c='k')
+
+    plt.xlabel(r'$\langle L_i \rangle$')
+    plt.ylabel(r'Kuhn length (nm of linker)')
+    # for i, kd in enumerate(kds):
+    #     ks = kuhns[kuhns['kd_unwrap'] == kd]
+    #     plt.plot(ks['mu'], ks['b'], c=sns.color_palette()[i],
+    #              alpha=0.1
+    plt.savefig(f'plots/PRL/figS11_unwrapping_kuhns.pdf', bbox_inches='tight')
+    return kuhns
+
+def figs11b_unwrapping_levels():
+    fig, ax = plt.subplots(figsize=(default_width*0.4, 0.5*default_height))
+    x = np.arange(8)
+    kds = [0.1, 0.01, 0.001]
+    for i, kd in enumerate(kds):
+        plt.bar(x, scipy.stats.binom(7, kd).pmf(x),
+                fc=sns.color_palette()[i]+(0.3,), width=1,
+                ec=sns.color_palette()[i], linewidth=2,
+                label=f'$K_d = {kd}$')
+    xticks = [0, 2, 4, 6]
+    plt.xticks(xticks)
+    plt.xlabel(r'# unwrapped')
+    plt.ylabel(r'Probability')
+    plt.savefig(f'plots/PRL/figS11_unwrapping_levels.pdf', bbox_inches='tight')
 

@@ -33,7 +33,6 @@ from . import linkers as ncl
 from .linkers import convert
 from MultiPoint import propagator
 from MultiPoint import WLCgreen
-from memory_profiler import profile
 from multiprocessing import Pool
 from filelock import Timeout, FileLock
 import sys
@@ -209,7 +208,7 @@ def r2wlc(ldna, lp=default_lp):
     return 2*(lp*ldna - lp**2 + lp**2*np.exp(-ldna/lp))
 
 def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False,
-        lt=default_lt, lp=default_lp, kd_unwrap=0.0, w_ins=ncg.default_w_in,
+        lt=default_lt, lp=default_lp, kd_unwrap=None, w_ins=ncg.default_w_in,
         w_outs=ncg.default_w_out, tau_d=ncg.dna_params['tau_d'],
         tau_n=ncg.dna_params['tau_n'], lmax=2, helix_params=ncg.helix_params_best,
         unwraps=None, random_phi=False):
@@ -250,7 +249,8 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False,
     b = helix_params['b']
     num_linkers = len(links)
     num_nucleosomes = num_linkers + 1
-    if kd_unwrap > 0.0:
+    # resolve kd_unwrap
+    if kd_unwrap is not None:
         sites_unbound_left = scipy.stats.binom(7, kd_unwrap).rvs(num_nucleosomes)
         sites_unbound_right = scipy.stats.binom(7, kd_unwrap).rvs(num_nucleosomes)
         w_ins, w_outs = convert.resolve_wrapping_params(sites_unbound_left + sites_unbound_right,
@@ -325,7 +325,11 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False,
     lengthDNA = lengthDNA * ncg.dna_params['lpb']
 
     # Find scaling of R2 with length of chain at larger length scales to calculate Kuhn length
-    kuhn = stats.linregress(lengthDNA[5000:], r2[5000:])[0]
+    try:
+        min_i = np.round(len(lengthDNA)*5/6).astype(int)
+        kuhn = stats.linregress(lengthDNA[min_i:], r2[min_i:])[0]
+    except:
+        kuhn = np.nan
     # Plot r2 vs. length of chain (in bp)
     if plotfig:
         raise NotImplementedError('This module no longer plots.')
@@ -335,7 +339,7 @@ def R2_kinked_WLC_no_translation(links, figname='fig', plotfig=False,
         # plt.ylabel(r'$<R^2>$')
         # plt.savefig(figname)
 
-    return r2, lengthDNA, kuhn
+    return r2, lengthDNA, kuhn, w_ins, w_outs
 
 def tabulate_kuhn_lengths():
     """Calculate and save Kuhn lengths for chains with fixed linker lengths 1-250 bp
@@ -355,7 +359,7 @@ def tabulate_kuhn_lengths():
     for i in range(links.shape[0]):
         linkers = np.tile(links[i, 0], 10000)
         for j in range(unwraps.shape[1]):
-            r2, ldna, kuhn, bmats = R2_kinked_WLC_no_translation(linkers, unwraps=unwraps[i, j])
+            r2, ldna, kuhn, w_ins, w_outs = R2_kinked_WLC_no_translation(linkers, unwraps=unwraps[i, j])
             kuhns[i, j] = kuhn
             # append dictionary from previous calculation to the global dictionary
             Bmats = {**Bmats, **bmats}
@@ -508,7 +512,7 @@ def heterogenous_chains_kuhn_lengths(links, unwraps=0, numiter=10, **kwargs):
     ldna = np.zeros_like(r2)
     for i in range(numiter):
         links = np.random.choice(links, 7500)
-        r2d, ldnad, kuhnsd = R2_kinked_WLC_no_translation(links, plotfig=False, unwraps=unwraps)
+        r2d, ldnad, kuhnsd, w_ins, w_outs = R2_kinked_WLC_no_translation(links, plotfig=False, unwraps=unwraps)
         r2[i, :] = r2d
         ldna[i, :] = ldnad
         kuhns[i] = kuhnsd
@@ -545,16 +549,20 @@ def tabulate_r2_heterogenous_fluctuating_chains_by_variance(num_chains, chain_le
     variance = rmax.copy()
     chain_id = rmax.copy()
     kuhns = rmax.copy()
+    all_w_ins = rmax.copy()
+    all_w_outs = rmax.copy()
     def given_ij(ij):
         i, j = ij
         #note r2, ldna returned by R2_kinked_WLC() is the same shape as links. add a 0 to the beginning
         #to match bruno's code; Output is in nm
-        R2, Rmax, kuhn = R2_kinked_WLC_no_translation(links[i,j,:].flatten(), plotfig=False, **kwargs)
+        R2, Rmax, kuhn, w_ins, w_outs = R2_kinked_WLC_no_translation(links[i,j,:].flatten(), plotfig=False, **kwargs)
         r2[i,j] = np.concatenate(([0], R2))
         rmax[i,j] = np.concatenate(([0], Rmax))
         variance[i] = sigmas[i]
         kuhns[i,j] = kuhn
         chain_id[i,j] = j
+        all_w_ins[i,j] = w_ins
+        all_w_outs[i,j] = w_outs
     if pool_size is None:
         for i in range(n_sig):
             for j in range(num_chains):
@@ -563,8 +571,9 @@ def tabulate_r2_heterogenous_fluctuating_chains_by_variance(num_chains, chain_le
         with Pool(processes=pool_size) as p:
             p.map(given_ij, [(i,j) for i in range(n_sig) for j in range(num_chains)])
     df = pd.DataFrame(np.stack([
-        r2.flatten(), rmax.flatten(), variance.flatten(), chain_id.flatten(), kuhns.flatten()
-        ], axis=1), columns=['r2', 'rmax', 'variance', 'chain_id', 'kuhn'])
+        r2.flatten(), rmax.flatten(), variance.flatten(), chain_id.flatten(), kuhns.flatten(),
+        all_w_ins.flatten(), all_w_outs.flatten()], axis=1),
+        columns=['r2', 'rmax', 'variance', 'chain_id', 'kuhn', 'w_ins', 'w_outs'])
     return df
 
 def tabulate_r2_heterogenous_fluctuating_chains_exponential(num_chains, chain_length, mu=35, pool_size=None, **kwargs):
@@ -578,14 +587,18 @@ def tabulate_r2_heterogenous_fluctuating_chains_exponential(num_chains, chain_le
     r2 = rmax.copy()
     chain_id = rmax.copy()
     kuhns = rmax.copy()
+    all_w_ins = rmax.copy()
+    all_w_outs = rmax.copy()
     def given_chain_i(i):
         #note r2, ldna returned by R2_kinked_WLC() is the same shape as links. add a 0 to the beginning
         #to match bruno's code; Output is in nm
-        R2, Rmax, kuhn = R2_kinked_WLC_no_translation(links[i,:].flatten(), plotfig=False, **kwargs)
+        R2, Rmax, kuhn, w_ins, w_outs = R2_kinked_WLC_no_translation(links[i,:].flatten(), plotfig=False, **kwargs)
         r2[i] = np.concatenate(([0], R2))
         rmax[i] = np.concatenate(([0], Rmax))
         kuhns[i] = kuhn
         chain_id[i] = i
+        all_w_ins[i] = w_ins
+        all_w_outs[i] = w_outs
     if pool_size is None:
         for i in range(num_chains):
             given_chain_i(i)
@@ -594,8 +607,9 @@ def tabulate_r2_heterogenous_fluctuating_chains_exponential(num_chains, chain_le
         # with Pool(processes=pool_size) as p:
         #     p.map(given_ij, [(i,j) for i in range(n_sig) for j in range(num_chains)])
     df = pd.DataFrame(np.stack([
-        r2.flatten(), rmax.flatten(), chain_id.flatten(), kuhns.flatten()
-        ], axis=1), columns=['r2', 'rmax', 'chain_id', 'kuhn'])
+        r2.flatten(), rmax.flatten(), chain_id.flatten(), kuhns.flatten(),
+        all_w_ins.flatten(), all_w_outs.flatten()], axis=1),
+        columns=['r2', 'rmax', 'chain_id', 'kuhn', 'w_ins', 'w_outs'])
     df['mu'] = mu
     return df
 
@@ -611,7 +625,7 @@ def tabulate_r2_heterogenous_fluctuating_chains_homogenous(num_chains, chain_len
     def given_chain_i(i):
         #note r2, ldna returned by R2_kinked_WLC() is the same shape as links. add a 0 to the beginning
         #to match bruno's code; Output is in nm
-        R2, Rmax, kuhn = R2_kinked_WLC_no_translation(links[i,:].flatten(), plotfig=False, **kwargs)
+        R2, Rmax, kuhn, w_ins, w_outs = R2_kinked_WLC_no_translation(links[i,:].flatten(), plotfig=False, **kwargs)
         r2[i] = np.concatenate(([0], R2))
         rmax[i] = np.concatenate(([0], Rmax))
         kuhns[i] = kuhn
@@ -694,8 +708,12 @@ def get_kuhn(df, thresh, rmax_col='rmax', r2_col='r2'):
     """Take a df with r2/rmax columns and a threshold (burn in length) in
     number of monomers after which to fit adn do a linear fit to extract teh
     kuhn length."""
-    ks = scipy.stats.linregress(df.loc[df[rmax_col] > thresh, rmax_col],
-                                df.loc[df[rmax_col] > thresh, r2_col])
+    if not np.any(df[rmax_col] > thresh):
+        ks = scipy.stats.mstats_basic.LinregressResult(np.nan, np.nan, np.nan,
+                                                       np.nan, np.nan)
+    else:
+        ks = scipy.stats.linregress(df.loc[df[rmax_col] > thresh, rmax_col],
+                                    df.loc[df[rmax_col] > thresh, r2_col])
     return ks
 
 def get_kuhns_grouped(df, thresh, groups, rmax_col='rmax', r2_col='r2'):
@@ -710,26 +728,30 @@ def aggregate_existing_kuhns(glob='*.csv', thresh=5000):
     """Aggregates all Kuhn lengths that can be calculated from the
     r2-tabulation script."""
     kuhns = []
-    r2_format_re = re.compile('r2-(fluct|geom)-(box|exp)-mu_([0-9]+)-sigma_([0-9]+)-([0-9]+)unwraps(-.*)?.csv')
+    r2_format_re = re.compile('r2-(fluct|geom)-(box|exp)-mu_([0-9]+)-sigma_([0-9]+)-kd_unwraps_([0-9]*\.?[0-9]*(?:e-[0-9]+)?)(-.*)?.csv')
     for path in Path('./csvs/r2').glob(glob):
-        try:
-            df = pd.read_csv(path)
-        except:
-            continue
         match = r2_format_re.search(path.name)
         if match is None:
             print("File name cannot be parsed: " + str(path))
             continue
-        sim_type, variance_type, mu, sigma, unwrap, desc = match.groups()
+        try:
+            df = pd.read_csv(path)
+        except:
+            print("Pandas was unable to parse file: " + str(path))
+            continue
+        if len(df) == 0:
+            print("File was empty: " + str(path))
+            continue
+        sim_type, variance_type, mu, sigma, kd_unwrap, desc = match.groups()
         df['mu'] = mu
         df['sigma'] = sigma
-        df['unwrap'] = unwrap
-        ks = get_kuhns_grouped(df, thresh=thresh, groups=['mu', 'sigma', 'unwrap'])
+        df['kd_unwrap'] = kd_unwrap
+        ks = get_kuhns_grouped(df, thresh=thresh, groups=['mu', 'sigma', 'kd_unwrap'])
         ks = ks.reset_index()
         ks['sim_type'] = sim_type
         ks['variance_type'] = variance_type
         kuhns.append(ks)
-    all_ks = [ks.set_index(['variance_type', 'sim_type', 'mu', 'sigma', 'unwrap']) for ks in kuhns]
+    all_ks = [ks.set_index(['variance_type', 'sim_type', 'mu', 'sigma', 'kd_unwrap']) for ks in kuhns]
     all_ks = pd.concat(all_ks)
 
     return all_ks
@@ -1143,7 +1165,6 @@ def gprop_R_given_N_quad_integration(Kmin=10**-3, Kmax=10**5, l0max=20, **kwargs
 ###{{{
 # """Propogators for kinked WLC"""
 
-#@profile
 def Bprop_k_given_L(k, links, filepath, w_ins=ncg.default_w_in, w_outs=ncg.default_w_out,
                         helix_params=ncg.helix_params_best, unwraps=None, **kwargs):
     """Calculate :math:`B_{00}^{00}(k;L)` for a chain of heterogenous linkers.
