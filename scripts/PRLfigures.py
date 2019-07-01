@@ -337,13 +337,13 @@ def plot_fig4b():
     plt.savefig('plots/PRL/fig4b_kuhn_exponential.pdf', bbox_inches='tight')
 
 def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
-    fig, ax = plt.subplots(figsize=(default_width, default_height))
+    fig, ax = plt.subplots(figsize=(default_width, 1.06*default_height))
     n = rmax_or_ldna
     # first set sim-specific parameters, draw scaling triangles at manually
     # chosen locations
     if (named_sim, rmax_or_ldna) == ('mu56', 'ldna'):
-        draw_power_law_triangle(-3/2, x0=[3.8, -7.1], width=0.4, orientation='up')
-        plt.text(10**(3.95), 10**(-6.8), '$L^{-3/2}$')
+        draw_power_law_triangle(-3/2, x0=[3.8, -6], width=0.4, orientation='up')
+        plt.text(10**(3.95), 10**(-5.7), '$L^{-3/2}$')
         # manually set thresholds to account for numerical instability at low n
         min_n = 10**2.6
     elif (named_sim, rmax_or_ldna) == ('mu56', 'rmax'):
@@ -355,8 +355,8 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
         plt.text(10**3.1, 10**(-7.3), '$L^{-3/2}$')
         min_n = 10**2.0
     elif (named_sim, rmax_or_ldna) == ('links31-to-52', 'ldna'):
-        draw_power_law_triangle(-3/2, x0=[3.5, -7], width=0.4, orientation='up')
-        plt.text(10**3.6, 10**(-6.8), '$L^{-3/2}$')
+        draw_power_law_triangle(-3/2, x0=[3.7, -6], width=0.4, orientation='up')
+        plt.text(10**3.85, 10**(-5.7), '$L^{-3/2}$')
         min_n = 10**2.5
     if df is None:
         df = load_looping_statistics_heterogenous_chains(named_sim=named_sim)
@@ -425,7 +425,7 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
         max_nuc_to_plot = num_nucs*(1 - 0.2*np.random.rand())
         chain = chain[chain['nuc_id'] <= max_nuc_to_plot]
         chain = chain[chain[n] >= min_n]
-        plt.plot(chain[n].values, chain['ploops'].values,
+        plt.plot(chain[n].values, chain['ploops'].values/ncg.dna_params['lpb']**3,
                  c=palette[ord[i]], alpha=0.15, lw=0.5, label=None)
     # bold a couple of the chains
     bold_c = palette[int(9*len(palette)/10)]
@@ -433,18 +433,17 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
         chains_to_bold = [(100,1), (50,120), (100,112)]
     elif named_sim == 'links31-to-52':
         chains_to_bold = [(50, 1), (50, 3), (50, 5)]
-        min_n = 10**2.7
     for chain_id in chains_to_bold:
         chain = df.loc[chain_id]
         chain = chain[chain[n] >= min_n]
-        plt.plot(chain[n].values, chain['ploops'].values, c=bold_c, alpha=0.6,
+        plt.plot(chain[n].values, chain['ploops'].values/ncg.dna_params['lpb']**3, c=bold_c, alpha=0.6,
                  label=None)
     fill = plt.fill_between(xgrid,
-            y_pred - ste_to_conf*sig,
-            y_pred + ste_to_conf*sig,
+            (y_pred - ste_to_conf*sig)/ncg.dna_params['lpb']**3,
+            (y_pred + ste_to_conf*sig)/ncg.dna_params['lpb']**3,
             alpha=.10, color='r')
 
-    plt.plot(xgrid, y_pred, 'r-', label='Average $\pm$ 95\%')
+    plt.plot(xgrid, y_pred/ncg.dna_params['lpb']**3, 'r-', label='Average $\pm$ 95\%')
 
     # load in the straight chain, in [bp] (b = 100nm/ncg.dna_params['lpb'])
     bare_n, bare_ploop = wlc.load_WLC_looping()
@@ -463,30 +462,31 @@ def plot_fig5(df=None, rmax_or_ldna='ldna', named_sim='mu56'):
         # (on ave)   = df['rmax'] + 146*df['rmax']/56
         bare_n = bare_n*(1 + nn)
     x, y = bare_n*k, bare_ploop/k**3,
-    lnormed = plt.plot(x[x >= min_n], y[x >= min_n],
+    lnormed = plt.plot(x[x >= min_n], y[x >= min_n]/ncg.dna_params['lpb']**3,
                        'k-.', label=f'Straight chain, b={b:0.1f}nm')
     # also plot just the bare WLC
     b = 2*wlc.default_lp
-    l100 = plt.plot(bare_n[bare_n>=min_n], bare_ploop[bare_n>=min_n], '-.', c=teal_flucts,
+    min_n_b100 = 10**2.7
+    l100 = plt.plot(bare_n[bare_n>=min_n_b100], bare_ploop[bare_n>=min_n_b100]/ncg.dna_params['lpb']**3, '-.', c=teal_flucts,
              label=f'Straight chain, b=100nm')
     # plt.plot(bare_n, wlc.sarah_looping(bare_n/2/wlc.default_lp)/(2*wlc.default_lp)**2)
 
     plt.xlim([10**(np.log10(min_n)*1), 10**(np.log10(np.max(df[n]))*0.99)])
     if rmax_or_ldna == 'rmax':
-        plt.ylim([10**(-11), 10**(-6)])
+        plt.ylim(np.array([10**(-11), 10**(-6)])/ncg.dna_params['lpb']**3)
     elif rmax_or_ldna == 'ldna':
-        plt.ylim([10**(-13), 10**(-5)])
+        plt.ylim(np.array([10**(-13), 10**(-5)])/ncg.dna_params['lpb']**3)
     plt.tick_params(axis='y', which='minor', left=False)
 
     if rmax_or_ldna == 'rmax':
         plt.xlabel('Total linker length (bp)')
     elif rmax_or_ldna == 'ldna':
         plt.xlabel('Genomic distance (bp)')
-    plt.ylabel(r'$P_\mathrm{loop}\;\;\;(\mathrm{bp}^{-3})$')
+    plt.ylabel(r'$P_\mathrm{loop}\;\;\;(\mathrm{nm}^{-3})$')
 
     # plt.legend([fill, l100, lnormed], ['Average $\pm$ 95\%',
     #         'Straight chain, b=100nm', f'Straight chain, b={b:0.2f}nm'],
-    plt.legend(loc='upper right', bbox_to_anchor=[0.9, 0.35])
+    plt.legend(loc='upper right', bbox_to_anchor=[0.9, 0.40])
     plt.yscale('log')
     plt.xscale('log')
 

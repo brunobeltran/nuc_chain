@@ -16,6 +16,10 @@ from nuc_chain import fluctuations as wlc
 from nuc_chain.linkers import convert
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+import re
+from pathlib import Path
+import pickle
+
 # Plotting parameters
 # PRL Font preference: computer modern roman (cmr), medium weight (m), normal shape
 cm_in_inch = 2.54
@@ -320,6 +324,67 @@ def draw_power_law_triangle(alpha, x0, width, orientation, base=10,
         raise ValueError(r"Need $\alpha\in\mathbb{R} and orientation\in{'up', 'down'}")
     return corner
 
+def load_looping_statistics_heterogenous_chains(*, dir=None, file_re=None, links_fmt=None, greens_fmt=None, named_sim=None):
+    """Load in looping probabilities for all example chains of a given type
+    done so far.
+
+    Specify how to find the files via the directory dir, a regex that can
+    extract the "num_nucs" and "chain_id" from the folder name, a format string that
+    expands num_nucs, chain_id into the file name holding the linker lengths
+    for that chain, and another format string that expands into the filename
+    holding the greens function.
+
+    OR: just pass named_sim='mu56' or 'links31-to-52' to load in exponential chains with
+    mean linker length 56 or uniform linker chain with lengths from 31-52,
+    resp.
+    """
+    if named_sim is not None:
+        file_re = re.compile("([0-9]+)nucs_chain([0-9]+)")
+        links_fmt = 'linker_lengths_{num_nucs}nucs_chain{chain_id}_{num_nucs}nucs.npy'
+        greens_fmt = 'kinkedWLC_greens_{num_nucs}nucs_chain{chain_id}_{num_nucs}nucs.npy'
+        if named_sim == 'mu56':
+            #directory in which all chains are saved
+            loops_dir = Path('csvs/Bprops/0unwraps/heterogenous/exp_mu56')
+        elif named_sim == 'links31-to-52':
+            loops_dir = Path('csvs/Bprops/0unwraps/heterogenous/links31to52')
+        else:
+            raise ValueError('Unknown sim type!')
+        cache_csv = Path(loops_dir/f'looping_probs_heterochains_{named_sim}_0unwraps.csv')
+        if cache_csv.exists():
+            df = pd.read_csv(cache_csv)
+            df = df.set_index(['num_nucs', 'chain_id']).sort_index()
+            return df
+    #Create one data frame per chain and add to this list; concatenate at end
+    list_dfs = []
+    #first load in chains of length 100 nucs
+    for chain_folder in loops_dir.glob('*'):
+        match = file_re.match(chain_folder.name)
+        if match is None:
+            continue
+        num_nucs, chain_id = match.groups()
+        try:
+            links = np.load(chain_folder
+                    /links_fmt.format(chain_id=chain_id, num_nucs=num_nucs))
+            greens = np.load(chain_folder
+                    /greens_fmt.format(chain_id=chain_id, num_nucs=num_nucs))
+        except FileNotFoundError:
+            print(f'Unable to find (num_nucs,chain_id)=({num_nucs},{chain_id}) in {chain_folder}')
+            continue
+        df = pd.DataFrame(columns=['num_nucs', 'chain_id', 'nuc_id', 'ldna', 'rmax', 'ploops'])
+        #only including looping statistics for 2 nucleosomes onwards when plotting though
+        df['ldna'] = convert.genomic_length_from_links_unwraps(links, unwraps=0)
+        df['rmax'] = convert.Rmax_from_links_unwraps(links, unwraps=0)
+        df['ploops'] = greens[0,:]
+        df['num_nucs'] = int(num_nucs)
+        df['chain_id'] = int(chain_id)
+        df['nuc_id'] = np.arange(1, len(df)+1)
+        list_dfs.append(df)
+    #Concatenate list into one data frame
+    df = pd.concat(list_dfs, ignore_index=True, sort=False)
+    df = df.set_index(['num_nucs', 'chain_id']).sort_index()
+    df.to_csv(cache_csv)
+    return df
+
 def plot_looping_heterogeneous(df=None, rmax_or_ldna='ldna', named_sim='links31-to-52'):
     "Plot supplemental looping figure with uniformly distributed linkers 31-52 bp."
     fig, ax = plt.subplots(figsize=(default_width, default_height))
@@ -327,8 +392,8 @@ def plot_looping_heterogeneous(df=None, rmax_or_ldna='ldna', named_sim='links31-
     # first set sim-specific parameters, draw scaling triangles at manually
     # chosen locations
     if (named_sim, rmax_or_ldna) == ('mu56', 'ldna'):
-        draw_power_law_triangle(-3/2, x0=[3.8, -7.1], width=0.4, orientation='up')
-        plt.text(10**(3.95), 10**(-6.8), '$L^{-3/2}$')
+        draw_power_law_triangle(-3/2, x0=[3.8, -6], width=0.4, orientation='up')
+        plt.text(10**(3.95), 10**(-5.7), '$L^{-3/2}$')
         # manually set thresholds to account for numerical instability at low n
         min_n = 10**2.6
     elif (named_sim, rmax_or_ldna) == ('mu56', 'rmax'):
@@ -340,8 +405,8 @@ def plot_looping_heterogeneous(df=None, rmax_or_ldna='ldna', named_sim='links31-
         plt.text(10**3.1, 10**(-7.3), '$L^{-3/2}$')
         min_n = 10**2.0
     elif (named_sim, rmax_or_ldna) == ('links31-to-52', 'ldna'):
-        draw_power_law_triangle(-3/2, x0=[3.5, -7], width=0.4, orientation='up')
-        plt.text(10**3.6, 10**(-6.8), '$L^{-3/2}$')
+        draw_power_law_triangle(-3/2, x0=[3.7, -6], width=0.4, orientation='up')
+        plt.text(10**3.85, 10**(-5.7), '$L^{-3/2}$')
         min_n = 10**2.5
     if df is None:
         df = load_looping_statistics_heterogenous_chains(named_sim=named_sim)
@@ -370,7 +435,7 @@ def plot_looping_heterogeneous(df=None, rmax_or_ldna='ldna', named_sim='links31-
         max_nuc_to_plot = num_nucs*(1 - 0.2*np.random.rand())
         chain = chain[chain['nuc_id'] <= max_nuc_to_plot]
         chain = chain[chain[n] >= min_n]
-        plt.plot(chain[n].values, chain['ploops'].values,
+        plt.plot(chain[n].values, chain['ploops'].values/ncg.dna_params['lpb']**3,
                  c=palette[ord[i]], alpha=0.15, lw=0.5, label=None)
     # bold a couple of the chains
     bold_c = palette[int(9*len(palette)/10)]
@@ -381,14 +446,14 @@ def plot_looping_heterogeneous(df=None, rmax_or_ldna='ldna', named_sim='links31-
     for chain_id in chains_to_bold:
         chain = df.loc[chain_id]
         chain = chain[chain[n] >= min_n]
-        plt.plot(chain[n].values, chain['ploops'].values, c=bold_c, alpha=0.6,
+        plt.plot(chain[n].values, chain['ploops'].values/ncg.dna_params['lpb']**3, c=bold_c, alpha=0.6,
                  label=None)
     fill = plt.fill_between(xgrid,
-            y_pred - ste_to_conf*sig,
-            y_pred + ste_to_conf*sig,
+            (y_pred - ste_to_conf*sig)/ncg.dna_params['lpb']**3,
+            (y_pred + ste_to_conf*sig)/ncg.dna_params['lpb']**3,
             alpha=.10, color='r')
 
-    plt.plot(xgrid, y_pred, 'r-', label='Average $\pm$ 95\%')
+    plt.plot(xgrid, y_pred/ncg.dna_params['lpb']**3, 'r-', label='Average $\pm$ 95\%')
 
     # load in the straight chain, in [bp] (b = 100nm/ncg.dna_params['lpb'])
     bare_n, bare_ploop = wlc.load_WLC_looping()
@@ -407,20 +472,20 @@ def plot_looping_heterogeneous(df=None, rmax_or_ldna='ldna', named_sim='links31-
         # (on ave)   = df['rmax'] + 146*df['rmax']/56
         bare_n = bare_n*(1 + nn)
     x, y = bare_n*k, bare_ploop/k**3,
-    lnormed = plt.plot(x[x >= min_n], y[x >= min_n],
+    lnormed = plt.plot(x[x >= min_n], y[x >= min_n]/ncg.dna_params['lpb']**3,
                        'k-.', label=f'Straight chain, b={b:0.1f}nm')
     # also plot just the bare WLC
     b = 2*wlc.default_lp
     min_n_b100 = 10**2.7
-    l100 = plt.plot(bare_n[bare_n>=min_n_b100], bare_ploop[bare_n>=min_n_b100], '-.', c=teal_flucts,
+    l100 = plt.plot(bare_n[bare_n>=min_n_b100], bare_ploop[bare_n>=min_n_b100]/ncg.dna_params['lpb']**3, '-.', c=teal_flucts,
              label=f'Straight chain, b=100nm')
     # plt.plot(bare_n, wlc.sarah_looping(bare_n/2/wlc.default_lp)/(2*wlc.default_lp)**2)
 
     plt.xlim([10**(np.log10(min_n)*1), 10**(np.log10(np.max(df[n]))*0.99)])
     if rmax_or_ldna == 'rmax':
-        plt.ylim([10**(-11), 10**(-6)])
+        plt.ylim(np.array([10**(-11), 10**(-6)])/ncg.dna_params['lpb']**3)
     elif rmax_or_ldna == 'ldna':
-        plt.ylim([10**(-13), 10**(-5)])
+        plt.ylim(np.array([10**(-13), 10**(-5)])/ncg.dna_params['lpb']**3)
     plt.tick_params(axis='y', which='minor', left=False)
 
     if rmax_or_ldna == 'rmax':
@@ -436,7 +501,7 @@ def plot_looping_heterogeneous(df=None, rmax_or_ldna='ldna', named_sim='links31-
     plt.xscale('log')
 
     plt.tight_layout()
-    plt.savefig(f'plots/PRL/figS8_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
+    plt.savefig(f'plots/PRL/figS9_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
 
 def interpolated_ploop(df, rmax_or_ldna='ldna', n=np.logspace(2, 5, 1000),
                        ploop_col='ploops'):
@@ -447,6 +512,96 @@ def interpolated_ploop(df, rmax_or_ldna='ldna', n=np.logspace(2, 5, 1000),
     ploop = np.interp(n, df[n_col].values, df[ploop_col].values,
             left=df[ploop_col].values[0], right=df[ploop_col].values[-1])
     return pd.DataFrame(np.stack([n, ploop]).T, columns=[n_col+'_interp', ploop_col+'_interp'])
+
+def plot_experimental_looping(datadf=None, df=None, rmax_or_ldna='ldna', named_sim='mu56'):
+
+    fig, ax = plt.subplots(figsize=(default_width, default_height))
+    if datadf == None:
+        datadf = pd.read_csv('csvs/extractedHiC_cyclization_Sanborn2015.csv')
+    if df is None:
+        df = load_looping_statistics_heterogenous_chains(named_sim=named_sim)
+
+    n = rmax_or_ldna
+    min_n = 2*10**2
+    # if the first step is super short, we are numerically unstable
+    df.loc[df['rmax'] <= 5, 'ploops'] = np.nan
+    # if the output is obviously bad numerics, ignore it
+    df.loc[df['ploops'] > 10**(-4), 'ploops'] = np.nan
+    df.loc[df['ploops'] < 10**(-13), 'ploops'] = np.nan
+    df = df.dropna()
+    df = df.sort_values(n)
+    df_int = df.groupby(['num_nucs', 'chain_id']).apply(interpolated_ploop,
+            rmax_or_ldna=rmax_or_ldna, n=np.logspace(np.log10(min_n), np.log10(df[n].max()), 1000))
+    df_int_ave = df_int.groupby(n+'_interp')['ploops_interp'].agg(['mean', 'std', 'count'])
+    df_int_ave = df_int_ave.reset_index()
+    xgrid = df_int_ave[n+'_interp'].values
+    y_pred = df_int_ave['mean'].values
+    sig = df_int_ave['std'].values/np.sqrt(df_int_ave['count'].values - 1)
+    # 95% joint-confidence intervals, bonferroni corrected
+    ste_to_conf = scipy.stats.norm.ppf(1 - (0.05/1000)/2)
+    # plot all the individual chains, randomly chop some down to make plot look
+    # nicer
+    palette = sns.cubehelix_palette(n_colors=len(df.groupby(['num_nucs', 'chain_id'])))
+    ord = np.random.permutation(len(palette))
+    for i, (label, chain) in enumerate(df.groupby(['num_nucs', 'chain_id'])):
+        num_nucs = int(label[0])
+        max_nuc_to_plot = num_nucs*(1 - 0.2*np.random.rand())
+        chain = chain[chain['nuc_id'] <= max_nuc_to_plot]
+        chain = chain[chain[n] >= min_n]
+        plt.plot(chain[n].values, chain['ploops'].values/ncg.dna_params['lpb']**3,
+                 c=palette[ord[i]], alpha=0.15, lw=0.5, label=None)
+
+    # load in the straight chain, in [bp] (b = 100nm/ncg.dna_params['lpb'])
+    bare_n, bare_ploop = wlc.load_WLC_looping()
+    # now rescale the straight chain to match average
+    if named_sim == 'mu56':
+        b = 40.67 # nm
+        k = b/100 # scaling between straight and 56bp exponential chain
+        nn = 146/56 # wrapped amount to linker length ratio
+    elif named_sim == 'links31-to-52':
+        b = 2*13.762 # nm
+        k = b/100 # scaling between straight and uniform chain
+        nn = 146/41.5
+    if rmax_or_ldna == 'ldna':
+        # we use the fact that (e.g. for exp_mu56, 0 unwraps)
+        # df['ldna'] = df['rmax'] + 146*df['nuc_id']
+        # (on ave)   = df['rmax'] + 146*df['rmax']/56
+        bare_n = bare_n*(1 + nn)
+    x, y = bare_n*k, bare_ploop/k**3,
+    lnormed = plt.plot(x[x>min_n], y[x>min_n]/ncg.dna_params['lpb']**3,
+                       'k-.', label=f'Straight chain, b={b:0.1f}nm')
+    # also plot just the bare WLC
+    b = 2*wlc.default_lp
+    min_n_b100 = 10**2.7
+    l100 = plt.plot(bare_n[bare_n>=min_n_b100], bare_ploop[bare_n>=min_n_b100]/ncg.dna_params['lpb']**3, '-.', c=teal_flucts,
+             label=f'Straight chain, b=100nm')
+    
+    plt.xlim([min(datadf.X), max(datadf.X)])
+    if rmax_or_ldna == 'rmax':
+        plt.ylim(np.array([10**(-11), 10**(-6)])/ncg.dna_params['lpb']**3)
+    elif rmax_or_ldna == 'ldna':
+        plt.ylim(np.array([10**(-13), 10**(-5)])/ncg.dna_params['lpb']**3)
+    plt.tick_params(axis='y', which='minor', left=False)
+
+    if rmax_or_ldna == 'rmax':
+        plt.xlabel('Total linker length (bp)')
+    elif rmax_or_ldna == 'ldna':
+        plt.xlabel('Genomic distance (bp)')
+    plt.ylabel(r'$P_\mathrm{loop}\;\;\;(\mathrm{nm}^{-3})$')
+
+    plt.plot(datadf.X, datadf.Y*(max(y[x >= min_n]/ncg.dna_params['lpb']**3)/max(datadf.Y)), 'g', label='HiC cyclization probability')
+
+    # plt.legend([fill, l100, lnormed], ['Average $\pm$ 95\%',
+    #         'Straight chain, b=100nm', f'Straight chain, b={b:0.2f}nm'],
+    plt.legend(loc='upper right', bbox_to_anchor=[0.9, 0.35])
+    plt.yscale('log')
+    plt.xscale('log')
+
+    plt.tight_layout()
+    plt.savefig(f'plots/PRL/figS8_HiC_{named_sim}_{rmax_or_ldna}.pdf', bbox_inches='tight')
+
+    
+
 
 
 def figs11a_unwrapping_kuhn():
